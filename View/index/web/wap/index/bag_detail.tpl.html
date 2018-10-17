@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+    <title>红包详情</title>
+
+    <link rel="stylesheet" href="../../../css/wap/index/bag_detail.css">
+
+    <script src="../../../js/comm/jquery.min.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<!--红包详情-->
+
+<div class="head" ishead="1">
+
+    <div class="head_sbox">
+
+        <a class="return_box" href="javascript:void(0);" onclick="window.history.go(-1)">
+
+            <img class="return_img" src="../../../img/wap/comm/return_w.png"/>
+
+        </a>
+
+        <!--<p class="head_title-text">红包详情</p>-->
+
+    </div>
+
+</div>
+
+<div class="bd1 on">
+
+    <img class="bd1_img" src="../../../img/wap/index/draw_index/gmj.png" alt=""/>
+
+    <!--未被抢光-->
+
+    <div class="bd1_sbox">
+
+        <p class="bag_title">花蒜的红包</p>
+
+        <p class="bag_hint">打开花蒜 好吃的都在这里！</p>
+
+        <h5 class="money_text col">
+
+            0.15
+
+            <span>元</span>
+
+        </h5>
+
+        <p class="bd1_check"><span>已存入你的账户，</span><a href="#">立即查看&gt;</a></p>
+
+    </div>
+
+    <!--红包被抢光了-->
+
+    <div class="bd1_sbox2">
+
+        <img class="no_img" src="../../../img/wap/index/bag_detail/no.png" alt=""/>
+
+        <p class="db1_sbox2_text">红包被抢光了啦！等下一波。</p>
+
+    </div>
+
+</div>
+
+<p class="bd1_hint">领取875/10000个</p>
+
+<div class="bd2">
+
+    <ul class="db2_ul">
+
+        <li class="db2_li">
+
+            <div class="db2_left">
+
+                <img class="people-img" src="../../../img/wap/index/bag_detail/people.png" alt=""/>
+
+            </div>
+
+            <div class="db2_right">
+
+                <p class="user_name">10032654</p>
+
+                <p class="db2_time">2017-12-11 20:20:10</p>
+
+                <b class="db2_money">0.48元</b>
+
+            </div>
+
+        </li>
+
+        <li class="db2_li">
+
+            <div class="db2_left">
+
+                <img class="people-img" src="../../../img/wap/index/bag_detail/people.png" alt=""/>
+
+            </div>
+
+            <div class="db2_right">
+
+                <p class="user_name">10032654</p>
+
+                <p class="db2_time">2017-12-11 20:20:10</p>
+
+                <b class="db2_money">0.48元</b>
+
+            </div>
+
+        </li>
+
+        <li class="db2_li">
+
+            <div class="db2_left">
+
+                <img class="people-img" src="../../../img/wap/index/bag_detail/people.png" alt=""/>
+
+            </div>
+
+            <div class="db2_right">
+
+                <p class="user_name">10032654</p>
+
+                <p class="db2_time">2017-12-11 20:20:10</p>
+
+                <b class="db2_money">0.48元</b>
+
+            </div>
+
+        </li>
+
+        <li class="db2_li">
+
+            <div class="db2_left">
+
+                <img class="people-img" src="../../../img/wap/index/bag_detail/people.png" alt=""/>
+
+            </div>
+
+            <div class="db2_right">
+
+                <p class="user_name">10032654</p>
+
+                <p class="db2_time">2017-12-11 20:20:10</p>
+
+                <b class="db2_money">0.48元</b>
+
+            </div>
+
+        </li>
+
+    </ul>
+
+</div>
+
+
+
+<script>
+
+    var bd1H;
+
+    $(document).ready(function () {
+
+        var winW = $(window).width();
+
+        bd1H = winW*300/320;
+
+        $(".bd1").height(bd1H);
+
+
+
+
+
+        $(window).resize(function () {
+
+            var winW = $(window).width();
+
+            bd1H = winW*300/320;
+
+            $(".bd1").height(bd1H);
+
+        });
+
+    });
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+
+
+<head>
+
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+
+
+<link rel="stylesheet" type="text/css" href="../../css/login/comm.css"/>
+
+
+
+<link rel="stylesheet" type="text/css" href="../../css/login/index.css"/>
+
+
+
+<script type="text/javascript" src="../../js/comm/jquery.min.js"></script>
+
+
+
+<script type="text/javascript" src="../../js/comm/Cookie.js"></script>
+
+
+
+<title>登录</title>
+
+
+
+<script>
+
+
+
+$(document).ready(function(){
+
+
+
+	$('#login').submit(function(){
+
+
+
+		if($("#username").val()!="" && $("#password").val()!=""){
+
+
+
+			return true;
+
+
+
+		}else{
+
+
+
+			alert('用户名或密码不能为空');
+
+
+
+			return false;
+
+
+
+		}
+
+
+
+	});
+
+
+
+	$('#username').focus(function(){
+
+
+
+		$('.header label img').attr('src','{IMG}login/t1.png');
+
+
+
+	});
+
+
+
+	$('#username').blur(function(){
+
+
+
+		$('.header label img').attr('src','{IMG}login/t2.png');
+
+
+
+	});
+
+
+
+	$('#password').focus(function(){
+
+
+
+		$('.lock label img').attr('src','{IMG}login/t3.png');
+
+
+
+	});
+
+
+
+	$('#password').blur(function(){
+
+
+
+		$('.lock label img').attr('src','{IMG}login/t4.png');
+
+
+
+	});
+
+
+
+	$('#close').click(function(){
+
+
+
+		$('.shade').css('display','none');	
+
+
+
+		$('.tips').css('display','none');
+
+
+
+	});	
+
+
+
+});
+
+
+
+function reloadcode(){
+
+
+
+	var d = new Date();
+
+
+
+	document.getElementById('code').src="{DECODE}?t="+d.toTimeString();
+
+
+
+}
+
+
+
+</script>
+
+
+
+</head>
+
+
+
+<body>
+
+
+
+<div class="body_bg"> <img src="../../img/login/b3.jpg" width="100%" height="100%" /> </div>
+
+
+
+<decode_files/>
+
+
+
+<div class="main">
+
+
+
+  <div class="logo"> <img src="../../img/login/f1.png" /> </div>
+
+
+
+  <div class="division"> </div>
+
+
+
+  <div class="form">
+
+
+
+    <form action="{link:login-index}" method="post" id="login">
+
+
+
+      <div class="form_bg">
+
+
+
+        <div class="header fl">
+
+
+
+          <label><img src="../../img/login/t2.png" /></label>
+
+
+
+          <input type="text" name="name" id="username"/>
+
+
+
+        </div>
+
+
+
+        <div class="lock fl">
+
+
+
+          <label><img src="../../img/login/t4.png" /></label>
+
+
+
+          <input type="password" name="password" id="password"/>
+
+
+
+        </div>
+
+
+
+        <div class="go fr">
+
+
+
+          <input type="submit" value="" id="submit" name="{captcha}"/>
+
+
+
+        </div>
+
+
+
+        <div class="clear"></div>
+
+
+
+      </div>
+
+
+
+    </form>
+
+
+
+  </div>
+
+
+
+</div>
+
+
+
+<div class="footer">
+
+
+
+  <p>Copyright 2008-{times} 深圳市聚慧腾达电子商务有限公司 版权所有 粤ICP备14096272号-1</p>
+
+
+
+</div>
+
+
+
+</body>
+
+
+
+</html>

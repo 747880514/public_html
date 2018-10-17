@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+
+<html>
+
+<head lang="en">
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+
+    <link rel="stylesheet" href="../../../css/wap/set/help.css"/>
+
+    <script type="text/javascript"src="../../../js/wap/lwj/flexible.js"></script>
+
+    <title></title>
+
+</head>
+
+<body>
+
+    <div class="set-head">
+
+        <a href="javascript:void(0);" onclick="window.history.go(-1)">
+
+            <img class="head-img" src="../../../img/wap/set/help/return.png" alt=""/>
+
+        </a>
+
+      <span class="head-span">帮助中心</span>
+
+        <a href="">
+
+        <img class="sx" src="../../../img/wap/set/help/good_detail_refresh.png" alt=""/>
+
+        </a>
+
+    </div>
+
+    <div class="sm">
+
+        <strong><span class="sm-span">免责声明</span></strong>
+
+    </div>
+
+    <div class="apple">
+
+        <p class="sm-p">本软件由深圳市聚慧腾达电子商务有限公司开发,供您从Applelnc.(以下苹果公司的APP store平台下载.并仅限在iPhone.ipad.ipod.itouch等手执移动端中安装,使用的软件.本软件涉及的所有版权问题,以及摇事宜与苹果公司无关)</p>
+
+    </div>
+
+    <div class="lx">
+
+       <strong><span class="sm-span">联系客服</span></strong>
+
+    </div>
+
+    <div class="lxdh">
+
+       <span class="number">客服电话: <span class="pink"> 0755-27595853</span></span>
+
+        <span class="number">微信公众号: <span class="pink"> </span></span>
+
+    </div>
+
+    <div class="lx">
+
+        <strong><span class="sm-span">常见问题解答</span></strong>
+
+    </div>
+
+    <div class="problem">
+
+        <img class="pro-img" src="../../../img/wap/set/help/help_peoblem.png" alt=""/>
+
+        <span class="pro-hi">在花蒜下单后,<span class="pink">何时能看到订单?</span></span>
+
+        <div class="down" q="0"></div>
+
+        <p class="pro-p">【7.1版本以上】可在我的返利一次进行查看,更多的返利以及红包。</p>
+
+    </div>
+
+    <div class="problem">
+
+        <img class="pro-img" src="../../../img/wap/set/help/help_peoblem.png" alt=""/>
+
+        <span class="pro-hi">在花蒜下单后,<span class="pink">何时能看到订单?</span></span>
+
+        <div class="down"></div>
+
+        <p class="pro-p">【7.1版本以上】可在我的返利一次进行查看,更多的返利以及红包。</p>
+
+    </div>
+
+
+
+
+
+    <script src="../../../js/wap/lwj/jquery-3.2.1.js"></script>
+
+    <script>
+
+                var nun=0;
+
+     $(document).ready(function () {
+
+
+
+            $(".down").click(function(){
+
+                if($(this).attr("q")==0){
+
+                    $(this).removeClass("down");
+
+                    $(this).addClass("up").attr("q",1);
+
+                    $(this).next(".pro-p").addClass("pro-p-on").removeClass("pro-p");
+
+                    $(this).parent(".problem").addClass("problem-on").removeClass("problem");
+
+
+
+                }else{
+
+                    $(this).addClass("down").attr("q",0);
+
+                    $(this).removeClass("up");
+
+                    $(this).next(".pro-p-on").addClass("pro-p").removeClass("pro-p-on");
+
+                    $(this).parent(".problem-on").addClass("problem").removeClass("problem-on");
+
+
+
+                };
+
+            });
+
+
+
+
+
+     });
+
+
+
+
+
+
+
+
+
+    </script>
+
+
+
+</body>
+
+</html>
