@@ -17,7 +17,7 @@ class agencyAction extends Action{
           $money = self::getSetting("fxdl_money" . $i);
 		  if(empty($money))$money="免费";
 		  else $money.="元";
-		   $fxdldata[$i]['title']=$money."升级".$fxdldata[$i]['title'];
+		  $fxdldata[$i]['title']=$money."升级".$fxdldata[$i]['title'];
 		 }
 		$fxdldata=array_values($fxdldata);
 		$set['dl_list']=array();
@@ -31,6 +31,7 @@ class agencyAction extends Action{
 		if(!empty($set['dl_bjt']))$set['dl_zdjs']=UPLOAD_URL."slide/".$set['dl_zdjs'];
 		$set['zhushi']="注：若升级到更高等级需缴纳相应的费用";
 		unset($set['AppDisplayName']);
+
 		zfun::fecho("申请页面",$set,1);
 	}
 
@@ -47,7 +48,7 @@ class agencyAction extends Action{
 		foreach($model as $k=>$v){
 			if(empty($v))continue;
 			if(empty($v['content_first']))$v['content_first']='扫一扫注册下载'.$set['AppDisplayName'];
-			$url=INDEX_WEB_URL."?mod=new_share&act=agency&ctrl=getcode&token=".$_POST['token']."&id=".$v['id'];
+			$url=INDEX_WEB_URL."?mod=new_share&act=agency&ctrl=getcode&token=".$_POST['token']."&id=".$v['id']."&time=".time();
 			$model[$k]['image']=$url;
 			unset($model[$k]['content_first']);unset($model[$k]['img_max']);
 
@@ -266,42 +267,42 @@ class agencyAction extends Action{
 		if(empty($url4))$url4=INDEX_WEB_URL."?act=api&ctrl=downloadfile";
 		if($set['haibao_share_onoff']==2)$url=$url4;
 		$data = array();
-		// $data['width']=790;
-		// $data['height']=1280;
-		$data['width']=1080;
-		$data['height']=1920;
+		$data['width']=790;
+		$data['height']=1280;
         $data['list'][0] = array(//背景图
             "url" => UPLOAD_URL."model/".$arr['img_max'],
             "x" => 0,
             "y" => 0,
-            // "width" => 790,
-            // "height" => 1280,
-            "width" => 1080,
-            "height" => 1920,
+            "width" => 790,
+            "height" => 1280,
 			"type"=>"png"
         );
 		$data['list'][1] = array(//二维码
            // "url" => INDEX_WEB_URL."comm/qrcode/?url=".$arr."&size=10&codeKB=2",
 		   "url" => INDEX_WEB_URL."comm/qrcode/?url=".urlencode($url)."&size=10&codeKB=2",
-            // "x" => 300,
-            // "y" => 980,
-            "x" => 445,
-            "y" => 1500,
+            "x" => 291,
+            "y" => 1020,
             "width" => 200,
             "height" => 200,
 			"type"=>"png"
         );
-
+       	$data['text'][0]=array(
+			"size"=>26,
+			"x"=>285,
+			"y"=>990,
+			"width" => 214,
+            "height" => 20,
+			"val"=>"邀请码".$user['tid'],
+			"color"=>0,
+		);
 		$data['text'][1]=array(
-			"size"=>20,
-			// "x"=>270,
-			// "y"=>1220,
-			"x"=>425,
-			"y"=>1740,
+			"size"=>16,
+			"x"=>220,
+			"y"=>1260,
 			"width" => 214,
             "height" => 20,
 			"val"=>$arr['content_first'],
-			"color"=>3,
+			"color"=>0,
 		);
 		if($new==1){
 			fun("pic");
