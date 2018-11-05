@@ -311,13 +311,13 @@ class agencyAction extends Action{
         $hs_qrcode = $hs_qrcode->url;
 
 		$data['list'][1] = array(//二维码
-           // "url" => INDEX_WEB_URL."comm/qrcode/?url=".$arr."&size=10&codeKB=2",
-		   // "url" => INDEX_WEB_URL."comm/qrcode/?url=".urlencode($url)."&size=10&codeKB=2",
+           	// "url" => INDEX_WEB_URL."comm/qrcode/?url=".$arr."&size=10&codeKB=2",
+		   	// "url" => INDEX_WEB_URL."comm/qrcode/?url=".urlencode($url)."&size=10&codeKB=2",
 		   	"url" => $hs_qrcode,
             "x" => 291,
             "y" => 1000,
             "width" => 200,
-            "height" => 228,
+            "height" => 200,
 			"type"=>"png"
         );
        	$data['text'][0]=array(
