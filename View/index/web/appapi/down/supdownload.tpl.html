@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+
+    <title>{array:set:xz_wz_title}</title>
+
+    <link href="../../../css/appapi/down/sup_download.css" rel="stylesheet" type="text/css"/>
+
+    <script src="../../../js/wap/comm/jquery.min.js" type="text/javascript"></script>
+
+    <script type="text/javascript" src="../../../js/wap/lwj/flexible.js"></script>
+
+
+
+</head>
+<style type="text/css">
+	/*.yaoqingma{
+		width: 100%;
+		overflow: hidden;
+	}
+	.neiddede{
+		width: 70%;
+		margin: auto;
+		overflow: hidden;
+	}
+	.dianji1fuzhi{
+		font-size: 12px;
+		background-color: #ccc;
+		color: #fff;
+	    line-height: 38px;
+    	height: 38px;
+    	border-top-right-radius: 20px;
+    	border-bottom-right-radius: 20px;
+	}
+	.dianji1fuzhi font font{
+		font-size: 12px;
+	}
+	.yanzheng{
+		background-color: #FDE7E7;
+		border-bottom-left-radius:20px;
+		border-top-left-radius: 20px;
+		color: #F44F2C;
+		font-size: 12px;
+	}
+	.yanzheng font font{
+		color: #F44F2C;
+		font-size: 12px;
+	}
+	.shurukuang{
+		width: 85%;
+	    border: none;
+	    border-radius: 20px;
+	    height: 29px;
+	    display: block;
+	    margin-top: 4px;
+	    margin-left: 7%;
+	    font-size: 15px;
+	    text-indent: 10px;
+	    background-color: #FDE7E7;
+	}*/
+	body{
+		background-color:#EC1B40;
+	}
+	.img_kai{
+		width: 100%;
+		height: 100%;
+	}
+	.kuang{
+		position: fixed;
+		bottom: 12vh;
+		width: 100%;
+	}
+	.yanzheng{
+		width: 100%;
+	}
+	.shurukuang{
+		text-align: center;
+	    width: 60%;
+	    height: 39px;
+	    border: none;
+	    border-radius: 20px;
+	    font-size: 13px;
+	}
+	.dianji1fuzhi{
+		margin: 0 auto;
+	    width: 60%;
+	    height: 39px;
+	    line-height: 39px;
+	    background-color: #FE8479;
+	    border-radius: 20px;
+	    margin-top: 13px;
+	    color: #fff;
+	}
+</style>
+
+<body style="background-image:none;">
+
+
+
+
+<!-- 第二次 -->
+<!-- <img class="publicity_logo_img" src="{array:set:AppLogo}" alt=""/>
+
+<p class="pub_text" style="    margin: 0 10%;">{array:set:xz_wz_up}</p>
+
+
+
+<img class="publicity_pic_img" src="{array:set:dow_img}" alt=""/> -->
+
+<!-- 第一次 -->
+<!-- <div class="yaoqingma">
+	<div class="neiddede">
+		<div class="pub_text yanzheng" style=" display: block; width: 60%;text-align: center; float: left; height: 6vh; line-height: 6vh;">{array:set:tgid}</div>
+		<div class="dianji1fuzhi" id="clip_button" onClick="shuru()" style="width: 40%;text-align: center; float: left;">复制</div>
+	</div>
+</div> -->
+
+
+<!-- 第二次 -->
+<!-- <input type="text" value='{array:set:tgid}' id="clip_num" style="position: absolute;top: -150rem;" >
+
+<div class="yaoqingma">
+	<div class="neiddede">
+		<div class="pub_text yanzheng" style=" display: block; width: 70%;text-align: center; float: left; height: 38px; line-height: 38px;">
+			<input type="number" class="shurukuang" placeholder="填写手机号下载APP" value="" maxlength="11" />
+		</div>
+		<div class="dianji1fuzhi" id="clip_button" style="width: 30%;text-align: center; float: left; ">确定</div>
+	</div>
+</div>
+
+<center style="color: #ff204a;font-size: 14px;margin-top: 5px;" id="ts"></center>
+
+<button class="dounload_botton" style="margin-top: 3vh; display: none;" onClick="window.location='{link:down-downurl-appapi}'" >立即下载{array:set:AppDisplayName}</button>
+ -->
+
+<div class="img_kai">
+	<img src="http://app.juhuivip.com/Upload/kai_img/yaoxinzhuce.jpg" style="width: 100%;height: 100%;">
+</div>
+
+<div class="kuang">
+	<div class="yanzheng">
+		<input type="number" class="shurukuang" placeholder="输入手机号" value="" maxlength="11" >
+		<center style="color: #ff204a;font-size: 14px;margin-top: 5px;" id="ts"></center>
+	</div>
+	<div class="dianji1fuzhi">
+		下载APP领取
+	</div>
+</div>
+</body>
+
+<script type="text/javascript">
+	// 复制
+	// var addss = $(".yanzheng").text();
+	// var num= addss.replace(/[^0-9]/ig,"");
+	// $("#clip_num").val(num)
+ //    function copyNum(){
+	// 	var NumClip=document.getElementById("clip_num");
+	// 	var NValue=NumClip.value;
+	// 	var valueLength = NValue.length;
+	// 	selectText(NumClip, 0, valueLength);
+	// 	if(document.execCommand('copy', false, null)){
+	// 	    document.execCommand('copy', false, null)// 执行浏览器复制命令
+	// 	    console.log("已复制,赶紧分享给朋友吧");
+	// 	    alert("已复制");
+	// 	}else{
+	// 	    console.log("不兼容");
+	// 	    alert("复制失败");
+	// 	}
+ //    }
+ //    function selectText(textbox, startIndex, stopIndex) {
+	// 	if(textbox.createTextRange) {//ie
+	// 	    var range = textbox.createTextRange();
+	// 	    range.collapse(true);
+	// 	    range.moveStart('character', startIndex);//起始光标
+	// 	    range.moveEnd('character', stopIndex - startIndex);//结束光标
+	// 	    range.select();//不兼容苹果
+	// 	}else{//firefox/chrome
+	// 	    textbox.setSelectionRange(startIndex, stopIndex);
+	// 	    textbox.focus();
+	// 	}
+ //    }
+	    
+	    		var uid = '{array:baili:uid}';
+                var mobile = '{array:baili:mobile}';
+                var share_host = '{array:baili:share_host}';
+                if(mobile != -1)
+                {
+                	window.location.replace('{link:down-downurl-appapi}');
+                }
+
+                $(".shurukuang").keyup(function(){
+                	var m = $(this).val();
+                	if(m.length == 11)
+                	{
+                		$(".dianji1fuzhi").attr("onClick", "shuru();").css("background-color","#FE8479");
+                	}
+                	else
+                	{
+                		$(".dianji1fuzhi").removeAttr("onClick").css("background-color","#cccccc");
+                	}
+                });
+				function shuru(){
+					var phonenumber = $(".shurukuang").val();
+					var myreg=/^[1][0-9]{10}$/;
+			            if (!myreg.test(phonenumber))
+			            {
+			                $("#ts").text("您输入的手机号有误");
+			            }
+			            else
+			            {
+							$.post("http://"+share_host+"/?mod=appapi&act=down&ctrl=bind_mobile",{mobile:phonenumber,uid:uid},function(res){
+								if(res.status == 1)
+								{
+									window.location.replace('{link:down-downurl-appapi}');
+								}
+								else
+								{
+									$("#ts").text(res.msg);
+								}
+
+							},'json')
+			            }
+
+				}
+</script>
+
+</html>

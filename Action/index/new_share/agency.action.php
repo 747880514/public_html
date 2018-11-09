@@ -310,19 +310,25 @@ class agencyAction extends Action{
         $hs_qrcode = json_decode($hs_qrcode);
         $hs_qrcode = $hs_qrcode->url;
 
+        //百里.替换域名生成二维码
+        $url = "http://".$set['share_host']."/?mod=appapi&act=down&ctrl=get_unionid&tgid=".$tid;
+
+        //百里.邀请码位置调整（不同位数）
+        $leftpx = 285 - ( strlen($user['tid']) - 5 ) * 8;
+
 		$data['list'][1] = array(//二维码
            // "url" => INDEX_WEB_URL."comm/qrcode/?url=".$arr."&size=10&codeKB=2",
-		   // "url" => INDEX_WEB_URL."comm/qrcode/?url=".urlencode($url)."&size=10&codeKB=2",
-		   	"url" => $hs_qrcode,
+		   "url" => INDEX_WEB_URL."comm/qrcode/?url=".urlencode($url)."&size=10&codeKB=2",
+		   	// "url" => $hs_qrcode,	//开启此项需要开启获取小程序二维码
             "x" => 291,
             "y" => 1000,
             "width" => 200,
-            "height" => 228,
+            "height" => 200,
 			"type"=>"png"
         );
        	$data['text'][0]=array(
 			"size"=>26,
-			"x"=>285,
+			"x"=>$leftpx,	//285,
 			"y"=>970,
 			"width" => 214,
             "height" => 20,

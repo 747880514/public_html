@@ -68,11 +68,20 @@ class set_order_user_lvAction extends Action{
 
 			//百里.重新计算比例
 			foreach ($ex_user as $bk => &$bv) {
-				if($bv['cha_bili'] > 0 && $total_bili > 0)
+				//蒜头最高10%,多余10%拿出来给上级分
+				if($bv['is_sqdl'] == '1' && $bv['bili'] > 0.1)
 				{
-					$this_bili = $total_bili - $bv['cha_bili'] > 0 ? $bv['cha_bili'] : $total_bili;
-					$bv['bili'] += $this_bili;
-					$total_bili -= $this_bili;
+					$bv['bili'] = 0.1;
+					$total_bili += $bv['bili'] - 0.1;
+				}
+				else
+				{
+					if($bv['cha_bili'] > 0 && $total_bili > 0)
+					{
+						$this_bili = $total_bili - $bv['cha_bili'] > 0 ? $bv['cha_bili'] : $total_bili;
+						$bv['bili'] += $this_bili;
+						$total_bili -= $this_bili;
+					}
 				}
 			}
 

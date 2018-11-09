@@ -322,6 +322,8 @@ class goods_all_typeAction extends Action{
 
 		//百里
 		foreach ($goods as $key => &$value) {
+			$value['goods_price'] = sprintf("%.2f", $value['goods_price'] - $value['yhq_price']);
+			$value['fx_commission'] = sprintf("%.2f", $value['goods_price'] * $value['fx_commission_bili'] / 100);
 			$value['fcommission'] = $value['fx_commission'];
 		}
 

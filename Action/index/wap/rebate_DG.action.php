@@ -1,7 +1,7 @@
 <?php
 actionfun("appapi/dgappcomm");
 class rebate_DGAction extends Action{
-	
+
 	public function dmshop($shops=array()){
 		$uid=intval($this->getUserId());
 		foreach($shops as $k=>$v){
@@ -20,9 +20,9 @@ class rebate_DGAction extends Action{
 	public function gologin(){
 		$uid=intval(self::getUserId());
 		self::assign("uid",$uid);
-		self::assign("isjflogin",intval(self::getSetting('isjflogin')));	
-	}	
-   
+		self::assign("isjflogin",intval(self::getSetting('isjflogin')));
+	}
+
 	public static function get_bc_detail($fnuo_id){
 		if(empty($fnuo_id))zfun::fecho("rebate_FG get_bc_detail val empry");
 		fun("bcapi");
@@ -48,14 +48,14 @@ class rebate_DGAction extends Action{
 					$arr[$k]['name']=$k1;
 					$arr[$k]['val']=$v1;
 				}
-				
-			}		
+
+			}
 		}
-			
+
 		//图片
 		$img=json_decode('['.self::getinstr($tmp,'"images":[',']').']',true);
 		foreach($img as $k=>$v){
-			$img[$k]=$v."_400x400.jpg";	
+			$img[$k]=$v."_400x400.jpg";
 		}
 		$data=array();
 		$data['url']=$url;
@@ -78,7 +78,7 @@ class rebate_DGAction extends Action{
 		$data['detail_img']=$detail_img;
 		//fpre($detail_img);exit;
 		return $data;
-		
+
 	}
 	public static function getinstr($str='',$str1='',$str2=''){
 		$tmp=explode($str1,$str);
@@ -86,7 +86,7 @@ class rebate_DGAction extends Action{
 		$tmp=explode($str2,$tmp[1]);
 		return $tmp[0];
 	}
-	
+
       // 商品详情
 	public function rebate_detail(){//zheli
         $uid=self::getUserId();
@@ -100,6 +100,13 @@ class rebate_DGAction extends Action{
 				$url=self::getUrl("rebate_DG","rebate_detail",$_GET,"wap");
 			}
 			$url=base64_encode($url);
+
+			//百里.下载APP
+			$tgid = ($_GET['tgid']);
+			$set=zfun::f_getset("share_host");
+			$downappurl = "http://".$set['share_host']."/?mod=appapi&act=down&ctrl=get_unionid&tgid=".$tgid;
+			self::assign("downappurl",$downappurl);
+
 			self::assign("url",$url);
 			self::assign("title","详情");
 			self::display("rebate_DG","dl_get");
@@ -107,7 +114,7 @@ class rebate_DGAction extends Action{
 		}
         $fnuo_id=$gid=intval($_GET['id']);
         //self::setseo("优惠券商品详情");
-	   
+
 		$tgid = ($_GET['tgid']);
 
 		//百里
@@ -118,37 +125,43 @@ class rebate_DGAction extends Action{
 			$Decodekey = $this -> getApp('Tgidkey');
 			$tgid = $Decodekey -> Decodekey($tgid);
 			$tguser=zfun::f_row("User","id='$tgid'");
-			
+
 		}else $tgid = $tguser['id'];
-		
+
 		if(!empty($_GET['show_tgid']))fpre(array("show_tgid"=>$tgid));
-		
+
 		$tg_pid=$tguser['tg_pid'];
-		
+
 		$str="taobaopid,app_goods_tw_url,app_goods_tw_kouling,app_fanli_onoff,app_fanli_off_str";
 		$str.=",CSharp_share_onoff";//助手分享开关
 		$str.=",ggapitype,share_get_str7";
 		$str.=",tb_gy_api_onoff,tb_wl_gy_api_onoff";//高佣接口开关
 		$str.=",tlj_fenyong_onoff";//掏礼金是否参与分佣
-		
+
+		$str.=",share_host";	//百里.下载APP
+
 		$set=zfun::f_getset($str);
+
+		$downappurl = "http://".$set['share_host']."/?mod=appapi&act=down&ctrl=get_unionid&tgid=".$tgid;	//百里.下载APP
+		self::assign("downappurl",$downappurl);	//百里.下载APP
+
 		$this->assign("share_get_str7",$set['share_get_str7']);
 		$set['CSharp_share_onoff']=intval($set['CSharp_share_onoff']);
-		
+
 		//fpre($set);exit;
 		if(!empty($tg_pid)){
 			zfun::$set['pid']=$tg_pid;
-			
+
 			$tmp=explode("_",$set['taobaopid']);
 			$GLOBALS['taobaopid']=$set['taobaopid']=$tg_pid=$tmp[0]."_".$tmp[1]."_".$tmp[2]."_".$tg_pid;
 		}
-	    
+
 		if(!empty($_GET['id'])){
 			$goods=zfun::f_row("Goods","id=$gid","id,yhq,fnuo_id,goods_type,commission,goods_img,goods_title,shop_id,goods_price,yhq_price,yhq_url,highcommission_url,highcommission,goods_detail,goods_desc,tlj_url");
 			if(!empty($goods['goods_desc']))$goods['is_desc']=1;
-			else $goods['is_desc']=0;	
+			else $goods['is_desc']=0;
 		}
-			
+
         if(!empty($_GET['fnuo_id'])){
 			$fnuo_id=$_GET['fnuo_id'];
 			/*改*/
@@ -156,7 +169,7 @@ class rebate_DGAction extends Action{
 				if($set['ggapitype']!=2){//不是物料 用联盟接口
 				actionfun("default/alimama");
 					$data=$v=alimamaAction::getcommission($fnuo_id);
-				}	
+				}
 				else{//物料模式
 					actionfun("comm/tbmaterial");
 					$wl_goods=$v=tbmaterial::id($fnuo_id);
@@ -165,7 +178,7 @@ class rebate_DGAction extends Action{
 
 			$shop_arr=array(0=>1,1=>2);
 			$shop_str=array(0=>"淘宝",1=>"天猫");
-			
+
 			if($set['ggapitype']!=2){
 				$arr=array(
 					"fnuo_id"=>$v['auctionId'],
@@ -204,7 +217,7 @@ class rebate_DGAction extends Action{
 				);
 				$shop_name_arr=array(1=>'淘宝',2=>'天猫',);
 				$arr['shop_type']=$shop_name_arr[$v['shop_id']];
-				
+
 			}
 			actionfun("default/gototaobao");
 			$tmp_yhq_url=gototaobaoAction::check_yhq_url(array("goods_title"=>$arr['goods_title'],"fnuo_id"=>$arr['fnuo_id']),1);
@@ -225,7 +238,7 @@ class rebate_DGAction extends Action{
 				$arr['yhq_url']=$tmp_yhq_url;
 			}
 			elseif(!empty($wl_goods['yhq_url'])){
-				$arr['yhq_url']=$wl_goods['yhq_url'];	
+				$arr['yhq_url']=$wl_goods['yhq_url'];
 				$arr['yhq_price']=$wl_goods['yhq_price'];
 			}
 			$arr['noyhq_price']=$arr['goods_price'];
@@ -238,7 +251,7 @@ class rebate_DGAction extends Action{
 				$arr['yhq']=1;
 			}
 			$ku_goods=zfun::f_row("Goods","fnuo_id='".$fnuo_id."'");
-			
+
 			if(!empty($ku_goods)&&empty($arr['yhq_url'])&&empty($GLOBALS['taobaopid'])){
 				if(!empty($ku_goods['highcommission_url']))$arr['yhq_url']=$garr['highcommission_url']=$ku_goods['highcommission_url'];
 				if(!empty($ku_goods['yhq_url']))$arr['yhq_url']=$garr['yhq_url']=$ku_goods['yhq_url'];
@@ -246,15 +259,15 @@ class rebate_DGAction extends Action{
 			}
 			//$arr['yhq_url']=$data['yhq_url'];
 			$goods=$arr;
-			
+
 		}
-		
+
  		//self::setseo($goods['goods_title']);
       //  if(empty($goods))zfun::alert("该商品已下架");
         if($_GET['data']){
-           $goods = zfun::arr64_decode($_GET['data']); 
+           $goods = zfun::arr64_decode($_GET['data']);
         }
-          
+
         $goods['tkl'] = '';
         $goods['qhj'] = $goods['goods_price'] - $goods['yhq_price'];
         $goods['goods_img'] = str_replace(array(
@@ -263,27 +276,27 @@ class rebate_DGAction extends Action{
 			"_400x400.jpg",
         ) , "", $goods['goods_img']) . "_400x400.jpg";
         $tdj = '';
-    	
+
 		$goods['is_wx']=1;
-		
+
 		//掏礼金 jj explosion
 		$tmp=zfun::f_row("Goods","fnuo_id='{$fnuo_id}'");
 		if(!empty($tmp)&&!empty($tmp['tlj_url']))$goods['tlj_url']=$tmp['tlj_url'];
 
 		include_once ROOT_PATH."Action/index/appapi/tkl.action.php";
-		
+
 		if($set['CSharp_share_onoff']===0)$goods['tkl']=tkl::gettkl($goods);
-      
+
         $_POST['tdj']=1;
         $goods=zfun::f_fgoodscommission(array($goods));
-		appcomm::goodsfanlioff($goods); 
+		appcomm::goodsfanlioff($goods);
 		$goods=reset($goods);
-		
-		
+
+
 			//life is a shipwreck
 		if(!empty($tg_pid)){
 			$goods['fnuo_url'].="&pid=".$GLOBALS['taobaopid'];
-				
+
 		}else{
 			$goods['fnuo_url'].="&pid=".$set['taobaopid'];
 		}
@@ -297,24 +310,24 @@ class rebate_DGAction extends Action{
         $data['button'] = '<a class="goto_buy" isconvert=1 data-itemid="' . $goods['fnuo_id'] . '" buy="on">马上抢</a>';
         $data['fnuo_id'] = $goods["fnuo_id"];
 		$service=zfun::f_getset("qqservice");
-	
+
         self::assign("kdata", json_encode($data));
 		self::assign("service", $service['qqservice']);
-		
-       
+
+
 		//插入或更新足迹
      	if(!empty($uid)){
-            $fgoods= zfun::f_count("FootMark","goodsid = '$fnuo_id' and uid = '$uid'"); 
+            $fgoods= zfun::f_count("FootMark","goodsid = '$fnuo_id' and uid = '$uid'");
             if($fgoods == '0') {
                 $fdata=array();
                 $fdata['goodsid']=$goods['fnuo_id'];
                 $fdata['starttime']=time();
                 $fdata['endtime']=time();
                 $fdata['uid']=intval($uid);
-                zfun::f_insert("FootMark",$fdata); 
+                zfun::f_insert("FootMark",$fdata);
             }else{
                 $fdata['endtime']=time();
-                zfun::f_update("FootMark","goodsid =  '$fnuo_id' and uid = '$uid'",$fdata); 
+                zfun::f_update("FootMark","goodsid =  '$fnuo_id' and uid = '$uid'",$fdata);
             }
         }
         $share['UcenterShareTitle']=$this->getSetting("UcenterShareTitle");
@@ -325,7 +338,7 @@ class rebate_DGAction extends Action{
         $tg_url = ($this -> getUrl('invite_friend_wap', 'new_packet', array('tgid' => $uid1),'new_share_wap'));
    		$title="商品详情";
 		self::assign("title", $title);
-		
+
 		//jj explosion
 		if($set['CSharp_share_onoff']===1){
 			$goods['fnuo_url']='';
@@ -335,10 +348,10 @@ class rebate_DGAction extends Action{
 			$tdj_web_url=$tdj_data['tdj_web_url'];
 			$tmp=explode("/",$tdj_web_url);
 			$tdj_web_url=$tmp[0]."//".$tmp[2]."/";
-			
+
 			self::assign("tx_host",md5(str_replace("www.","",$tdj_web_url)."我要加密了"));
 			self::assign("tx_pid",$GLOBALS['taobaopid']);
-			
+
 		}
 		self::assign("set",$set);
         self::assign("goods", $goods);
@@ -362,10 +375,10 @@ class rebate_DGAction extends Action{
 		zfun::isoff($set);
         $this ->display("rebate_DG","rebate_detail","wap");
 		//$this -> runplay("wap","comm","top");
-		
+
 		$this ->play();
 	}
-	
+
 	//代理请求
 	function dl_get(){
 		if(empty($_GET['code']))zfun::fecho("error");
@@ -389,8 +402,8 @@ class rebate_DGAction extends Action{
         $uid=self::getUserId();
         if (empty($_GET['id'])&&empty($_GET['fnuo_id']))zfun::alert("该商品已下架");
         $fnuo_id=$gid=intval($_GET['id']);
-		
-		
+
+
 		$tgid = ($_GET['tgid']);
 		$tguser=zfun::f_row("User","tg_code='".$tgid."'");
 		if(empty($tguser)){
@@ -404,22 +417,22 @@ class rebate_DGAction extends Action{
 		$set=zfun::f_getset($str);
 		$this->assign("share_get_str7",$set['share_get_str7']);
 		$set['CSharp_share_onoff']=intval($set['CSharp_share_onoff']);
-		
+
 		if(!empty($tg_pid)){
 			zfun::$set['pid']=$tg_pid;
 			$tmp=explode("_",$set['taobaopid']);
 			$GLOBALS['taobaopid']=$set['taobaopid']=$tg_pid=$tmp[0]."_".$tmp[1]."_".$tmp[2]."_".$tg_pid;
 		}
-		
+
        // self::setseo("优惠券商品详情");
 		if(!empty($_GET['id'])){
 			$goods=zfun::f_row("Goods","id=$gid","id,yhq,fnuo_id,goods_type,commission,goods_img,goods_title,shop_id,goods_price,yhq_price,yhq_url,highcommission_url,highcommission,goods_detail,goods_desc");
 			if(!empty($goods['goods_desc']))$goods['is_desc']=1;
-			else $goods['is_desc']=0;	
+			else $goods['is_desc']=0;
 		}
-       
+
 		$fnuo_id=$_GET['fnuo_id'];
-		
+
 		if($set['ggapitype']!=2){
 			/*改*/
 			if(strstr($fnuo_id,"dtk")==false){
@@ -467,7 +480,7 @@ class rebate_DGAction extends Action{
 			);
 			$shop_name_arr=array(1=>'淘宝',2=>'天猫',);
 			$arr['shop_type']=$shop_name_arr[$v['shop_id']];
-			
+
 		}
 		$arr['noyhq_price']=$arr['goods_price'];
 		actionfun("default/gototaobao");
@@ -476,7 +489,7 @@ class rebate_DGAction extends Action{
 			$arr['yhq_url']=$tmp_yhq_url;
 		}
 		elseif(!empty($wl_goods['yhq_url'])){
-			$arr['yhq_url']=$wl_goods['yhq_url'];	
+			$arr['yhq_url']=$wl_goods['yhq_url'];
 			$arr['yhq_price']=$wl_goods['yhq_price'];
 		}
 			if(!empty($GLOBALS['yhq_price']))$arr['yhq_price']=$GLOBALS['yhq_price'];
@@ -488,15 +501,15 @@ class rebate_DGAction extends Action{
 		}
 		//$arr['yhq_url']=$data['yhq_url'];
 		$goods=$arr;
-			
-		
-		
+
+
+
  		//self::setseo($goods['goods_title']);
       //  if(empty($goods))zfun::alert("该商品已下架");
         if($_GET['data']){
-           $goods = zfun::arr64_decode($_GET['data']); 
+           $goods = zfun::arr64_decode($_GET['data']);
         }
-          
+
         $goods['tkl'] = '加载中';
         $goods['qhj'] = $goods['goods_price'] - $goods['yhq_price'];
         $goods['goods_img'] = str_replace(array(
@@ -505,10 +518,10 @@ class rebate_DGAction extends Action{
 			"_400x400.jpg"
         ) , "", $goods['goods_img']) ;
         $tdj = '';
-    	
-		
+
+
        //if($goods['yhq']==1){
-		   
+
 		//actionfun("default/gototaobao");
 		//include_once ROOT_PATH."Action/index/default/tbk_coupon.action.php";
 		// actionfun("default/tbk_coupon");
@@ -518,8 +531,8 @@ class rebate_DGAction extends Action{
 			$tmp_yhq_url=gototaobaoAction::check_yhq_url($goods,1);
 			if(!empty($tmp_yhq_url))$goods['yhq_url']=$tmp_yhq_url;
 		}*/
-		
-           
+
+
         //}
 		/*
         if(!empty($goods['yhq_url'])&&strstr($goods['yhq_url'],"uland.taobao.com")==false){
@@ -528,11 +541,11 @@ class rebate_DGAction extends Action{
 		/*
         if(self::iswx()&&file_exists(ROOT_PATH."Action/index/weixin/tkl.action.php")||!empty($_GET['show_tkl'])){
          */
-		
+
 		$goods['is_wx']=1;
 		include_once ROOT_PATH."Action/index/appapi/tkl.action.php";
 		if($set['CSharp_share_onoff']===0)$goods['tkl']=tkl::gettkl($goods);
-		 /*   
+		 /*
         }else{
 		$goods['is_wx']=0;
 		$tdj=$this->getSetting('un_setting_tdj');
@@ -543,11 +556,11 @@ class rebate_DGAction extends Action{
 		//life is a shipwreck
 		if(!empty($tg_pid)){
 			$goods['fnuo_url'].="&pid=".$GLOBALS['taobaopid'];
-				
+
 		}else{
 			$goods['fnuo_url'].="&pid=".$set['taobaopid'];
 		}
-		
+
 		$goods['update']='浏览器购买';
 		$goods['kltype']='淘宝';
 		if(intval($set['app_goods_tw_kouling'])==1){
@@ -573,24 +586,24 @@ class rebate_DGAction extends Action{
         $data['button'] = '<a class="goto_buy" isconvert=1 data-itemid="' . $goods['fnuo_id'] . '" buy="on">马上抢</a>';
         $data['fnuo_id'] = $goods["fnuo_id"];
 		$service=zfun::f_getset("qqservice");
-	
+
         self::assign("kdata", json_encode($data));
 		self::assign("service", $service['qqservice']);
-		
+
         zfun::isoff($goods);
 	//插入或更新足迹
      	if(!empty($uid)){
-            $fgoods= zfun::f_count("FootMark","goodsid =  '$fnuo_id' and uid = '$uid'"); 
+            $fgoods= zfun::f_count("FootMark","goodsid =  '$fnuo_id' and uid = '$uid'");
             if($fgoods == '0') {
                 $fdata=array();
                 $fdata['goodsid']=$goods['fnuo_id'];
                 $fdata['starttime']=time();
                 $fdata['endtime']=time();
                 $fdata['uid']=intval($uid);
-                zfun::f_insert("FootMark",$fdata); 
+                zfun::f_insert("FootMark",$fdata);
             }else{
                 $fdata['endtime']=time();
-                zfun::f_update("FootMark","goodsid =  '$fnuo_id' and uid = '$uid'",$fdata); 
+                zfun::f_update("FootMark","goodsid =  '$fnuo_id' and uid = '$uid'",$fdata);
             }
         }
         $share['UcenterShareTitle']=$this->getSetting("UcenterShareTitle");
@@ -601,7 +614,7 @@ class rebate_DGAction extends Action{
         $tg_url = ($this -> getUrl('invite_friend_wap', 'new_packet', array('tgid' => $uid1),'new_share_wap'));
    		$title="商品详情";
 		self::assign("title", $title);
-		
+
 		//jj explosion
 		self::assign("set",$set);
 		if($set['CSharp_share_onoff']===1){
@@ -610,9 +623,9 @@ class rebate_DGAction extends Action{
 			self::assign("tx_fnuo_id",$_GET['fnuo_id']);
 			self::assign("tx_host",md5(str_replace("www.","",INDEX_WEB_URL)."我要加密了"));
 			self::assign("tx_pid",$GLOBALS['taobaopid']);
-			
+
 		}
-		
+
         self::assign("goods", $goods);
         self::assign("data", $share);
         self::assign("tgurl",$tg_url);
@@ -662,7 +675,7 @@ class rebate_DGAction extends Action{
 		}
 		//if(empty($goods))zfun::fecho("error");
 		$tmp=$uid."_".$pset['fnuo_id']."_".$garr['goods_title'];
-			
+
 		$code=substr(md5($tmp),0,6);
 		$arr=array(
 			"code"=>$code,
@@ -683,20 +696,20 @@ class rebate_DGAction extends Action{
 			zfun::f_insert("Kouling",$arr);
 		}
 		else{
-			zfun::f_update("Kouling",$where,$arr);	
+			zfun::f_update("Kouling",$where,$arr);
 		}
 		$code="#".$code."#";
 		return $code;
 	}
-	
+
     // 获取分类
     public function getcate($pid,$t){
         $categoryModel=self::getDatabase("Category");
         if($t==1){
            $cate=$categoryModel->getCate("all","id,pid,catename");
         }else{
-          if(!empty($pid))$cate=$categoryModel->getAll($pid,"id,pid,category_name,img"); 
-          else$cate=$categoryModel->getAll("all"); 
+          if(!empty($pid))$cate=$categoryModel->getAll($pid,"id,pid,category_name,img");
+          else$cate=$categoryModel->getAll("all");
         }
         return $cate;
     }
@@ -722,9 +735,9 @@ class rebate_DGAction extends Action{
         $sort="cjtime desc";
         switch ($t) {
             case '0':
-                
+
             break;
-            
+
             case '1':
                 $sort=" goods_sales desc ";
             break;
@@ -734,7 +747,7 @@ class rebate_DGAction extends Action{
             case '3':
                 $sort=" goods_price asc ";
             break;
-            
+
         }
         $filde="id,fnuo_id,goods_title,goods_img,goods_price,goods_cost_price,stock,goods_sales,goods_type,shop_id,cjtime,commission,yhq,highcommission,highcommission_wap_url,cate_id,yhq_price";
         $goods=zfun::f_goods("Goods",$where,$filde,$sort,null,$limit);
@@ -763,7 +776,7 @@ class rebate_DGAction extends Action{
         }
         //$uid = $this -> getUserId();
         $url = "http://ai.taobao.com/search/index.htm?key=" . $_POST['keyword'] . "&pid=" . $pid . "&commend=all&unid=" . $uid . "&taoke_type=1";
-        
+
        header("Location:".$url);
         //$isjifents = $this -> getSetting('isjifents');
     }
@@ -776,7 +789,7 @@ class rebate_DGAction extends Action{
         //登录
     public function islogin(){
         $uid=$this->getUserId();
-		
+
         if (empty($uid)) {
             $this -> linkNo('login', 'login',array(),"wap");
             exit ;
@@ -793,6 +806,6 @@ class rebate_DGAction extends Action{
 		if(file_exists(ROOT_PATH."Action/index/weixin/wxlogin.action.php")==false)return;
 		$this->runplay("weixin","wxlogin","login");
 	}
-	
+
 }
 ?>

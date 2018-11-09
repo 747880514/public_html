@@ -6,19 +6,33 @@ fun("zfun");
 
 class downAction extends Action{
 
-	public function supdownload($url=NULL){
+	public function __construct()
+	{
+		session_start();
+	}
 
-		//百里 如果没有已授权标识，则先注册用户
-		if(empty($_GET['registered']) && empty($_GET['test']) == 1)
-		{
-			header("location:http://app.juhuivip.com?registered=1&tgid=".strval($_GET['tgid']));
-		}
-		else
-		{
-			$baili['uid'] = $_GET['uid'];
-			$baili['mobile'] = !empty($_GET['mobile']) ? $_GET['mobile'] : -1;
-			$this->assign("baili", $baili);
-		}
+	public function supdownload($url=NULL){
+		$set=zfun::f_getset("share_host");
+
+
+		//百里 如果没有已授权标识，则先注册用户（域名正常访问）
+		// if(empty($_GET['registered']) && empty($_GET['test']) == 1)
+		// {
+		// 	header("location:http://app.juhuivip.com?registered=1&tgid=".strval($_GET['tgid']));
+		// }
+		// else
+		// {
+		// 	$baili['uid'] = $_GET['uid'];
+		// 	$baili['mobile'] = !empty($_GET['mobile']) ? $_GET['mobile'] : -1;
+		// 	$this->assign("baili", $baili);
+		// }
+
+		//通过微信授权登录（域名被封解决方案）
+		$baili['uid'] = $_GET['uid'];
+		$baili['mobile'] = !empty($_GET['mobile']) ? $_GET['mobile'] : -1;
+		$baili['share_host'] = $set['share_host'];
+		$this->assign("baili", $baili);
+
 
 
 
@@ -47,6 +61,8 @@ class downAction extends Action{
 		if(!empty($_GET['tgid']))$set['tgid']="邀请码:".$_GET['tgid'];
 
 		$this->assign("set",$set);
+
+		$this->assign("unionid",$_REQUEST['unionid']);
 
 		$this->display();
 
@@ -129,6 +145,167 @@ class downAction extends Action{
 		zfun::jump($tg_url);
 
 	 }
+
+	public function get_unionid()
+	{
+		$tgid = $_REQUEST['tgid'];
+		$_SESSION['down_tgid'] = $tgid;
+
+		$set=zfun::f_getset("share_host");
+
+		$redirect_uri = urlencode("http://".$set['share_host']."/?mod=appapi&act=down&ctrl=callback");
+		$url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=wx22b99a9b76e68aff&redirect_uri=".$redirect_uri."&response_type=code&scope=snsapi_userinfo&state=1";
+		header('Location: '.$url);
+	}
+
+	public function callback()
+	{
+		$code = $_REQUEST['code'];
+		$tgid = $_SESSION['down_tgid'];
+		$set=zfun::f_getset("share_host");
+
+		/*根据code获取用户openid*/
+		$url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx22b99a9b76e68aff&secret=7c34b8015bf2129fe57184c1ce1344c2&code=".$code."&grant_type=authorization_code";
+
+		$abs = file_get_contents($url);
+		$obj=json_decode($abs);
+		$access_token = $obj->access_token;
+		$openid = $obj->openid;
+		/*根据code获取用户openid end*/
+
+		/*根据用户openid获取用户基本信息*/
+		$abs_url = "https://api.weixin.qq.com/sns/userinfo?access_token=".$access_token."&openid=".$openid."&lang=zh_CN";
+		$abs_url_data = file_get_contents($abs_url);
+		$obj_data=json_decode($abs_url_data);
+
+		$unionid = $obj_data->unionid;
+		$openid = $obj_data->openid;
+		$nickname = $obj_data->nickname;
+		$headimgurl = $obj_data->headimgurl;
+
+		//检测用户，注册
+		$user = zfun::f_row("User", "weixin_au = '".$unionid."' OR weixin_au = '".$openid."'");
+		if(!$user)
+		{
+			$commission_reg = floatval(self::getSetting("commission_reg"));
+			$jf_reg=floatval(self::getSetting("jf_reg"));
+
+			$tgidkey = $this->getApp('Tgidkey');
+			$tgid = $tgidkey->Decodekey($tgid);
+
+			$arr=array(
+
+				"nickname"=>$nickname,
+
+				"reg_time"=>time(),
+
+				"login_time"=>time(),
+
+				"commission"=>$commission_reg,
+
+				"integral"=>$jf_reg,
+
+				'head_img' => $headimgurl,
+
+				"extend_id"=>$tgid,//邀请人id
+
+				"weixin_au" => $unionid,
+
+				"wx_openid" => $unionid,
+
+				"token" => md5(base64_encode($tgid . time() . uniqid(rand()))),
+
+			);
+
+			$uid = zfun::f_insert("User", $arr);
+			$mobile = -1;
+		}
+		else
+		{
+			$uid = $user['id'];
+			$mobile = $user['phone'];
+		}
+
+
+		$downurl = "http://".$set['share_host']."/?mod=appapi&act=down&ctrl=supdownload&uid=".$uid."&mobile=".$mobile;
+		header('Location: '.$downurl);
+	}
+
+
+	/**
+	 * [bind_mobile 绑定手机号]
+	 * @Author   Baili
+	 * @Email    baili@juhuivip.com
+	 * @DateTime 2018-10-27T11:50:13+0800
+	 * @return   [type]                   [description]
+	 */
+	public function bind_mobile()
+	{
+
+		$uid = intval($_POST['uid']);
+
+		$mobile = strval(trim($_POST['mobile']));
+
+		$result = array(
+			'status' => 1,
+			'msg' => '绑定成功！点击确定下载APP',
+		);
+
+		//uid数据错误
+		$user = zfun::f_select("User","id='{$uid}'");
+		$user = $user[0];
+		if(!$user)
+		{
+			$result = array(
+				'status' => 0,
+				'msg' => '参数错误！',
+			);
+			echo json_encode($result);
+			die;
+		}
+
+		//手机号格式不正确
+		if(!preg_match("/^1\d{10}$/",$mobile)){
+		    $result = array(
+				'status' => 0,
+				'msg' => '手机号格式不正确',
+			);
+			echo json_encode($result);
+			die;
+		}
+
+
+
+		//手机号已存在
+		$hasmobile = zfun::f_select("User","phone='{$mobile}'");
+		if($hasmobile)
+		{
+			$result = array(
+				'status' => 1,
+				'msg' => '手机号验证通过',	//负责老用户下载
+			);
+
+			echo json_encode($result);
+			die;
+		}
+
+		//绑定成功/失败
+		$res = false;
+		if(empty($user['phone']))
+		{
+			$res = zfun::f_update("User","id='{$uid}'",array('phone'=>$mobile));
+		}
+
+		if(!$res)
+		{
+			$result = array(
+				'status' => 0,
+				'msg' => '绑定失败，请稍后重试！',
+			);
+		}
+		echo json_encode($result);
+
+	}
 
 }
 
