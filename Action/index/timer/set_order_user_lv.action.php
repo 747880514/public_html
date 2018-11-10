@@ -3,9 +3,33 @@ actionfun("comm/order");
 //记录当前时间 订单 用户等级 比例佣金
 class set_order_user_lvAction extends Action{
 	static $set=array();
+	//匹配旧的订单的 分享人购买人id
+	function check_buy_share_uid(){
+		$rebate=zfun::f_select("Rebate","buy_share_uid='0'",NULL,1000,0,"id asc");
+		if(empty($rebate))fpre("check_buy_share_uid 完成");
+		$rebate_sum=zfun::f_count("Rebate","buy_share_uid='0'");
+		fpre("rebate_sum : ".$rebate_sum);
+		$order=zfun::f_kdata("Order",$rebate,"orderId","orderId","id,orderId,uid,share_uid");
+		//过滤重复记录
+		$cf_arr=array();
+		foreach($rebate as $k=>$v){
+			$key=$v['orderId'].'';
+			if(!empty($cf_arr[$key])){continue;}$cf_arr[$key]=1;//过滤重复记录
+			if(empty($order[$v['orderId'].''])){
+				zfun::f_update("Rebate","id='".$v['id']."'",array("buy_share_uid"=>"null"));
+				continue;
+			}
+			$one=$order[$v['orderId'].''];
+			if(intval($one['uid'])!='0')$buy_share_uid=$one['uid'];
+			elseif(intval($one['share_uid'])!='0')$buy_share_uid=$one['share_uid'];
+			else $buy_share_uid='null';
+			zfun::f_update("Rebate","orderId='".$v['orderId']."'",array("buy_share_uid"=>$buy_share_uid));
+		}
+	}
 	function index(){
 		//if(empty($_GET['run']))zfun::fecho("测试中断");
 		ignore_user_abort();set_time_limit(0);
+		self::check_buy_share_uid();//匹配旧的订单的 分享人购买人id
 		$where="(uid>0 or share_uid >0) and status IN('创建订单','订单付款','订单结算','订单失效') and is_rebate=0";
 		//fpre(zfun::f_count("Order",$where));
 		$order=zfun::f_select("Order",$where,"id,orderId,status,orderType,uid,share_uid,is_rebate,commission,createDate,now_user,returnstatus",100,0,"id asc");
@@ -16,6 +40,7 @@ class set_order_user_lvAction extends Action{
 			order::$set['tmp_oid']=$v['orderId'];
 			$uid=$v['uid'];
 			if($v['share_uid']!='0')$uid=$v['share_uid'];
+			$buy_share_uid=$uid;//购买分享人id
 			$now_user=json_decode($v['now_user'],true);
 			order::$set['now_user']=json_decode($v['now_user'],true);//读取预设 用户等级
 			if(empty(order::$set['now_user']))order::$set['now_user']=array();
@@ -30,6 +55,7 @@ class set_order_user_lvAction extends Action{
 				}
 				$order_arr['now_user']=addslashes(json_encode($now_user));
 			}
+
 
 			//百里.每个人能拿到的最大比例
 			$baili_first = false;
@@ -67,15 +93,17 @@ class set_order_user_lvAction extends Action{
 
 
 			//百里.重新计算比例
+			$ff = false;
 			foreach ($ex_user as $bk => &$bv) {
 				//蒜头最高10%,多余10%拿出来给上级分
-				if($bv['is_sqdl'] == '1' && $bv['bili'] > 0.1)
+				if($bv['is_sqdl'] == '1' && $bv['bili'] > 0.1 && $ff)
 				{
 					$bv['bili'] = 0.1;
 					$total_bili += $bv['bili'] - 0.1;
 				}
 				else
 				{
+					$ff = true;
 					if($bv['cha_bili'] > 0 && $total_bili > 0)
 					{
 						$this_bili = $total_bili - $bv['cha_bili'] > 0 ? $bv['cha_bili'] : $total_bili;
@@ -100,7 +128,8 @@ class set_order_user_lvAction extends Action{
 					"comment"=>$v1['gx_type_str'],
 					"fcommission"=>zfun::dian(doubleval($v['commission'])*$v1['bili'],1000),//返利佣金
 					"status"=>$v['status'],//订单状态
-					"returnstatus"=>$v['returnstatus']//是否已经返利
+					"returnstatus"=>$v['returnstatus'],//是否已经返利
+					"buy_share_uid"=>$buy_share_uid,//购买分享人id jj explosion
 				);
 
 				//判断是否自购分享
@@ -126,15 +155,12 @@ class set_order_user_lvAction extends Action{
 			$order_arr['is_rebate']=1;
 			zfun::f_update("Order","id='".$v['id']."'",$order_arr);
 		}
-
 		/*
 		if(count($order)==25){
 			echo '<script>window.location=window.location.href;</script>';
 		}
 		else{die("完成");}
 		*/
-		
-
 		zfun::fecho("run ".count($order),array(),1);
 	}
 

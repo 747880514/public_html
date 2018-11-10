@@ -65,11 +65,15 @@
 	    background-color: #FDE7E7;
 	}*/
 	body{
-		background-color:#EC1B40;
+		/*background-color:#EC1B40;*/
 	}
 	.img_kai{
 		width: 100%;
 		height: 100%;
+	}
+	.img_kai .default-items img{
+		width: 100%;
+		height:100%;
 	}
 	.kuang{
 		position: fixed;
@@ -92,7 +96,7 @@
 	    width: 60%;
 	    height: 39px;
 	    line-height: 39px;
-	    background-color: #FE8479;
+	    background-color: #CCCCCC;
 	    border-radius: 20px;
 	    margin-top: 13px;
 	    color: #fff;
@@ -139,8 +143,10 @@
 <button class="dounload_botton" style="margin-top: 3vh; display: none;" onClick="window.location='{link:down-downurl-appapi}'" >立即下载{array:set:AppDisplayName}</button>
  -->
 
+
 <div class="img_kai">
-	<img src="http://app.juhuivip.com/Upload/kai_img/yaoxinzhuce.jpg" style="width: 100%;height: 100%;">
+	{array:baili:html}
+	<!-- <img src="http://app.juhuivip.com/Upload/kai_img/yaoxinzhuce.jpg" style="width: 100%;height: 100%;"> -->
 </div>
 
 <div class="kuang">
@@ -152,6 +158,7 @@
 		下载APP领取
 	</div>
 </div>
+
 </body>
 
 <script type="text/javascript">
@@ -189,6 +196,9 @@
 	    		var uid = '{array:baili:uid}';
                 var mobile = '{array:baili:mobile}';
                 var share_host = '{array:baili:share_host}';
+                var bgcolor = '{array:baili:bgcolor}';
+                $("body").css("backgroundColor", bgcolor);
+
                 if(mobile != -1)
                 {
                 	window.location.replace('{link:down-downurl-appapi}');

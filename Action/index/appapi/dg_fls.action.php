@@ -11,17 +11,19 @@ class dg_flsAction extends Action{
 		$arr=filter_check($_POST).'';
 		$data=appcomm::f_goods("FLS","id>0 and hide=0","img,title,SkipUIIdentifier,url","sort desc",$arr,20);
 		foreach($data as $k=>$v){
+			if(empty($v['title']))$data[$k]['title']=$v['title']='福利社';
 			if(!empty($v['img']))$data[$k]['img']=UPLOAD_URL."slide/".$v['img'];
+			$data[$k]['type']=$v['type']=$v['SkipUIIdentifier'];
 			$SkipUIIdentifier=tzbs_newAction::getarr_ksrk_fuck($data[$k]);
-			$v['type']=0;
+			
 			if(!empty($SkipUIIdentifier)){
 				$data[$k]['SkipUIIdentifier']=$SkipUIIdentifier;
 				$v['type']=$SkipUIIdentifier;
-				
 			}
 			$data[$k]['UIIdentifier']=$v['type'];
 			
 			$tmp=apiAction::view_type($v,1);
+			
 			$data[$k]['name']=$v['title'];
 			$data[$k]['view_type']=$tmp['view_type'];
 			if(!empty($v['url'])){
@@ -273,7 +275,8 @@ class dg_flsAction extends Action{
 		//更新累计收益
 		$commission_sums=zfun::dian($user['commission']+$user['dlcommission']+$money);
 		if($commission_sums>$user['commission_sum'])zfun::f_update("User","id='".$uid."' and id<>0",array("commission_sum"=>$commission_sums));
-		
+		$data['mem_font_color']=$set1['mem_font_color'];
+
 		//百里.邀请人
 		$extend_user = zfun::f_row("User", "id = '".$user['extend_id']."'");
 		$extend_user_nickname = "";
@@ -289,15 +292,65 @@ class dg_flsAction extends Action{
 		);
 
 		//百里.重写自购佣金，修改为邀请待解锁奖励
-		$set=zfun::f_getset("fxdl_yqzcjl1,fxdl_yqzcjl2,fxdl_yqzcjl3,fxdl_yqzcjl4,fxdl_yqzcjl5");	//配置
-		$user=zfun::f_row("User","token='".filter_check($_POST['token'])."'");
-		$yaoqing_count = zfun::f_count("User","extend_id={$user['id']}");	//邀请人数
-		$yihuode_jl=zfun::f_sum("Interal","uid='$uid' and  uid<>0 and detail LIKE '邀请好友注册%佣金'","interal");	//已获得
-		//待入账 = 总收益 - 已到账;  总收益 = 当前等级 * 邀请人数
-		$fxdl_yqzcjl = $user['is_sqdl']+1;
-		$zgcommission2 = $set['fxdl_yqzcjl'.$fxdl_yqzcjl] * $yaoqing_count - $yihuode_jl;
-		$zgcommission2 = max( sprintf("%.2f", $zgcommission2), '0.00');
+		// if($user['id'] == '1757')
+		// {
+			$set=zfun::f_getset("fxdl_yqzcjl1,fxdl_yqzcjl2,fxdl_yqzcjl3,fxdl_yqzcjl4,fxdl_yqzcjl5");	//配置
+			$fxdl_yqzcjl = $user['is_sqdl']+1;	//等级
 
+			//执行新用户数据,添加返佣金额
+			$new_user_js_ids = array();
+			$new_user_js_ids = zfun::f_select("User", "extend_id='{$user['id']}' and huasuan_jstime = 0", "id,huasuan_jsmoney");
+			if(!empty($new_user_js_ids))
+			{
+				//当前等级返佣
+				$huasuan_jsmoney = $set['fxdl_yqzcjl'.$fxdl_yqzcjl];
+
+				foreach ($new_user_js_ids as $k => $v) {
+					//未保存返佣金额
+					if($v['huasuan_jsmoney'] <= 0 || $v['huasuan_jsmoney'] == '')
+					{
+						zfun::f_update("User","id = '{$v['id']}'", array('huasuan_jsmoney'=>$huasuan_jsmoney));
+					}
+
+					//有金额，未结算
+					if($v['huasuan_jsmoney'] > 0)
+					{
+						//查询是否结算
+						$row = zfun::f_row("Interal", "uid = '{$user['id']}' and next_id = '{$v['id']}' and type = 100", "time");
+						//更新
+						if($row)
+						{
+							zfun::f_update("User","id = '{$v['id']}'",array("huasuan_jstime"=>$row['time']));
+						}
+					}
+				}
+			}
+
+			//查询自己数据
+			if($user['huasuan_jsmoney'] == 0 && $user['extend_id'] > 0)
+			{
+				$extend_user_sqdl = zfun::f_row("User", "id='{$user['extend_id']}'", "is_sqdl");
+				$extend_user_sqdl = $extend_user_sqdl['is_sqdl']+1;	//等级
+				$extend_user_sqdl = $set['fxdl_yqzcjl'.$extend_user_sqdl];
+				zfun::f_update("User", "id='{$user['id']}'", array("huasuan_jsmoney"=>$extend_user_sqdl));
+			}
+
+
+			//查询当前用户数据
+			$zgcommission2 = zfun::f_sum("User","extend_id='{$user['id']}' and huasuan_jsmoney > 0 and (ISNULL(huasuan_jstime) OR huasuan_jstime = 0)","huasuan_jsmoney");	//待解锁
+			$zgcommission2 = max( sprintf("%.2f", $zgcommission2), '0.00');	//格式化金额
+		// }
+		// else
+		// {
+
+		// 		$set=zfun::f_getset("fxdl_yqzcjl1,fxdl_yqzcjl2,fxdl_yqzcjl3,fxdl_yqzcjl4,fxdl_yqzcjl5");	//配置
+		// 		$fxdl_yqzcjl = $user['is_sqdl']+1;	//等级
+
+		// 		$yaoqing_count = zfun::f_count("User","extend_id={$user['id']}");	//总邀请人数
+		// 		$yihuode_count = zfun::f_count("Interal","uid='{$user['id']}' and  uid<>0 and type = 100","interal");	//已获得人数
+		// 		$zgcommission2 = ( $yaoqing_count - $yihuode_count ) * $set['fxdl_yqzcjl'.$fxdl_yqzcjl];	//邀请总人数 - 已获得人数） * 比例
+		// 		$zgcommission2 = max( sprintf("%.2f", $zgcommission2), '0.00');	//格式化金额
+		// }
 
 		$data['wallet']=array(
 			"title"=>$set1['wallet_tx_title'],
@@ -312,7 +365,7 @@ class dg_flsAction extends Action{
 				array(
 					"name"=>$set1['wdqb_2_title'],
 					// "val"=>$zgcommission,
-					"val" => $zgcommission2,
+					"val"=>$zgcommission2,
 				),
 				array(
 					"name"=>$set1['wdqb_3_title'],
@@ -410,7 +463,10 @@ class dg_flsAction extends Action{
 			$data['hhr']['title1']='查看全部报表';
 		}
 		$data['hy_ico']=array("title"=>$set1['hytb_list_title']);
-		
+
+		$data['a_server'] = $_SERVER;
+		$data['a_session'] = $_SESSION;
+		$data['a_cookie'] = $_COOKIE;
 		fun("cwdl_rule");
 		//die("".__LINE__);
 		//cwdl_rule::yq_next_friend($uid);//检测是否要更新用户数量
@@ -421,7 +477,7 @@ class dg_flsAction extends Action{
 		$str1="tx_notshow_hyzx,tx_time_hyzx,hhr_right_title,hhr_left_title,yq_tg_title,wallet_tx_title,order_list_title,hhr_list_title,hytb_list_title";
 		 $str1.=",wdqb_1_title,wdqb_2_title,wdqb_3_title,wdqb_4_title,hhr_mem_SkipUIIdentifier";
 		 //运营商
-		$str1.=",operator_wuxian_bili,operator_name,operator_name_2";
+		$str1.=",operator_wuxian_bili,operator_name,operator_name_2,mem_font_color";
 		$set1=zfun::f_getset($str1);
 		if(empty($set1['yq_tg_title']))$set1['yq_tg_title']="我的邀请ID:";
 		if(empty($set1['wallet_tx_title']))$set1['wallet_tx_title']="我的钱包";
@@ -435,6 +491,8 @@ class dg_flsAction extends Action{
 		if(empty($set1['wdqb_3_title']))$set1['wdqb_3_title']="即将到账";
 		if(empty($set1['wdqb_4_title']))$set1['wdqb_4_title']="累计提币";
 		if(empty($set1['hhr_mem_SkipUIIdentifier']))$set1['hhr_mem_SkipUIIdentifier']="pub_shouyibaobiao";
+		if(empty($set1['mem_font_color']))$set1['mem_font_color']="FFFFFF";
+		
 		$sett=zfun::f_getset("fxdl_name".($user['is_sqdl']+1));
 		$fxdl_name=$sett["fxdl_name".($user['is_sqdl']+1)];
 		if($user['operator_lv']==1)$fxdl_name=$set1['operator_name'];

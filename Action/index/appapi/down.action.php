@@ -14,7 +14,6 @@ class downAction extends Action{
 	public function supdownload($url=NULL){
 		$set=zfun::f_getset("share_host");
 
-
 		//百里 如果没有已授权标识，则先注册用户（域名正常访问）
 		// if(empty($_GET['registered']) && empty($_GET['test']) == 1)
 		// {
@@ -31,8 +30,23 @@ class downAction extends Action{
 		$baili['uid'] = $_GET['uid'];
 		$baili['mobile'] = !empty($_GET['mobile']) ? $_GET['mobile'] : -1;
 		$baili['share_host'] = $set['share_host'];
-		$this->assign("baili", $baili);
 
+		//读取花蒜后台自定义页面
+		//顶部背景图
+		$page = file_get_contents("https://www.juhuivip.com/app/index.php?i=2&c=entry&m=ewei_shopv2&do=mobile&r=diypage&id=152");
+		$pattern = "/<div class=\"default-items\">(.*?)<div class=\"custom-items\"><\/div>/ies";
+		preg_match_all($pattern, $page, $matches);
+		$page = $matches[0][0];
+		$page = str_replace("<div class=\"custom-items\"></div>", "", $page);
+		$baili['html'] = $page;
+
+		//底部背景色
+		$pattern = "/background: (.*?);/ies";
+		preg_match_all($pattern, $page, $matches);
+		$baili['bgcolor'] = $matches[1][0];
+
+		//百里.数据返回
+		$this->assign("baili", $baili);
 
 
 
@@ -252,8 +266,7 @@ class downAction extends Action{
 		);
 
 		//uid数据错误
-		$user = zfun::f_select("User","id='{$uid}'");
-		$user = $user[0];
+		$user = zfun::f_row("User","id='{$uid}'");
 		if(!$user)
 		{
 			$result = array(
@@ -277,7 +290,7 @@ class downAction extends Action{
 
 
 		//手机号已存在
-		$hasmobile = zfun::f_select("User","phone='{$mobile}'");
+		$hasmobile = zfun::f_row("User","phone='{$mobile}'");
 		if($hasmobile)
 		{
 			$result = array(

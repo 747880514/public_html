@@ -106,6 +106,7 @@ class rebate_DGAction extends Action{
 			$set=zfun::f_getset("share_host");
 			$downappurl = "http://".$set['share_host']."/?mod=appapi&act=down&ctrl=get_unionid&tgid=".$tgid;
 			self::assign("downappurl",$downappurl);
+			self::assign("tgid", $tgid);
 
 			self::assign("url",$url);
 			self::assign("title","详情");
@@ -115,11 +116,15 @@ class rebate_DGAction extends Action{
         $fnuo_id=$gid=intval($_GET['id']);
         //self::setseo("优惠券商品详情");
 
+        //百里.下载APP
 		$tgid = ($_GET['tgid']);
-
-		//百里
+		$set=zfun::f_getset("share_host");
+		$downappurl = "http://".$set['share_host']."/?mod=appapi&act=down&ctrl=get_unionid&tgid=".$tgid;
+		self::assign("downappurl",$downappurl);
 		self::assign("tgid", $tgid);
 
+
+		$tgid = ($_GET['tgid']);
 		$tguser=zfun::f_row("User","tg_code='".$tgid."'");
 		if(empty($tguser)){
 			$Decodekey = $this -> getApp('Tgidkey');
@@ -138,12 +143,7 @@ class rebate_DGAction extends Action{
 		$str.=",tb_gy_api_onoff,tb_wl_gy_api_onoff";//高佣接口开关
 		$str.=",tlj_fenyong_onoff";//掏礼金是否参与分佣
 
-		$str.=",share_host";	//百里.下载APP
-
 		$set=zfun::f_getset($str);
-
-		$downappurl = "http://".$set['share_host']."/?mod=appapi&act=down&ctrl=get_unionid&tgid=".$tgid;	//百里.下载APP
-		self::assign("downappurl",$downappurl);	//百里.下载APP
 
 		$this->assign("share_get_str7",$set['share_get_str7']);
 		$set['CSharp_share_onoff']=intval($set['CSharp_share_onoff']);
