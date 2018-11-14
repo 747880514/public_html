@@ -321,10 +321,38 @@ class goods_all_typeAction extends Action{
 		if(empty($goods))$goods=array();
 
 		//百里
+		//获取当前会员等级比例
+		$user_lv = $user['is_sqdl'];
+		switch ($user_lv) {
+			case '0':
+				$hs_bili = 0;
+				break;
+			case '1':
+				$hs_bili = 0.51;
+				break;
+			case '2':
+				$hs_bili = 0.76;
+				break;
+			case '3':
+				$hs_bili = 0.88;
+				break;
+			default:
+				$hs_bili = 0.51;
+				break;
+		}
+
+		//修改显示比例
 		foreach ($goods as $key => &$value) {
+			// $value['goods_price'] = sprintf("%.2f", $value['goods_price'] - $value['yhq_price']);
+			// $value['fx_commission'] = sprintf("%.2f", $value['goods_price'] * $value['fx_commission_bili'] / 100);
+			// $value['fcommission'] = $value['fx_commission'];
+
+			// $value['fxz'] = "分享奖：".$value['fx_commission'];
+
 			$value['goods_price'] = sprintf("%.2f", $value['goods_price'] - $value['yhq_price']);
-			$value['fx_commission'] = sprintf("%.2f", $value['goods_price'] * $value['fx_commission_bili'] / 100);
+			$value['fx_commission'] = sprintf("%.2f", $value['goods_price'] * ($value['commission']/100) * $hs_bili );
 			$value['fcommission'] = $value['fx_commission'];
+			$value['fxz'] = "分享奖：".$value['fx_commission'];
 		}
 
 		zfun::fecho("领券直播",$goods,1);

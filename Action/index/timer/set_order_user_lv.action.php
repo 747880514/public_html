@@ -35,7 +35,7 @@ class set_order_user_lvAction extends Action{
 		$order=zfun::f_select("Order",$where,"id,orderId,status,orderType,uid,share_uid,is_rebate,commission,createDate,now_user,returnstatus",100,0,"id asc");
 		if(empty($order))$order=array();
 		$order=zfun::ordercommission($order);
-		
+
 		foreach($order as $k=>$v){
 			order::$set['tmp_oid']=$v['orderId'];
 			$uid=$v['uid'];
@@ -57,61 +57,8 @@ class set_order_user_lvAction extends Action{
 			}
 
 
-			//百里.每个人能拿到的最大比例
-			$baili_first = false;
-			$total_bili = 0.91;
-			foreach ($ex_user as $bk => &$bv) {
-				//计算拿最大比
-				switch ($bv['is_sqdl']) {
-					case '1':
-						$bv['max_bili'] = 0.51;
-						break;
-					case '2':
-						$bv['max_bili'] = 0.82;
-						break;
-					case '3':
-						$bv['max_bili'] = 0.91;
-						break;
-					default:
-						$bv['max_bili'] = 0.51;
-						break;
-				}
-
-				//计算当前比例和最大比例差
-				$bv['cha_bili'] = $bv['max_bili'] - $bv['bili'] > 0 ? $bv['max_bili'] - $bv['bili'] : 0;
-
-				//计算购买人拿的最大比(总最大比)
-				// if(!$baili_first)
-				// {
-				// 	$total_bili = $bv['max_bili'];
-				// 	$baili_first = true;
-				// }
-
-				//计算剩余比
-				$total_bili -= $bv['bili'];
-			}
-
-
-			//百里.重新计算比例
-			$ff = false;
-			foreach ($ex_user as $bk => &$bv) {
-				//蒜头最高10%,多余10%拿出来给上级分
-				if($bv['is_sqdl'] == '1' && $bv['bili'] > 0.1 && $ff)
-				{
-					$bv['bili'] = 0.1;
-					$total_bili += $bv['bili'] - 0.1;
-				}
-				else
-				{
-					$ff = true;
-					if($bv['cha_bili'] > 0 && $total_bili > 0)
-					{
-						$this_bili = $total_bili - $bv['cha_bili'] > 0 ? $bv['cha_bili'] : $total_bili;
-						$bv['bili'] += $this_bili;
-						$total_bili -= $this_bili;
-					}
-				}
-			}
+			//百里.花蒜重置返佣比,记得修改下方循环的2处bili=>hs_bili
+			$ex_user = self::hs_fenyong($ex_user);
 
 			foreach($ex_user as $k1=>$v1){
 				$arr=array(
@@ -120,13 +67,15 @@ class set_order_user_lvAction extends Action{
 					"orderId"=>$v['orderId'],
 					"platform"=>$v['orderType'],
 					"order_create_time"=>$v['createDate'],
-					"bili"=>$v1['bili'],
+					// "bili"=>$v1['bili'],
+					"bili"=>$v1['hs_bili'],
 					"time"=>time(),
 					"lv"=>$v1['lv'],
 					"gx_str"=>$v1['gx_str'],
 					"gx_id"=>$v1['gx_id'],
 					"comment"=>$v1['gx_type_str'],
-					"fcommission"=>zfun::dian(doubleval($v['commission'])*$v1['bili'],1000),//返利佣金
+					// "fcommission"=>zfun::dian(doubleval($v['commission'])*$v1['bili'],1000),//返利佣金
+					"fcommission"=>zfun::dian(doubleval($v['commission'])*$v1['hs_bili'],1000),//返利佣金
 					"status"=>$v['status'],//订单状态
 					"returnstatus"=>$v['returnstatus'],//是否已经返利
 					"buy_share_uid"=>$buy_share_uid,//购买分享人id jj explosion
@@ -164,5 +113,201 @@ class set_order_user_lvAction extends Action{
 		zfun::fecho("run ".count($order),array(),1);
 	}
 
+	/**
+	 * [hs_fenyong 花蒜分佣]
+	 * @Author   Baili
+	 * @Email    baili@juhuivip.com
+	 * @DateTime 2018-11-12T17:21:22+0800
+	 * @param    [type]                   $ex_user [description]
+	 * @return   [type]                            [description]
+	 */
+	public static function hs_fenyong($ex_user)
+	{
+
+		//百里.每个人能拿到的最大比例
+		$total_bili = 0.91;
+		$ex_user = array_values($ex_user);	//重置key
+		$hs_buy_lv = '';	//购买者等级
+
+		$hs_bili 	= array('v1'=>0.51,'v2'=>0.76,'v3'=>0.88);	//每个等级拿到的最低比例
+		$hs_v1_bili = array(0.10, 0.15, 0.06, 0.06, 0.03);	//蒜头购买：[0]蒜苗分享者/蒜头分享者 [1][2]蒜苗 [3][4]蒜花
+		$hs_v2_bili = array(0.06, 0.06, 0.03);	//蒜苗购买：[0]蒜苗 [1][2]蒜花
+		$hs_v3_bili = array(0.03);	//蒜花购买 [0]蒜花
+
+		//重新计算分配比
+		$hs_lv = array();
+		foreach ($ex_user as $bk => &$bv)
+		{
+			$hs_lv[$bv['lv']] += 1;
+			if($hs_lv[$bv['lv']] > 2)
+			{
+				unset($ex_user[$bk]);
+				$hs_lv[$bv['lv']] -= 1;
+			}
+		}
+
+		foreach ($ex_user as $bk => &$bv)
+		{
+			$bv['hs_bili'] = 0;
+			if($bk == 0)
+			{
+				switch ($bv['lv']){
+					case 'v1':
+						$bv['hs_bili'] = $hs_bili['v1'];
+						break;
+					case 'v2':
+						$bv['hs_bili'] = $hs_bili['v2'];
+						if($hs_lv['v2'] == 1)
+						{
+							$bv['hs_bili'] += $hs_v2_bili[0];
+							$hs_v2_bili[0] = 0;
+						}
+						break;
+					case 'v3':
+						$bv['hs_bili'] = $hs_bili['v3'];
+						if($hs_lv['v3'] == 1)
+						{
+							$bv['hs_bili'] += $hs_v3_bili[0];
+							$hs_v3_bili[0] = 0;
+						}
+						break;
+					default:
+						$bv['hs_bili'] = 0;
+						break;
+				}
+
+				$hs_buy_lv = $bv['lv'];
+			}
+			else
+			{
+				//蒜头购买
+				if($hs_buy_lv == 'v1')
+				{
+					switch ($bv['lv']) {
+						case 'v1':
+							$bv['hs_bili'] = $hs_v1_bili[0] > 0 ? $hs_v1_bili[0] : 0;
+							$hs_v1_bili[0] = 0;
+							break;
+						case 'v2':
+							if($hs_lv['v2'] == 1)
+							{
+								if($hs_v1_bili[0] > 0)
+								{
+									$bv['hs_bili'] = $hs_v1_bili[0];
+									$hs_v1_bili[0] = 0;
+								}
+								$bv['hs_bili'] += $hs_v1_bili[1] + $hs_v1_bili[2];
+								$hs_v1_bili[1] = $hs_v1_bili[2] = 0;
+							}
+							else if($hs_lv['v2'] == 2)
+							{
+								if($hs_v1_bili[0] > 0)
+								{
+									$bv['hs_bili'] = $hs_v1_bili[0];
+									$hs_v1_bili[0] = 0;
+								}
+								if($hs_v1_bili[1] > 0)
+								{
+									$bv['hs_bili'] += $hs_v1_bili[1];
+									$hs_v1_bili[1] = 0;
+								}
+								elseif($hs_v1_bili[1] == 0 && $hs_v1_bili[2] > 0)
+								{
+									$bv['hs_bili'] += $hs_v1_bili[2];
+									$hs_v1_bili[2] = 0;
+								}
+							}
+							break;
+
+						case 'v3':
+							if($hs_lv['v2'] == 0 || !isset($hs_lv['v2']))
+							{
+								if($hs_v1_bili[0] > 0)
+								{
+									$bv['hs_bili'] += $hs_v1_bili[0];
+									$hs_v1_bili[0] = 0;
+								}
+								if($hs_v1_bili[1] > 0)
+								{
+									$bv['hs_bili'] += $hs_v1_bili[1];
+									$hs_v1_bili[1] = 0;
+								}
+								if($hs_v1_bili[2] > 0)
+								{
+									$bv['hs_bili'] += $hs_v1_bili[2];
+									$hs_v1_bili[2] = 0;
+								}
+							}
+
+							if($hs_lv['v3'] == 1)
+							{
+								$bv['hs_bili'] += $hs_v1_bili[3];
+								$bv['hs_bili'] += $hs_v1_bili[4];
+								$hs_v1_bili[3] = $hs_v1_bili[4] = 0;
+							}
+							else if($hs_lv['v3'] == 2)
+							{
+								if($hs_v1_bili[3] > 0)
+								{
+									$bv['hs_bili'] += $hs_v1_bili[3];
+									$hs_v1_bili[3] = 0;
+								}
+								else if($hs_v1_bili[4] > 0)
+								{
+									$bv['hs_bili'] += $hs_v1_bili[4];
+									$hs_v1_bili[4] = 0;
+								}
+							}
+							break;
+					}
+				}
+				//蒜苗购买
+				else if($hs_buy_lv == 'v2')
+				{
+					switch ($bv['lv']) {
+						case 'v2':
+							if($hs_lv['v2'] == 2)
+							{
+								$bv['hs_bili'] = $hs_v2_bili[0];
+								$hs_v2_bili[0] = 0;
+							}
+
+						case 'v3':
+							if($hs_lv['v3'] == 1)
+							{
+								$bv['hs_bili'] = $hs_v2_bili[1] + $hs_v2_bili[2];
+								$hs_v2_bili[1] = $hs_v2_bili[2] = 0;
+							}
+							else if($hs_lv['v3'] == 2)
+							{
+								if($hs_v2_bili[1] > 0)
+								{
+									$bv['hs_bili'] = $hs_v2_bili[1];
+									$hs_v2_bili[1] = 0;
+								}
+								else if($hs_v2_bili[2] > 0)
+								{
+									$bv['hs_bili'] = $hs_v2_bili[2];
+									$hs_v2_bili[2] = 0;
+								}
+							}
+							break;
+					}
+				}
+				//蒜花购买
+				else if($hs_buy_lv == 'v3')
+				{
+					switch ($bv['lv']) {
+						case 'v3':
+							$bv['hs_bili'] = $hs_v3_bili[0] > 0 ? $hs_v3_bili[0] : 0;
+							$hs_v3_bili[0] = 0;
+							break;
+					}
+				}
+			}
+		}
+
+		return $ex_user;
+	}
 }
 ?>

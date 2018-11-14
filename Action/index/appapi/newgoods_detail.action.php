@@ -238,7 +238,57 @@ class newgoods_detailAction extends Action{
 		$goods['is_tlj']=intval($is_tlj);
 
 		//百里
-		// $goods['img_sjz']['bili'] = $goods['img_fxz']['bili'];
+		//获取当前会员等级比例
+		$user_lv = $user['is_sqdl'];
+		switch ($user_lv) {
+			case '0':
+				$hs_bili = 0;
+				break;
+			case '1':
+				$hs_bili = 0.51;
+				break;
+			case '2':
+				$hs_bili = 0.76;
+				break;
+			case '3':
+				$hs_bili = 0.88;
+				break;
+			default:
+				$hs_bili = 0.51;
+				break;
+		}
+		$goods['hs_bili'] = explode("￥", $goods['btn_fxz']['bili'])[1];
+		$goods['new_hs_bili'] = $goods['goods_price'] * ($goods['commission']/100) * $hs_bili;
+		$goods['new_hs_bili'] = sprintf("%.2f", $goods['new_hs_bili']);
+		$goods['hs_bili'] = str_replace($goods['hs_bili'], $goods['new_hs_bili'], $goods['btn_fxz']['bili']);
+
+		$goods['btn_fxz']['bili'] = $goods['hs_bili'];
+		$goods['btn_zgz']['bili'] = $goods['hs_bili'];
+		$goods['img_fxz']['bili'] = $goods['hs_bili'];
+
+		//升级奖
+		$user_lv = $user['is_sqdl'] + 1;
+		$up_hs_bili = 0;
+		switch ($user_lv) {
+			case '1':
+				$up_hs_bili = 0.51;
+				break;
+			case '2':
+				$up_hs_bili = 0.76;
+				break;
+			case '3':
+				$up_hs_bili = 0.88;
+				break;
+		}
+		if($up_hs_bili > 0)
+		{
+			$goods['fcommission'] = $goods['goods_price'] * ($goods['commission']/100) * $up_hs_bili;
+			$goods['fcommission'] = sprintf("%.2f", $goods['fcommission']);
+
+
+			$goods['up_hs_bili'] = explode("￥", $goods['img_sjz']['bili'])[1];
+			$goods['img_sjz']['bili'] = str_replace($goods['up_hs_bili'], $goods['fcommission'], $goods['img_sjz']['bili']);
+		}
 
 		zfun::fecho("商品详情",$goods,1,1);
 	}

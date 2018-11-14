@@ -113,6 +113,59 @@ class appJdGoodsDetailAction extends Action{
 
 		$data=newgoods_detailAction::getfanli($data,$user);
 		
+		//百里
+		//获取当前会员等级比例
+		$user_lv = $user['is_sqdl'];
+		switch ($user_lv) {
+			case '0':
+				$hs_bili = 0;
+				break;
+			case '1':
+				$hs_bili = 0.51;
+				break;
+			case '2':
+				$hs_bili = 0.76;
+				break;
+			case '3':
+				$hs_bili = 0.88;
+				break;
+			default:
+				$hs_bili = 0.51;
+				break;
+		}
+		$data['hs_bili'] = explode("￥", $data['btn_fxz']['bili'])[1];
+		$data['new_hs_bili'] = $data['goods_price'] * ($data['commission']/100) * $hs_bili;
+		$data['new_hs_bili'] = sprintf("%.2f", $data['new_hs_bili']);
+		$data['hs_bili'] = str_replace($data['hs_bili'], $data['new_hs_bili'], $data['btn_fxz']['bili']);
+
+		$data['btn_fxz']['bili'] = $data['hs_bili'];
+		$data['btn_zgz']['bili'] = $data['hs_bili'];
+		$data['img_fxz']['bili'] = $data['hs_bili'];
+
+		//升级奖
+		$user_lv = $user['is_sqdl'] + 1;
+		$up_hs_bili = 0;
+		switch ($user_lv) {
+			case '1':
+				$up_hs_bili = 0.51;
+				break;
+			case '2':
+				$up_hs_bili = 0.76;
+				break;
+			case '3':
+				$up_hs_bili = 0.88;
+				break;
+		}
+		if($up_hs_bili > 0)
+		{
+			$data['fcommission'] = $data['goods_price'] * ($data['commission']/100) * $up_hs_bili;
+			$data['fcommission'] = sprintf("%.2f", $data['fcommission']);
+
+
+			$data['up_hs_bili'] = explode("￥", $data['img_sjz']['bili'])[1];
+			$data['img_sjz']['bili'] = str_replace($data['up_hs_bili'], $data['fcommission'], $data['img_sjz']['bili']);
+		}
+
 	//	appcomm::set_app_cookie($data);
 		zfun::fecho("京东详情",$data,1);
 	}
@@ -309,8 +362,33 @@ class appJdGoodsDetailAction extends Action{
 		$data['str']=$con;
 		$data['goods_share_img']=INDEX_WEB_URL."View/index/img/appapi/comm/goods_share_img.png?time=".time();
 		$data['goods_share_fontcolor']='FFFFFF';
-		
+
 		if(!empty($set['goods_share_fontcolor']))$data['goods_share_fontcolor']=$set['goods_share_fontcolor'];
+
+		//百里
+		//获取当前会员等级比例
+		$user_lv = $user['is_sqdl'];
+		switch ($user_lv) {
+			case '0':
+				$hs_bili = 0;
+				break;
+			case '1':
+				$hs_bili = 0.51;
+				break;
+			case '2':
+				$hs_bili = 0.76;
+				break;
+			case '3':
+				$hs_bili = 0.88;
+				break;
+			default:
+				$hs_bili = 0.51;
+				break;
+		}
+		$data['old_fx_commission'] = $data['fx_commission'];
+		$data['fx_commission'] = sprintf("%.2f", $data['goods_price'] * ($data['commission']/100) * $hs_bili);
+		$data['fcommission'] = $data['fx_commission'];
+		$data['fxz'] =  str_replace($data['old_fx_commission'], $data['fx_commission'], $data['fxz']);
 
 		zfun::fecho("多图分享",$data,1,1);
 	}
