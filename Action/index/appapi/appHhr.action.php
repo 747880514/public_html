@@ -442,7 +442,7 @@ class appHhrAction extends Action{
 			zfun::fecho("我的粉丝",$data,1);
 		}
 		$sort=self::getSort1($_POST['sort']);
-		$user1=appcomm::f_goods("User",$where,"id,head_img,is_sqdl,nickname,reg_time,phone",$sort,NULL,20);
+		$user1=appcomm::f_goods("User",$where,"id,head_img,is_sqdl,nickname,reg_time,phone,tg_pid,tb_app_pid,ios_tb_app_pid",$sort,NULL,20);
 		$hhr_next_fl=zfun::f_kdata("HhrNextJl",$user1,"id","uid","uid,sum","  extend_id='$uid'");
 
 		foreach($user1  as $k=>$v){
@@ -453,9 +453,36 @@ class appHhrAction extends Action{
 
 			$user1[$k]['nickname'] = str_replace("****", "***", self::xphone($v['nickname']));
 			$user1[$k]['Vname']=self::getSetting("fxdl_name".($v['is_sqdl']+1));
-			if(!empty($v['phone']))
+
+			//百里.展示状态
+			//仅锁粉待激活（未填写手机号）
+			//未安装APP(有手机号）
+			//未登录APP(无推广位）
+			//待激活(有推广位无首单或订单为0
+			if(empty($one_user['phone']))
 			{
-				$user1[$k]['Vname'] .= '/'.$v['phone'];
+				$nexus[$k]['Vname'] = "仅锁粉";
+			}
+			else
+			{
+				if($one_user['tg_pid'] != '' || $one_user['tb_app_pid'] != '' || $one_user['ios_tb_app_pid'] != '' )
+				{
+					//查询有效订单
+					$validorder = zfun::f_row("Order", "status != '订单失效' AND uid = '{$one_user['id']}'");
+					if(!$validorder)
+					{
+						$nexus[$k]['Vname'] = "待激活";
+					}
+				}
+				else
+				{
+					$nexus[$k]['Vname'] = "未登录";
+				}
+			}
+			//有手机号，追加手机号
+			if(!empty($one_user['phone']))
+			{
+				$nexus[$k]['Vname'] .= '/'.$one_user['phone'];
 			}
 
 			$user1[$k]['commission']=zfun::dian($hhr_next_fl[$v['id']]['sum']);

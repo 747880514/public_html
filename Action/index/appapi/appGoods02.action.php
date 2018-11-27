@@ -6,6 +6,8 @@ actionfun("comm/zmCouponJingdong");
 actionfun("comm/pinduoduo");actionfun("comm/jtt_goods");
 actionfun("default/api");
 actionfun("default/atbapi");
+actionfun("appapi/baili");//百里
+
 class appGoods02Action extends Action{
 	static function getset(){
 		$set=zfun::f_getset("gg_goods_s_price,gg_goods_s_bili,dtk_sxtj_data,app_shouye_zhanwai_onoff,jd_indexgoods_type,pdd_indexgoods_type,app_shouye_zhanwai_onoff,zm_web_host,zm_api_pid,app_pddshouye_keyword,app_pddshouye_zhanwai_onoff,app_jdshouye_keyword,app_jdshouye_zhanwai_onoff");
@@ -264,38 +266,7 @@ class appGoods02Action extends Action{
 		$goods=self::comm_update_goods($data);
 
 		//百里
-		//获取会员信息
-		if (!empty($_POST['token'])) {
-			$user = zfun::f_row("User",'token="' . $_POST['token'] . '"');
-		}
-		//获取当前会员等级比例
-		$user_lv = $user['is_sqdl'];
-		switch ($user_lv) {
-			case '0':
-				$hs_bili = 0;
-				break;
-			case '1':
-				$hs_bili = 0.51;
-				break;
-			case '2':
-				$hs_bili = 0.76;
-				break;
-			case '3':
-				$hs_bili = 0.88;
-				break;
-			default:
-				$hs_bili = 0.51;
-				break;
-		}
-
-		//修改显示比例
-		foreach ($goods as $key => &$value) {
-			// $value['fcommission'] = $value['fx_commission'];
-
-			$value['fx_commission'] = sprintf("%.2f", $value['goods_price'] * ($value['commission']/100) * $hs_bili);
-			$value['fcommission'] = $value['fx_commission'];
-			$value['fxz'] = "分享奖：".$value['fx_commission'];
-		}
+		$goods = baili::hs_commission($goods);
 
 		zfun::fecho("首页拼多多商品",$goods,1);
 	}
@@ -312,38 +283,7 @@ class appGoods02Action extends Action{
 		$goods=self::comm_update_goods($data);
 
 		//百里
-		//获取会员信息
-		if (!empty($_POST['token'])) {
-			$user = zfun::f_row("User",'token="' . $_POST['token'] . '"');
-		}
-		//获取当前会员等级比例
-		$user_lv = $user['is_sqdl'];
-		switch ($user_lv) {
-			case '0':
-				$hs_bili = 0;
-				break;
-			case '1':
-				$hs_bili = 0.51;
-				break;
-			case '2':
-				$hs_bili = 0.76;
-				break;
-			case '3':
-				$hs_bili = 0.88;
-				break;
-			default:
-				$hs_bili = 0.51;
-				break;
-		}
-
-		//修改显示比例
-		foreach ($goods as $key => &$value) {
-			// $value['fcommission'] = $value['fx_commission'];
-
-			$value['fx_commission'] = sprintf("%.2f", $value['goods_price'] * ($value['commission']/100) * $hs_bili);
-			$value['fcommission'] = $value['fx_commission'];
-			$value['fxz'] = "分享奖：".$value['fx_commission'];
-		}
+		$goods = baili::hs_commission($goods);
 
 		zfun::fecho("首页拼多多商品",$goods,1);
 	}
@@ -397,38 +337,7 @@ class appGoods02Action extends Action{
 		$goods=self::comm_update_goods($data);
 
 		//百里
-		//获取会员信息
-		if (!empty($_POST['token'])) {
-			$user = zfun::f_row("User",'token="' . $_POST['token'] . '"');
-		}
-		//获取当前会员等级比例
-		$user_lv = $user['is_sqdl'];
-		switch ($user_lv) {
-			case '0':
-				$hs_bili = 0;
-				break;
-			case '1':
-				$hs_bili = 0.51;
-				break;
-			case '2':
-				$hs_bili = 0.76;
-				break;
-			case '3':
-				$hs_bili = 0.88;
-				break;
-			default:
-				$hs_bili = 0.51;
-				break;
-		}
-
-		//修改显示比例
-		foreach ($goods as $key => &$value) {
-			// $value['fcommission'] = $value['fx_commission'];
-
-			$value['fx_commission'] = sprintf("%.2f", $value['goods_price'] * ($value['commission']/100) * $hs_bili);
-			$value['fcommission'] = $value['fx_commission'];
-			$value['fxz'] = "分享奖：".$value['fx_commission'];
-		}
+		$goods = baili::hs_commission($goods);
 
 		zfun::fecho("首页京东商品",$goods,1);
 	}
@@ -445,38 +354,7 @@ class appGoods02Action extends Action{
 		$goods=self::comm_update_goods($data);
 
 		//百里
-		//获取会员信息
-		if (!empty($_POST['token'])) {
-			$user = zfun::f_row("User",'token="' . $_POST['token'] . '"');
-		}
-		//获取当前会员等级比例
-		$user_lv = $user['is_sqdl'];
-		switch ($user_lv) {
-			case '0':
-				$hs_bili = 0;
-				break;
-			case '1':
-				$hs_bili = 0.51;
-				break;
-			case '2':
-				$hs_bili = 0.76;
-				break;
-			case '3':
-				$hs_bili = 0.88;
-				break;
-			default:
-				$hs_bili = 0.51;
-				break;
-		}
-
-		//修改显示比例
-		foreach ($goods as $key => &$value) {
-			// $value['fcommission'] = $value['fx_commission'];
-
-			$value['fx_commission'] = sprintf("%.2f", $value['goods_price'] * ($value['commission']/100) * $hs_bili);
-			$value['fcommission'] = $value['fx_commission'];
-			$value['fxz'] = "分享奖：".$value['fx_commission'];
-		}
+		$goods = baili::hs_commission($goods);
 
 		zfun::fecho("首页京东商品",$goods,1);
 	}
@@ -545,38 +423,7 @@ class appGoods02Action extends Action{
 		$goods=self::comm_update_goods($data);
 
 		//百里
-		//获取会员信息
-		if (!empty($_POST['token'])) {
-			$user = zfun::f_row("User",'token="' . $_POST['token'] . '"');
-		}
-		//获取当前会员等级比例
-		$user_lv = $user['is_sqdl'];
-		switch ($user_lv) {
-			case '0':
-				$hs_bili = 0;
-				break;
-			case '1':
-				$hs_bili = 0.51;
-				break;
-			case '2':
-				$hs_bili = 0.76;
-				break;
-			case '3':
-				$hs_bili = 0.88;
-				break;
-			default:
-				$hs_bili = 0.51;
-				break;
-		}
-
-		//修改显示比例
-		foreach ($goods as $key => &$value) {
-			// $value['fcommission'] = $value['fx_commission'];
-
-			$value['fx_commission'] = sprintf("%.2f", $value['goods_price'] * ($value['commission']/100) * $hs_bili);
-			$value['fcommission'] = $value['fx_commission'];
-			$value['fxz'] = "分享奖：".$value['fx_commission'];
-		}
+		$goods = baili::hs_commission($goods);
 
 		zfun::fecho("首页京东商品",$goods,1);
 	}

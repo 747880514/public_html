@@ -248,6 +248,9 @@ class goods_all_typeAction extends Action{
 
 		appcomm::goodsfanlioff($goods);
 
+		//百里
+		$goods = baili::hs_commission($goods);
+
 		zfun::fecho("实时榜单",$goods,1);
 	}
 	//领券直播里面的
@@ -321,39 +324,7 @@ class goods_all_typeAction extends Action{
 		if(empty($goods))$goods=array();
 
 		//百里
-		//获取当前会员等级比例
-		$user_lv = $user['is_sqdl'];
-		switch ($user_lv) {
-			case '0':
-				$hs_bili = 0;
-				break;
-			case '1':
-				$hs_bili = 0.51;
-				break;
-			case '2':
-				$hs_bili = 0.76;
-				break;
-			case '3':
-				$hs_bili = 0.88;
-				break;
-			default:
-				$hs_bili = 0.51;
-				break;
-		}
-
-		//修改显示比例
-		foreach ($goods as $key => &$value) {
-			// $value['goods_price'] = sprintf("%.2f", $value['goods_price'] - $value['yhq_price']);
-			// $value['fx_commission'] = sprintf("%.2f", $value['goods_price'] * $value['fx_commission_bili'] / 100);
-			// $value['fcommission'] = $value['fx_commission'];
-
-			// $value['fxz'] = "分享奖：".$value['fx_commission'];
-
-			$value['goods_price'] = sprintf("%.2f", $value['goods_price'] - $value['yhq_price']);
-			$value['fx_commission'] = sprintf("%.2f", $value['goods_price'] * ($value['commission']/100) * $hs_bili );
-			$value['fcommission'] = $value['fx_commission'];
-			$value['fxz'] = "分享奖：".$value['fx_commission'];
-		}
+		$goods = baili::hs_commission($goods);
 
 		zfun::fecho("领券直播",$goods,1);
 	}
@@ -365,7 +336,38 @@ class goods_all_typeAction extends Action{
 		$limit=$GLOBALS['limit_size'];
 		actionfun("appapi/dtk_ddq_goods");
 		//fuck
-		$goods=dtk_ddq_goodsAction::this_dongdong($url,$limit);
+		// $goods=dtk_ddq_goodsAction::this_dongdong($url,$limit);
+
+		//百里.获取站内商品
+		$time = $_POST['time_'];
+		switch ($time) {
+			case '0':
+				$begin_time = mktime(0,0,0,date('m'),date('d'),date('Y'));
+				$end_time = mktime(date('H'),date('i'),date('s'),date('m'),date('d'),date('Y'));
+				break;
+			case '1':
+				$begin_time = mktime(8,0,0,date('m'),date('d'),date('Y'));
+				$end_time = mktime(9,59,59,date('m'),date('d'),date('Y'));
+				break;
+			case '2':
+				$begin_time = mktime(10,0,0,date('m'),date('d'),date('Y'));
+				$end_time = mktime(12,59,59,date('m'),date('d'),date('Y'));
+				break;
+			case '3':
+				$begin_time = mktime(13,0,0,date('m'),date('d'),date('Y'));
+				$end_time = mktime(14,59,59,date('m'),date('d'),date('Y'));
+				break;
+			case '4':
+				$begin_time = mktime(15,0,0,date('m'),date('d'),date('Y'));
+				$end_time = mktime(23,59,59,date('m'),date('d'),date('Y'));
+				break;
+			default:
+				$begin_time = mktime(0,0,0,date('m'),date('d'),date('Y'));
+				$end_time = mktime(date('H'),date('i'),date('s'),date('m'),date('d'),date('Y'));
+				break;
+		}
+		$where = "data LIKE '%\"ddq\"%' AND start_time >= {$begin_time} AND start_time <= {$end_time}";
+		$goods = zfun::f_select("Goods", $where);
 
 		if (!empty($_POST['token'])) {
 			$user = zfun::f_row("User",'token="' . $_POST['token'] . '"');

@@ -176,13 +176,14 @@ class downAction extends Action{
 	{
 		$code = $_REQUEST['code'];
 		$tgid = $_SESSION['down_tgid'];
-		$set=zfun::f_getset("share_host");
+		$set=zfun::f_getset("share_host,blocking_price_endday");
 
 		/*根据code获取用户openid*/
 		$url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx22b99a9b76e68aff&secret=7c34b8015bf2129fe57184c1ce1344c2&code=".$code."&grant_type=authorization_code";
 
 		$abs = file_get_contents($url);
 		$obj=json_decode($abs);
+
 		$access_token = $obj->access_token;
 		$openid = $obj->openid;
 		/*根据code获取用户openid end*/
@@ -191,11 +192,32 @@ class downAction extends Action{
 		$abs_url = "https://api.weixin.qq.com/sns/userinfo?access_token=".$access_token."&openid=".$openid."&lang=zh_CN";
 		$abs_url_data = file_get_contents($abs_url);
 		$obj_data=json_decode($abs_url_data);
+		$obj_data->access_token = $access_token;
 
 		$unionid = $obj_data->unionid;
 		$openid = $obj_data->openid;
 		$nickname = $obj_data->nickname;
 		$headimgurl = $obj_data->headimgurl;
+
+		$sex = $obj_data->sex;
+
+		$dq1 = zfun::f_row("Province", "ProvinceName LIKE '%".$obj_data->province."%'", "ProvinceID");
+		$dq1 = $dq1['ProvinceID'];
+
+		// $dq2 = zfun::f_row("District", " DistrictName LIKE '%".$obj_data->city."%'", "DistrictID");
+		// $dq2 = $dq2['DistrictID'];
+
+		$dq2 = zfun::f_row("City", "ProvinceID = {$dq1} AND CityName LIKE '%".$obj_data->city."%'", "CityID");
+		$dq2 = $dq2['CityID'];
+
+		if(empty($dq2))
+		{
+			$dq2 = zfun::f_row("City", "ProvinceID = {$dq1}", "CityID");
+			$dq2 = $dq2['CityID'];
+
+			$dq3 = zfun::f_row("District", "CityID = {$dq2} AND DistrictName LIKE '%".$obj_data->city."%'", "DistrictID");
+			$dq3 = $dq3['DistrictID'];
+		}
 
 		//检测用户，注册
 		$user = zfun::f_row("User", "weixin_au = '".$unionid."' OR weixin_au = '".$openid."'");
@@ -207,6 +229,10 @@ class downAction extends Action{
 			$tgidkey = $this->getApp('Tgidkey');
 			$tgid = $tgidkey->Decodekey($tgid);
 
+			//首单结束期限
+			$blocking_price_endtime = $set['blocking_price_endday'] > 0 ? $set['blocking_price_endday'] : 3;
+			$blocking_price_endtime = time() + $blocking_price_endtime * 24 * 3600;
+
 			$arr=array(
 
 				"nickname"=>$nickname,
@@ -215,7 +241,7 @@ class downAction extends Action{
 
 				"login_time"=>time(),
 
-				"commission"=>$commission_reg,
+				// "commission"=>$commission_reg,
 
 				"integral"=>$jf_reg,
 
@@ -228,6 +254,21 @@ class downAction extends Action{
 				"wx_openid" => $unionid,
 
 				"token" => md5(base64_encode($tgid . time() . uniqid(rand()))),
+
+				"sex" => $sex,
+
+				"dq1" => $dq1,
+
+				"dq2" => $dq2,
+
+				"dq3" => $dq3,
+
+				"wx_data" => serialize($obj_data),
+
+				"blocking_price" => $commission_reg,	//*****需要注释掉commission字段
+
+				"blocking_price_endtime" => $blocking_price_endtime,	//首单结束期限
+
 
 			);
 

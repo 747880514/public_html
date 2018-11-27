@@ -1,5 +1,6 @@
 <?php
 actionfun("appapi/dgappcomm");actionfun("appapi/appHhr");fun("comm");
+
 class goods_fenxiangAction extends Action{
 	public function index(){
 		$user=appcomm::signcheck();

@@ -288,6 +288,9 @@ class newgoods_detailAction extends Action{
 
 			$goods['up_hs_bili'] = explode("￥", $goods['img_sjz']['bili'])[1];
 			$goods['img_sjz']['bili'] = str_replace($goods['up_hs_bili'], $goods['fcommission'], $goods['img_sjz']['bili']);
+
+			//升级奖励
+			$goods['mid_zgz']['str'] = str_replace($goods['mid_zgz']['bili'], $goods['img_sjz']['bili'], $goods['mid_zgz']['str']);
 		}
 
 		zfun::fecho("商品详情",$goods,1,1);
