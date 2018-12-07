@@ -67,17 +67,36 @@ class goods_cateAction extends Action{
 			$data=appCateAction::tqg_time();
 		}
 		$set=zfun::f_getset("tqg_times_color,tqg_times_checkcolor");
-		$set['tqg_times_color']=str_replace("#",$set['tqg_times_color']);
+		$set['tqg_times_color']=str_replace("#","",$set['tqg_times_color']);
 		if(empty($set['tqg_times_color']))$set['tqg_times_color']='FFFFFF';
-		$set['tqg_times_checkcolor']=str_replace("#",$set['tqg_times_checkcolor']);
+		$set['tqg_times_checkcolor']=str_replace("#","",$set['tqg_times_checkcolor']);
 		if(empty($set['tqg_times_checkcolor']))$set['tqg_times_checkcolor']='ED685A';
-		foreach($data as $k=>$v){
 
-			//百里
-			if($v['date'] == '00:00')
+		//百里
+		$tk_time = array('08:00','10:00','12:00','14:00','16:00','18:00','20:00');
+		$data = array();
+		$thistime = date("Hi", time());
+		foreach ($tk_time as $key => $value) {
+			$t = str_replace(":","",$value);
+			$t2 = str_replace(":","", $tk_time[$key+1]);
+			if($t < $thistime)
 			{
-				$data[$k]['date'] = '全部';
+				$str = $t2 > $thistime ? '正在疯抢' : '已开抢';
 			}
+			else
+			{
+				$str = '未开始';
+			}
+			$data[] = array(
+				'check' => $str == '正在疯抢' ? 1 : 0,
+				'date' => $value,
+				'date_time'=>$t,
+				'status' => 1,
+				'str' => $str,
+				'time' => $key,
+			);
+		}
+		foreach($data as $k=>$v){
 
 			$data[$k]['bj_img']=INDEX_WEB_URL."View/index/img/appapi/comm/taoqianggou_time_img1.png";
 			$data[$k]['check_color']=$set['tqg_times_checkcolor'];

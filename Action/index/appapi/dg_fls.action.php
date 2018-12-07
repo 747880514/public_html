@@ -676,11 +676,11 @@ class dg_flsAction extends Action{
 				else
 				{
 					//是否存在结算订单
-					$where = "uid='{$value['id']}' AND `status` = '订单结算' AND `createDate` <= {$value['blocking_price_endtime']}";
+					$where = "uid='{$value['id']}' AND `status` = '订单结算' AND returnstatus = 1 AND `createDate` <= {$value['blocking_price_endtime']}";
 					$hasend = zfun::f_row("Order", $where);
 
 					//如果出现已结算
-					if($hasend['status'] == '订单结算')
+					if($hasend['status'] == '订单结算' && $hasend['returnstatus'] == 1)
 					{
 						$hs_update['commission'] = $value['commission'] + $value['blocking_price'];	//将冻结奖励合并到余额
 						$hs_update['blocking_price'] = 0;				//清除冻结奖励

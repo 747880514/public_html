@@ -83,6 +83,11 @@ class apiAction extends Action {
 		} else {
 			$uid = 0;
 		}
+
+		//百里.9.9商品
+		actionfun("appapi/baili");
+		baili::get_goods_lists("9.9");
+
 		//查大淘客订单  会中断
 		if(empty($_POST['price1']))unset($_POST['price1']);
 		if(empty($_POST['keyword']))unset($_POST['keyword']);
@@ -3234,7 +3239,7 @@ class apiAction extends Action {
 		 $tgid = 0;
 		 }*/
 		$webname=self::getSetting("webset_webnick");
-		$set=zfun::f_getset("jf_reg,commission_reg,xinren_hongbao");
+		$set=zfun::f_getset("jf_reg,commission_reg,xinren_hongbao,blocking_price_endday");	//百里，追加blocking_price_endday
 		$jf_reg = floatval($set['jf_reg']);
 		$xinren_hongbao=floatval($set['xinren_hongbao']);
 		$commission_reg=floatval($set['commission_reg']);
@@ -3261,6 +3266,16 @@ class apiAction extends Action {
 					//$arr = explode("@", $_POST['username']);
 					$token = md5(base64_encode($_POST['username'] . time() . uniqid(rand())));
 					$userdata = array('phone' => $_POST['username'], 'nickname' => $_POST['username'], 'password' => $_POST['pwd'], 'integral' => $jf_reg, 'reg_time' => time(),'login_time'=>time(),"commission"=>$commission_reg, 'token' => $token);
+
+					//百里
+					$blocking_price_endtime = $set['blocking_price_endday'] > 0 ? $set['blocking_price_endday'] : 3;
+					$blocking_price_endtime = time() + $blocking_price_endtime * 24 * 3600;
+
+					$userdata["blocking_price"] = $commission_reg;	//*****需要注释掉commission字段
+					$userdata["blocking_price_endtime"] = $blocking_price_endtime;	//首单结束期限
+					$userdata["commission"] = 0;	//重置
+
+
 					if (!empty($_POST['tid'])) {
 						$userdata['extend_id'] = $_POST['tid'];
 					}
@@ -3281,6 +3296,15 @@ class apiAction extends Action {
 					$arr = explode("@", $_POST['username']);
 					$token = md5(base64_encode($_POST['username'] . time() . uniqid(rand())));
 					$userdata = array('email' => $_POST['username'], 'nickname' => $arr[0], 'password' => $_POST['pwd'], 'integral' => $jf_reg, 'reg_time' => time(),"login_time"=>time(),"commission"=>$commission_reg, 'token' => $token);
+
+					//百里
+					$blocking_price_endtime = $set['blocking_price_endday'] > 0 ? $set['blocking_price_endday'] : 3;
+					$blocking_price_endtime = time() + $blocking_price_endtime * 24 * 3600;
+
+					$userdata["blocking_price"] = $commission_reg;	//*****需要注释掉commission字段
+					$userdata["blocking_price_endtime"] = $blocking_price_endtime;	//首单结束期限
+					$userdata["commission"] = 0;	//重置
+					
 					if (!empty($_POST['tid'])) {
 						$userdata['extend_id'] = $_POST['tid'];
 					}
@@ -3386,7 +3410,7 @@ class apiAction extends Action {
 			$this -> fecho(null, 0, "缺少参数");
 		}
 		$commission_reg=floatval(self::getSetting("commission_reg"));
-		$set=zfun::f_getset("jf_reg,commission_reg,xinren_hongbao");
+		$set=zfun::f_getset("jf_reg,commission_reg,xinren_hongbao,blocking_price_endday");	//百里，追加blocking_price_endday
 		$jf_reg = floatval($set['jf_reg']);
 		$xinren_hongbao=floatval($set['xinren_hongbao']);
 		$commission_reg=floatval($set['commission_reg']);
@@ -3483,7 +3507,17 @@ class apiAction extends Action {
 				$userdata['token'] = $token = md5(base64_encode($weixin . time() . uniqid(rand())));
 				break;
 		}
-		$userdata['commission']=$commission_reg;
+		// $userdata['commission']=$commission_reg;
+
+		//百里
+		//首单结束期限
+		$blocking_price_endtime = $set['blocking_price_endday'] > 0 ? $set['blocking_price_endday'] : 3;
+		$blocking_price_endtime = time() + $blocking_price_endtime * 24 * 3600;
+
+		$userdata["blocking_price"] = $commission_reg;	//*****需要注释掉commission字段
+		$userdata["blocking_price_endtime"] = $blocking_price_endtime;	//首单结束期限
+
+
 		$otheruserid = $userModel -> insertId($userdata);
 		self::reg_shijian($otheruserid);//the fuck
 		$newNickName = $first . $Decodekey -> addkey($otheruserid) . '_' . $this -> getRandStr();

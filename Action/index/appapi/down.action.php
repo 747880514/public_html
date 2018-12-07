@@ -207,10 +207,13 @@ class downAction extends Action{
 		// $dq2 = zfun::f_row("District", " DistrictName LIKE '%".$obj_data->city."%'", "DistrictID");
 		// $dq2 = $dq2['DistrictID'];
 
-		$dq2 = zfun::f_row("City", "ProvinceID = {$dq1} AND CityName LIKE '%".$obj_data->city."%'", "CityID");
-		$dq2 = $dq2['CityID'];
+		if(!empty($obj_data->city))
+		{
+			$dq2 = zfun::f_row("City", "ProvinceID = {$dq1} AND CityName LIKE '%".$obj_data->city."%'", "CityID");
+			$dq2 = $dq2['CityID'];
+		}
 
-		if(empty($dq2))
+		if(empty($dq2) && !empty($dq1))
 		{
 			$dq2 = zfun::f_row("City", "ProvinceID = {$dq1}", "CityID");
 			$dq2 = $dq2['CityID'];

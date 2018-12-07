@@ -249,6 +249,7 @@ class goods_all_typeAction extends Action{
 		appcomm::goodsfanlioff($goods);
 
 		//百里
+		actionfun("appapi/baili");
 		$goods = baili::hs_commission($goods);
 
 		zfun::fecho("实时榜单",$goods,1);
@@ -324,6 +325,7 @@ class goods_all_typeAction extends Action{
 		if(empty($goods))$goods=array();
 
 		//百里
+		actionfun("appapi/baili");
 		$goods = baili::hs_commission($goods);
 
 		zfun::fecho("领券直播",$goods,1);
@@ -339,33 +341,33 @@ class goods_all_typeAction extends Action{
 		// $goods=dtk_ddq_goodsAction::this_dongdong($url,$limit);
 
 		//百里.获取站内商品
-		$time = $_POST['time_'];
-		switch ($time) {
-			case '0':
-				$begin_time = mktime(0,0,0,date('m'),date('d'),date('Y'));
-				$end_time = mktime(date('H'),date('i'),date('s'),date('m'),date('d'),date('Y'));
-				break;
-			case '1':
-				$begin_time = mktime(8,0,0,date('m'),date('d'),date('Y'));
-				$end_time = mktime(9,59,59,date('m'),date('d'),date('Y'));
-				break;
-			case '2':
-				$begin_time = mktime(10,0,0,date('m'),date('d'),date('Y'));
-				$end_time = mktime(12,59,59,date('m'),date('d'),date('Y'));
-				break;
-			case '3':
-				$begin_time = mktime(13,0,0,date('m'),date('d'),date('Y'));
-				$end_time = mktime(14,59,59,date('m'),date('d'),date('Y'));
-				break;
-			case '4':
-				$begin_time = mktime(15,0,0,date('m'),date('d'),date('Y'));
-				$end_time = mktime(23,59,59,date('m'),date('d'),date('Y'));
-				break;
-			default:
-				$begin_time = mktime(0,0,0,date('m'),date('d'),date('Y'));
-				$end_time = mktime(date('H'),date('i'),date('s'),date('m'),date('d'),date('Y'));
-				break;
-		}
+		// $time = $_POST['time_'];
+		// switch ($time) {
+		// 	case '0':
+		// 		$begin_time = mktime(0,0,0,date('m'),date('d'),date('Y'));
+		// 		$end_time = mktime(date('H'),date('i'),date('s'),date('m'),date('d'),date('Y'));
+		// 		break;
+		// 	case '1':
+		// 		$begin_time = mktime(8,0,0,date('m'),date('d'),date('Y'));
+		// 		$end_time = mktime(9,59,59,date('m'),date('d'),date('Y'));
+		// 		break;
+		// 	case '2':
+		// 		$begin_time = mktime(10,0,0,date('m'),date('d'),date('Y'));
+		// 		$end_time = mktime(12,59,59,date('m'),date('d'),date('Y'));
+		// 		break;
+		// 	case '3':
+		// 		$begin_time = mktime(13,0,0,date('m'),date('d'),date('Y'));
+		// 		$end_time = mktime(14,59,59,date('m'),date('d'),date('Y'));
+		// 		break;
+		// 	case '4':
+		// 		$begin_time = mktime(15,0,0,date('m'),date('d'),date('Y'));
+		// 		$end_time = mktime(23,59,59,date('m'),date('d'),date('Y'));
+		// 		break;
+		// 	default:
+		// 		$begin_time = mktime(0,0,0,date('m'),date('d'),date('Y'));
+		// 		$end_time = mktime(date('H'),date('i'),date('s'),date('m'),date('d'),date('Y'));
+		// 		break;
+		// }
 		$where = "data LIKE '%\"ddq\"%' AND start_time >= {$begin_time} AND start_time <= {$end_time}";
 		$goods = zfun::f_select("Goods", $where);
 
@@ -379,12 +381,93 @@ class goods_all_typeAction extends Action{
 		$arr=array("1","0");
 		$ayy=array();
 
+		//百里
+		$baili_begin_time = "";
+		$baili_end_time = "";
+		$next = false;
+		$time = $_POST['time_'];
+
+		$tk_time = array('08:00','10:00','12:00','14:00','16:00','18:00','20:00');
+		$attr = array();
+		$thistime = date("Hi");
+
+		//抓取商品
+		actionfun("appapi/baili");
+		$hour_time = explode(":", $tk_time[$time]);
+		baili::get_goods_lists("hour", $hour_time[0]);
+
+		foreach ($tk_time as $key => $value) {
+			$t = str_replace(":","",$value);
+			$t2 = str_replace(":","", $tk_time[$key+1]);
+			if($t < $thistime)
+			{
+				$str = $t2 > $thistime ? '正在疯抢' : '已开抢';
+			}
+			else
+			{
+				$str = '未开始';
+			}
+			$attr[] = array(
+				'check' => $str == '正在疯抢' ? 1 : 0,
+				'date' => $value,
+				'date_time'=>$t,
+				'status' => 1,
+				'str' => $str,
+				'time' => $key,
+			);
+		}
+
 		foreach($attr  as $k=>$v){
 			if($_POST['time_']==$v['time']){
 				if($v['str']=='正在疯抢')$v['status']=1;
 				$ayy['status']=$arr[$v['status']];
 			}
+
+			// //百里
+			// if($next == true)
+			// {
+			// 	list($this_0, $this_1) = explode(":", $v['date']);
+			// 	$end_time = mktime($this_0, $this_1, 0, date('m'), date('d'), date('Y'));
+			// 	$next = false;
+			// }
+			// if($time == $k)
+			// {
+			// 	list($next_0, $next_1) = explode(":", $v['date']);
+			// 	$begin_time = mktime($next_0, $next_1, 0, date('m'), date('d'), date('Y'));
+			// 	$next = true;
+			// }
 		}
+
+		list($next_0, $next_1) = explode(":", $tk_time[$time]);
+		$begin_time = mktime($next_0, $next_1, 0, date('m'), date('d'), date('Y'));
+
+		if($tk_time[$time+1])
+		{
+			list($next_0, $next_1) = explode(":", $tk_time[$time+1]);
+			$end_time = mktime($next_0, $next_1, 0, date('m'), date('d'), date('Y'));
+		}
+
+		// 百里
+		$where = "";
+		if($begin_time > 0)
+		{
+			$where = "data LIKE '%\"ddq\"%' AND start_time >= {$begin_time} ";
+		}
+		if($end_time > 0)
+		{
+			$where .= " AND start_time < {$end_time}";
+		}
+
+		if($begin_time < time())
+		{
+			$goods = zfun::f_select("Goods", $where);
+
+			if(empty($goods))
+			{
+				$goods = zfun::f_select("Goods", "data LIKE '%\"ddq\"%' AND start_time < ".time()." order by id DESC LIMIT 30");
+			}
+		}
+
 		//分页处理
 		$p=intval($_POST['p']);
 		$start=($p-1)*5+1;

@@ -461,7 +461,7 @@ class appHhrAction extends Action{
 			//待激活(有推广位无首单或订单为0
 			if(empty($one_user['phone']))
 			{
-				$nexus[$k]['Vname'] = "仅锁粉";
+				$nexus[$k]['Vname'] = '未下载';//"仅锁粉";
 			}
 			else
 			{
@@ -469,9 +469,18 @@ class appHhrAction extends Action{
 				{
 					//查询有效订单
 					$validorder = zfun::f_row("Order", "status != '订单失效' AND uid = '{$one_user['id']}'");
-					if(!$validorder)
+					if($validorder)
 					{
-						$nexus[$k]['Vname'] = "待激活";
+						//存在
+						$validorderend = zfun::f_row("Order", "status = '订单结算' AND returnstatus = 1 AND uid = '{$one_user['id']}'");
+						if(!$validorderend)
+						{
+							$nexus[$k]['Vname'] = '解锁中';//"待激活";
+						}
+					}
+					else
+					{
+						$nexus[$k]['Vname'] = '未下单';//"待激活";
 					}
 				}
 				else

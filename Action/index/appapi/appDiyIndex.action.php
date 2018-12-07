@@ -14,10 +14,10 @@ class appDiyIndexAction extends Action{
 		$arr=self::getCSS($type);
 		$arr=array_values($arr);
 
+		echo str_replace('"success":1','"success":"1"',json_encode(array("msg"=>"首页数据","style_id"=>$index_style_id,"data"=>$arr,"success"=>1))); exit;
+
 		//百里.自动抓取淘客助手严选直播
 		baili::get_goods_lists();
-
-		echo str_replace('"success":1','"success":"1"',json_encode(array("msg"=>"首页数据","style_id"=>$index_style_id,"data"=>$arr,"success"=>1))); exit;
 	}
 	//跑马灯
 	public function super_msg(){

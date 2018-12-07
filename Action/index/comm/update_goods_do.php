@@ -184,6 +184,9 @@ class update_goods_do{
 			$str.=',fxdl_tjdl_bili6_'.$i.',fxdl_tjdl_bili7_'.$i.',fxdl_tjdl_bili8_'.$i.',fxdl_tjdl_bili9_'.$i.',fxdl_tjdl_bili10_'.$i;
 			$str.=',fxdl_tjdl_bili_operator1_'.$i.',fxdl_tjdl_bili_operator2_'.$i.',fxdl_tjdl_bili_operator3_'.$i.',fxdl_tjdl_bili_operator4_'.$i.',fxdl_tjdl_bili_operator5_'.$i;
 			$str.=',fxdl_tjdl_bili_operator6_'.$i.',fxdl_tjdl_bili_operator7_'.$i.',fxdl_tjdl_bili_operator8_'.$i.',fxdl_tjdl_bili_operator9_'.$i.',fxdl_tjdl_bili_operator10_'.$i;
+
+			//百里
+			$str .= ',fxdl_name'.$i;
 		}
 		$set=zfun::f_getset($str);
 		$fxdl_name=$set["fxdl_name".($level+1)];
@@ -201,9 +204,11 @@ class update_goods_do{
 
 		//百里.重新计算比例
 		$bili_mod = self::hs_bili_mod($lv_total);
+		$bili_str = array('直接奖励','间推奖励','管理奖励','蒜花分红','蒜花分红');
 		$k = 0;
 		foreach ($djdata as $key => &$value) {
 			$value['bili'] = $bili_mod[$k];
+			$value['bili_str'] = $bili_str[$k];
 			$k++;
 		}
 
@@ -239,7 +244,10 @@ class update_goods_do{
 					"gm_money"=>$money,
 				);
 				$jibie = $k + 1;
-				$result=self::adddetail("推荐【".$user['phone']."】成为".$fxdl_name." ".$jibie."级 返利 ".$commission,$v['uid'],0,$data,time(),$commission);
+				// 百里.修改前
+				// $result=self::adddetail("推荐【".$user['phone']."】成为".$fxdl_name." ".$jibie."级 返利 ".$commission,$v['uid'],0,$data,time(),$commission);
+				// 百里.修改后
+				$result=self::adddetail("推荐【".$user['phone']."】成为".$fxdl_name." 获得".$v['bili_str'].$commission,$v['uid'],0,$data,time(),$commission);
 				if(empty($result)){$is_fl=0;continue;}
 				$is_fl=1;
 			}
