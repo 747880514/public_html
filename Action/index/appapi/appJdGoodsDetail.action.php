@@ -133,10 +133,12 @@ class appJdGoodsDetailAction extends Action{
 				$hs_bili = 0.51;
 				break;
 		}
-		$data['hs_bili'] = explode("￥", $data['btn_fxz']['bili'])[1];
-		$data['new_hs_bili'] = $data['goods_price'] * ($data['commission']/100) * $hs_bili;
-		$data['new_hs_bili'] = sprintf("%.2f", $data['new_hs_bili']);
-		$data['hs_bili'] = str_replace($data['hs_bili'], $data['new_hs_bili'], $data['btn_fxz']['bili']);
+		// $data['hs_bili'] = explode("￥", $data['btn_fxz']['bili'])[1];
+		// $data['new_hs_bili'] = $data['goods_price'] * ($data['commission']/100) * $hs_bili;
+		// $data['new_hs_bili'] = sprintf("%.2f", $data['new_hs_bili']);
+		// $data['hs_bili'] = str_replace($data['hs_bili'], $data['new_hs_bili'], $data['btn_fxz']['bili']);
+		$data['hs_bili'] = $data['goods_price'] * ($data['commission']/100) * $hs_bili;
+		$data['hs_bili'] = sprintf("%.2f", $data['hs_bili']);
 
 		$data['btn_fxz']['bili'] = $data['hs_bili'];
 		$data['btn_zgz']['bili'] = $data['hs_bili'];
@@ -517,6 +519,8 @@ class appJdGoodsDetailAction extends Action{
 		self::qrcode2($garr,$user,$url1);
 		
 	}
+
+	//百里.修改分享图
 	public static function qrcode2($arr=array(),$user=array(),$urls=''){//生成二维码
 		
 		$img=str_replace("https:","http:",$arr['goods_img']);

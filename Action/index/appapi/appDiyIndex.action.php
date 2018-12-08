@@ -2,7 +2,7 @@
 fun("zfun");
 actionfun("appapi/dgappcomm");
 actionfun("appapi/tzbs_new");
-actionfun("appapi/baili");
+// actionfun("appapi/baili");	//百里
 
 class appDiyIndexAction extends Action{
 	//首页数据
@@ -17,7 +17,7 @@ class appDiyIndexAction extends Action{
 		echo str_replace('"success":1','"success":"1"',json_encode(array("msg"=>"首页数据","style_id"=>$index_style_id,"data"=>$arr,"success"=>1))); exit;
 
 		//百里.自动抓取淘客助手严选直播
-		baili::get_goods_lists();
+		// baili::get_goods_lists();
 	}
 	//跑马灯
 	public function super_msg(){

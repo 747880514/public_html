@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no">
+		<meta name="keywords" content="lighteshop商城 o2o b2c 返利 c2c">
+		<meta name="description" content="lighteshop商城">
+		<link rel="stylesheet" type="text/css" href="../../../css/wap/comm/comm1.css">
+		<link rel="stylesheet" type="text/css" href="../../../css/wap/help/usehelp.css">
+		<title>常见问题</title>
+		<script src="../../../js/comm/jquery.min.js"></script>
+		<script>
+			$(document).ready(function(e) {
+				$('.p-content nav ul li').val("0");
+				$('.p-content nav ul li').click(function() {
+					//$(this).find('.view').addClass("view-change");
+					$(this).find('section').slideToggle();
+					$(this).siblings().find('section').hide();
+				});
+			});
+		</script>
+		<style>
+			.view {
+				margin: 0 auto;
+				-webkit-border-radius: 110px;
+				border-radius: 110px;
+				-webkit-transition: -webkit-transform 0.2s ease-out;
+				-moz-transition: -moz-transform 0.2s ease-out;
+				-o-transition: -o-transform 0.2s ease-out;
+				-ms-transition: -ms-transform 0.2s ease-out;
+			}
+			.view:hover {
+				-webkit-transform: rotateZ(180deg);
+				-moz-transform: rotateZ(180deg);
+				-o-transform: rotateZ(180deg);
+				-ms-transform: rotateZ(180deg);
+				transform: rotateZ(180deg);
+			}
+			.videobtn{
+				transform:rotate(-90deg);
+				-ms-transform:rotate(-90deg); 	/* IE 9 */
+				-moz-transform:rotate(-90deg); 	/* Firefox */
+				-webkit-transform:rotate(-90deg); /* Safari 和 Chrome */
+				-o-transform:rotate(-90deg); 	/* Opera */
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="use-help">
+			<div class="p-content">
+				<h4 onclick="javascript:window.location.href='http://app.juhuivip.com/?mod=wap&act=help&ctrl=course'">视频教程<img src="../../../img/wap/help/sybz_down@3x.png" alt="" class="videobtn" style="width: 14px;float: right;padding: 1rem 0.5rem;" /></h4>
+				<h4>常见问题解答</h4>
+				<nav>
+					<ul>
+						<foreach name="article" value="v" key="k">
+							<li>
+								<p class="title">{$v.title}
+									<a href="javascript:;" class="view"><img src="../../../img/wap/help/sybz_down@3x.png" alt="" /></a>
+								</p>
+								<section>{$v.content}</section>
+							</li>
+						</foreach>
+
+					</ul>
+				</nav>
+				<if condition="'{is_show}'=='1'">
+				<footer>
+					<p>以上问题如果不能帮助到您，请联系客服</p>
+					<p>客服电话:<span class="phone-num">{phone}</span></p>
+				</footer>
+				</if>
+			</div>
+		</div>
+	</body>
+
+</html>

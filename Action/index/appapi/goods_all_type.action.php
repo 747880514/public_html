@@ -341,33 +341,37 @@ class goods_all_typeAction extends Action{
 		// $goods=dtk_ddq_goodsAction::this_dongdong($url,$limit);
 
 		//百里.获取站内商品
-		// $time = $_POST['time_'];
-		// switch ($time) {
-		// 	case '0':
-		// 		$begin_time = mktime(0,0,0,date('m'),date('d'),date('Y'));
-		// 		$end_time = mktime(date('H'),date('i'),date('s'),date('m'),date('d'),date('Y'));
-		// 		break;
-		// 	case '1':
-		// 		$begin_time = mktime(8,0,0,date('m'),date('d'),date('Y'));
-		// 		$end_time = mktime(9,59,59,date('m'),date('d'),date('Y'));
-		// 		break;
-		// 	case '2':
-		// 		$begin_time = mktime(10,0,0,date('m'),date('d'),date('Y'));
-		// 		$end_time = mktime(12,59,59,date('m'),date('d'),date('Y'));
-		// 		break;
-		// 	case '3':
-		// 		$begin_time = mktime(13,0,0,date('m'),date('d'),date('Y'));
-		// 		$end_time = mktime(14,59,59,date('m'),date('d'),date('Y'));
-		// 		break;
-		// 	case '4':
-		// 		$begin_time = mktime(15,0,0,date('m'),date('d'),date('Y'));
-		// 		$end_time = mktime(23,59,59,date('m'),date('d'),date('Y'));
-		// 		break;
-		// 	default:
-		// 		$begin_time = mktime(0,0,0,date('m'),date('d'),date('Y'));
-		// 		$end_time = mktime(date('H'),date('i'),date('s'),date('m'),date('d'),date('Y'));
-		// 		break;
-		// }
+		$time = $_POST['time_'];
+		switch ($time) {
+			case '0':
+				$begin_time = mktime(8,0,0,date('m'),date('d'),date('Y'));
+				$end_time = mktime(9,59,59,date('m'),date('d'),date('Y'));
+				break;
+			case '1':
+				$begin_time = mktime(10,0,0,date('m'),date('d'),date('Y'));
+				$end_time = mktime(11,59,59,date('m'),date('d'),date('Y'));
+				break;
+			case '2':
+				$begin_time = mktime(12,0,0,date('m'),date('d'),date('Y'));
+				$end_time = mktime(13,59,59,date('m'),date('d'),date('Y'));
+				break;
+			case '3':
+				$begin_time = mktime(14,0,0,date('m'),date('d'),date('Y'));
+				$end_time = mktime(15,59,59,date('m'),date('d'),date('Y'));
+				break;
+			case '4':
+				$begin_time = mktime(16,0,0,date('m'),date('d'),date('Y'));
+				$end_time = mktime(17,59,59,date('m'),date('d'),date('Y'));
+				break;
+			case '5':
+				$begin_time = mktime(18,0,0,date('m'),date('d'),date('Y'));
+				$end_time = mktime(19,59,59,date('m'),date('d'),date('Y'));
+				break;
+			case '6':
+				$begin_time = mktime(20,0,0,date('m'),date('d'),date('Y'));
+				$end_time = mktime(23,59,59,date('m'),date('d'),date('Y'));
+				break;
+		}
 		$where = "data LIKE '%\"ddq\"%' AND start_time >= {$begin_time} AND start_time <= {$end_time}";
 		$goods = zfun::f_select("Goods", $where);
 

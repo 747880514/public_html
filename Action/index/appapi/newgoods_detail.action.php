@@ -257,10 +257,12 @@ class newgoods_detailAction extends Action{
 				$hs_bili = 0.51;
 				break;
 		}
-		$goods['hs_bili'] = explode("￥", $goods['btn_fxz']['bili'])[1];
-		$goods['new_hs_bili'] = $goods['goods_price'] * ($goods['commission']/100) * $hs_bili;
-		$goods['new_hs_bili'] = sprintf("%.2f", $goods['new_hs_bili']);
-		$goods['hs_bili'] = str_replace($goods['hs_bili'], $goods['new_hs_bili'], $goods['btn_fxz']['bili']);
+		// $goods['hs_bili'] = explode("￥", $goods['btn_fxz']['bili'])[1];
+		// $goods['new_hs_bili'] = $goods['goods_price'] * ($goods['commission']/100) * $hs_bili;
+		// $goods['new_hs_bili'] = sprintf("%.2f", $goods['new_hs_bili']);
+		// $goods['hs_bili'] = str_replace($goods['hs_bili'], $goods['new_hs_bili'], $goods['btn_fxz']['bili']);
+		$goods['hs_bili'] = $goods['goods_price'] * ($goods['commission']/100) * $hs_bili;
+		$goods['hs_bili'] = sprintf("%.2f", $goods['hs_bili']);
 
 		$goods['btn_fxz']['bili'] = $goods['hs_bili'];
 		$goods['btn_zgz']['bili'] = $goods['hs_bili'];

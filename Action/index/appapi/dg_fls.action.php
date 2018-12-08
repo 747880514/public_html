@@ -364,7 +364,7 @@ class dg_flsAction extends Action{
 				array(
 					"name"=>$set1['wdqb_2_title'],
 					// "val"=>$zgcommission,
-					"val"=>$zgcommission2,
+					"val"=>$zgcommission2,	//百里
 				),
 				array(
 					"name"=>$set1['wdqb_3_title'],

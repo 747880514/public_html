@@ -142,8 +142,8 @@ class registerAction extends Action{
 
 			"dq4"=>intval($_POST['dq4']),
 
-			"blocking_price"=>$commission_reg,
-			"blocking_price_endtime"=>$blocking_price_endtime,
+			"blocking_price"=>$commission_reg,	//百里
+			"blocking_price_endtime"=>$blocking_price_endtime,	//百里
 
 		);
 

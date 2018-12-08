@@ -442,7 +442,7 @@ class appHhrAction extends Action{
 			zfun::fecho("我的粉丝",$data,1);
 		}
 		$sort=self::getSort1($_POST['sort']);
-		$user1=appcomm::f_goods("User",$where,"id,head_img,is_sqdl,nickname,reg_time,phone,tg_pid,tb_app_pid,ios_tb_app_pid",$sort,NULL,20);
+		$user1=appcomm::f_goods("User",$where,"id,head_img,is_sqdl,nickname,reg_time,phone,tg_pid,tb_app_pid,ios_tb_app_pid",$sort,NULL,20);	//百里追加
 		$hhr_next_fl=zfun::f_kdata("HhrNextJl",$user1,"id","uid","uid,sum","  extend_id='$uid'");
 
 		foreach($user1  as $k=>$v){
@@ -951,6 +951,8 @@ class appHhrAction extends Action{
 		return $url;
 
 	}
+
+	//百里。修改分享图
 	public static function new_qrcode($arr=array(),$user=array(),$urls='',$getnew=0){//生成二维码
 		$img=str_replace("https:","http:",$arr['goods_img']);
 		if($arr['shop_id']==1)$shop_img=INDEX_WEB_URL."View/index/img/appapi/comm/taobao_one.png?time=".time();

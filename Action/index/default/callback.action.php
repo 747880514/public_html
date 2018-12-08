@@ -50,6 +50,7 @@ class callbackAction extends Action {
 
 		$jf_reg = floatval($this -> getSetting('jf_reg'));
 
+		// 百里
 		// $commission_reg=floatval(self::getSetting("commission_reg"));
 
 		$jfname=self::getSetting("jf_name");

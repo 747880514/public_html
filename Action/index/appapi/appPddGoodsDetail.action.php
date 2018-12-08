@@ -105,10 +105,12 @@ class appPddGoodsDetailAction extends Action{
 				$hs_bili = 0.51;
 				break;
 		}
-		$data['hs_bili'] = explode("￥", $data['btn_fxz']['bili'])[1];
-		$data['new_hs_bili'] = $data['goods_price'] * ($data['commission']/100) * $hs_bili;
-		$data['new_hs_bili'] = sprintf("%.2f", $data['new_hs_bili']);
-		$data['hs_bili'] = str_replace($data['hs_bili'], $data['new_hs_bili'], $data['btn_fxz']['bili']);
+		// $data['hs_bili'] = explode("￥", $data['btn_fxz']['bili'])[1];
+		// $data['new_hs_bili'] = $data['goods_price'] * ($data['commission']/100) * $hs_bili;
+		// $data['new_hs_bili'] = sprintf("%.2f", $data['new_hs_bili']);
+		// $data['hs_bili'] = str_replace($data['hs_bili'], $data['new_hs_bili'], $data['btn_fxz']['bili']);
+		$data['hs_bili'] = $data['goods_price'] * ($data['commission']/100) * $hs_bili;
+		$data['hs_bili'] = sprintf("%.2f", $data['hs_bili']);
 
 		$data['btn_fxz']['bili'] = $data['hs_bili'];
 		$data['btn_zgz']['bili'] = $data['hs_bili'];

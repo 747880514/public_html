@@ -306,9 +306,9 @@ class agencyAction extends Action{
         );
 
         //百里.获取小程序二维码
-        $hs_qrcode = self::get_hs_qrcode($tid);
-        $hs_qrcode = json_decode($hs_qrcode);
-        $hs_qrcode = $hs_qrcode->url;
+        // $hs_qrcode = self::get_hs_qrcode($tid);
+        // $hs_qrcode = json_decode($hs_qrcode);
+        // $hs_qrcode = $hs_qrcode->url;
 
         //百里.替换域名生成二维码
         $url = "http://".$set['share_host']."/?mod=appapi&act=down&ctrl=get_unionid&tgid=".$tid;
@@ -316,6 +316,7 @@ class agencyAction extends Action{
         //百里.邀请码位置调整（不同位数）
         $leftpx = 285 - ( strlen($user['tid']) - 5 ) * 8;
 
+        //百里.修改样式
 		$data['list'][1] = array(//二维码
            // "url" => INDEX_WEB_URL."comm/qrcode/?url=".$arr."&size=10&codeKB=2",
 		   "url" => INDEX_WEB_URL."comm/qrcode/?url=".urlencode($url)."&size=10&codeKB=2",
@@ -337,7 +338,7 @@ class agencyAction extends Action{
 		);
 		$data['text'][1]=array(
 			"size"=>16,
-			"x"=>220,
+			"x"=>230,
 			"y"=>1260,
 			"width" => 214,
             "height" => 20,
