@@ -1,6 +1,5 @@
 <?php
 actionfun("appapi/dgappcomm");actionfun("appapi/appHhr");fun("comm");
-
 class goods_fenxiangAction extends Action{
 	public function index(){
 		$user=appcomm::signcheck();
@@ -168,6 +167,9 @@ class goods_fenxiangAction extends Action{
 		$getgoodstype=filter_check($_POST['getGoodsType']);
 		if($_POST['getGoodsType']=='dtk')$_POST['getGoodsType']='';
 		if(empty($getgoodstype)||$getgoodstype=='dtk'){	
+			actionfun("comm/dtk");
+			$dtk_goods=dtk::getgoods(str_replace(array("dtk","_"),"",$fnuo_id));	
+			if(!empty($dtk_goods['commission']))$garr['commission']=$goods['commission']=$dtk_goods['commission'];
 			if(!empty($GLOBALS['yhq_price']))$garr['yhq_price']=$GLOBALS['yhq_price'];
 			if(!empty($GLOBALS['yhq_span']))$garr['yhq_span']=$GLOBALS['yhq_span'];
 			if(!empty($GLOBALS['goods_cost_price']))$garr['goods_cost_price']=$GLOBALS['goods_cost_price'];
@@ -193,6 +195,7 @@ class goods_fenxiangAction extends Action{
 		$con=str_replace("{邀请码}",$tid,$con);
 		$commission=self::get_user_bili($garr);
 		$con=str_replace("{自购佣金}",$commission,$con);
+		$con=str_replace("{分享人自购佣金}",$garr['fcommission'],$con);
 		//判断是否
 		//fpre($goods);
 		
@@ -237,12 +240,12 @@ class goods_fenxiangAction extends Action{
 			}
 		}
 		foreach($garr['goods_img'] as $k=>$v){
-			
+			if($k!=0)continue;
 			$garr['goods_img'][$k]=INDEX_WEB_URL."?mod=appapi&act=appHhr&ctrl=getcode&img=".urlencode($v)."&fnuo_id=".$fnuo_id."&getGoodsType=".$_POST['getGoodsType']."&token=".$_POST['token'];
 			if(!empty($set['share_host'])){
 				$garr['goods_img'][$k]=str_replace(HTTP_HOST,$set['share_host'],$garr['goods_img'][$k]);
 			}
-
+			
 		}
 		$garr['goods_share_img']=INDEX_WEB_URL."View/index/img/appapi/comm/goods_share_img.png?time=".time();
 		$garr['goods_share_fontcolor']='FFFFFF';
@@ -275,7 +278,9 @@ class goods_fenxiangAction extends Action{
 		$garr['fxz'] = str_replace($garr['fx_commission'], $garr["hs_bili"], $garr['fxz']);
 		$garr['fx_commission'] = $garr["hs_bili"];
 
+		
 		appcomm::set_app_cookie($garr);
+		
 		zfun::fecho("分享",$garr,1,1);
 		//fpre($arr);
 	}
@@ -324,7 +329,7 @@ class goods_fenxiangAction extends Action{
 			zfun::fecho("请升级更高等级享受分享赚");
 		}
 		if(intval($user['hhr_gq_time'])>0&&$user['hhr_gq_time']<time()){
-			zfun::fecho("请续费会员享受分享赚");
+		//	zfun::fecho("请续费会员享受分享赚");
 		}
 	}
 	

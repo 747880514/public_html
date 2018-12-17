@@ -21,30 +21,32 @@ class cwdl_rule{
 		if(empty($tgid))return false;
 		$count=zfun::f_count("User","extend_id='$tgid'");
 		$user=zfun::f_row("User","id='$tgid'","yq_xj_count,is_sqdl");
-		if($user['yq_xj_count']<$count&&!empty($count)){
+		if($user['yq_xj_count'].''!=$count.''){
 			zfun::f_update("User","id='$tgid'",array("yq_xj_count"=>$count));//修改下级的累积数量
-
-		}else $count=$user['yq_xj_count'];
+			
+		}
 	    $count=intval($count);
 	   	return $count;
-
+		
 	}
-
+	
 	static function yq_next_friend($uid=0,$t=0){
 		if(empty($uid))return 0;
 		$user=zfun::f_row("User","id='{$uid}'","id,yq_all_count");
 		if(empty($user))return 0;
 		actionfun("comm/order");
-		$result=order::get_lower($uid);
+		//$result=order::get_lower($uid);
+		$count=zfun::f_count("Nexus","extend_uid='{$uid}' and bili<>0");
+		
 		//判断是否要更新 用户团队人数
-		if($user['yq_all_count'].''!=$result['lower_count'].''){
-			zfun::f_update("User","id='{$uid}'",array("yq_all_count"=>$result['lower_count']));
+		if($user['yq_all_count'].''!=$count.''){
+			zfun::f_update("User","id='{$uid}'",array("yq_all_count"=>$count));	
 		}
 		//总人数
-		$count=count($result['user_arr'])-1;
-		return $count;
+		$allcount=zfun::f_count("Nexus","extend_uid='{$uid}'");
+		return $allcount;
 	}
-
+	
 	/*public static function yq_next_friend($tgid=0,$t=0){//邀请下级下下级累积
 		if(empty($tgid))return false;
 		$user=zfun::f_row("User","id='$tgid'","yq_all_count,is_sqdl");
@@ -56,22 +58,28 @@ class cwdl_rule{
 		$count=$data_all['count'];
 		$count=intval($count);
 		return $count;
-
+	
 	}*/
-
+	
 	//累积自购佣金
-	public static function lj_buy($tgid=0,$t=0){
-		if(empty($tgid))return false;
-		$user=zfun::f_row("User","id='$tgid'","gm_all_commission,is_sqdl");
+	public static function lj_buy($uid=0,$t=0){
+		if(empty($uid))return false;
+		$user=zfun::f_row("User","id='$uid'","gm_all_commission,is_sqdl");
 		//订单佣金
+
+		/*
 		$count=zfun::f_sum("Order","status='订单结算' and uid='$tgid'","commission");
 		if($user['gm_all_commission']<$count&&!empty($count)){
 			zfun::f_update("User","id='$tgid'",array("gm_all_commission"=>$count));//修改返利
-
+			
 		}else $count=$user['gm_all_commission'];
-	    $count=floatval($count);
-		return $count;
+		$count=floatval($count);*/
 
+		//自购累计
+		$zigou=zfun::f_sum("Rebate","uid='".$uid."' and comment='自购'","fcommission");
+		zfun::f_update("User","id='{$uid}'",array("gm_all_commission"=>$zigou));
+		return $zigou;
+		
 	}
 	//自动升级操作
 	public static function zdsj_doing($tgid=0,$t=0){
@@ -90,32 +98,32 @@ class cwdl_rule{
 		if($t==1)return $arr;
 		$user=zfun::f_row("User","id='$tgid'");
 		$set=self::setset();
-
+		
 		if(intval($set['fxdl_zdsj_onoff'])==0)return false;//如果开关是关闭不能自动升级
 		$fxdl_lv=$set['fxdl_lv'];
 		$vip=intval($user['is_sqdl'])+1;
 		$sj_lv=0;
-
+		
 		//条件是否满足
-
+		
 		for($i=1;$i<=$fxdl_lv;$i++){
 			if($vip>=$i)continue;
-
+			
 			$check_dl=self::cwdl_tj($user,$i,$arr,1);//条件
 			if($check_dl==false)continue;
 			$sj_lv=$i;
-
+		
 		}
-
+		
 		if(intval($sj_lv)==0)return;
 		if(intval($sj_lv)<=$vip)return;
 		/****************判断是不是要付款的，付款的不能自动升级*****************/
 		$sj_tj=intval($set['fxdl_pay_tj'.$sj_lv]);
 		if($sj_tj==0||$sj_tj==1)return false;
-
+		
 		/*********************************/
 		$count_dljl=zfun::f_count("DLList","uid='$tgid' and checks=1");
-
+	
 		//if(empty($count_dljl)){
 			$arr=array(
 				"time"=>time(),
@@ -135,7 +143,7 @@ class cwdl_rule{
 			$arr['data']=json_encode($tmp);
 			zfun::f_insert("DLList",$arr);
 		//}
-
+		
 		//存到记录表
 		if($sj_lv>1){
 			$msg="升级成为".$set['fxdl_name'.$sj_lv];
@@ -150,15 +158,15 @@ class cwdl_rule{
 	}
 	//成为代理条件
 	public static function cwdl_tj($user=array(),$id,$arr,$t=0){
-
+		
 		if(empty($user))return false;
 		if(empty($arr))return false;
 		if(empty($id))return false;
 		$uid=intval($user['id']);
 		$set=zfun::f_getset("fxdl_sjmodel_onoff,fxdl_zdssdl_onoff,fxdl_ljzt".$id.",fxdl_jzlj".$id.",fxdl_zgfl".$id);
-
+		
 		$sjms=intval($set['fxdl_sjmodel_onoff']);
-
+		
 		$count=intval($arr['fxdl_ljzt']);
 		$count1=intval($arr['fxdl_jzlj']);
 		$count2=floatval($arr['fxdl_zgfl']);
@@ -179,15 +187,15 @@ class cwdl_rule{
 				"have_full"=>0,
 			),
 		);
-
+		
 		//判斷 是否已經設置
 		if(empty($set['fxdl_ljzt'.$id]))$tj_arr[1]['have_set']=0;
 		if(empty($set['fxdl_jzlj'.$id]))$tj_arr[2]['have_set']=0;
 		if(empty($set['fxdl_zgfl'.$id]))$tj_arr[3]['have_set']=0;
 		//判斷是否滿足條件
-		if($count>=intval($set['fxdl_ljzt'.$id])&&!empty($set['fxdl_ljzt'.$id]))$tj_arr[1]['have_full']=1;
-		if($count1>=intval($set['fxdl_jzlj'.$id])&&!empty($set['fxdl_jzlj'.$id]))$tj_arr[2]['have_full']=1;
-		if($count2>=floatval($set['fxdl_zgfl'.$id])&&!empty($set['fxdl_zgfl'.$id]))$tj_arr[3]['have_full']=1;
+		if($count>=intval($set['fxdl_ljzt'.$id])&&!empty($set['fxdl_ljzt'.$id]))$tj_arr[1]['have_full']=1;				
+		if($count1>=intval($set['fxdl_jzlj'.$id])&&!empty($set['fxdl_jzlj'.$id]))$tj_arr[2]['have_full']=1;	
+		if($count2>=floatval($set['fxdl_zgfl'.$id])&&!empty($set['fxdl_zgfl'.$id]))$tj_arr[3]['have_full']=1;	
 		zfun::isoff($tj_arr);
 		$sj=1;
 		$sj_count=0;
@@ -198,7 +206,7 @@ class cwdl_rule{
 		}
 		if($sjms==1)$sj=0;
 		foreach($tj_arr as $k=>$v){//一个条件满足情况下的判断
-			//如果 後台設置 也满足条件
+			//如果 後台設置 也满足条件 
 			if($v['have_full']==1&&$tj_arr[$k]['have_set']==1&&$sjms==1)$sj=1;
 		}
 		//如果三个都是0
@@ -206,7 +214,7 @@ class cwdl_rule{
 		zfun::isoff($sj,1);
 		if($sj==1)return true;
 		return false;
-
+		
 	}
 	/**********非接口*********/
 	//获取下级方法
@@ -246,9 +254,9 @@ class cwdl_rule{
 			}
 		}
 		return array("darr"=>$darr,"uids"=>$uids,"count"=>$cou);
-
+		
 	}
-
+	
 	public static function adddetail($msg='',$uid=0,$type=0,$data=array(),$time=0){
 		$arr=array("time"=>time(),"uid"=>$uid,"detail"=>$msg,"type"=>$type);
 		if(!empty($data)){

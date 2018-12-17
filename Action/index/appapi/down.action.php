@@ -176,7 +176,7 @@ class downAction extends Action{
 	{
 		$code = $_REQUEST['code'];
 		$tgid = $_SESSION['down_tgid'];
-		$set=zfun::f_getset("share_host,blocking_price_endday");
+		$set=zfun::f_getset("share_host");
 
 		/*根据code获取用户openid*/
 		$url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid=wx22b99a9b76e68aff&secret=7c34b8015bf2129fe57184c1ce1344c2&code=".$code."&grant_type=authorization_code";
@@ -224,6 +224,7 @@ class downAction extends Action{
 
 		//检测用户，注册
 		$user = zfun::f_row("User", "weixin_au = '".$unionid."' OR weixin_au = '".$openid."'");
+
 		if(!$user)
 		{
 			$commission_reg = floatval(self::getSetting("commission_reg"));
@@ -232,8 +233,8 @@ class downAction extends Action{
 			$tgidkey = $this->getApp('Tgidkey');
 			$tgid = $tgidkey->Decodekey($tgid);
 
-			//首单结束期限
-			$blocking_price_endtime = $set['blocking_price_endday'] > 0 ? $set['blocking_price_endday'] : 3;
+			//百里
+			$blocking_price_endtime = self::getSetting('blocking_price_endday') > 0 ? self::getSetting('blocking_price_endday') : 3;
 			$blocking_price_endtime = time() + $blocking_price_endtime * 24 * 3600;
 
 			$arr=array(
@@ -245,6 +246,7 @@ class downAction extends Action{
 				"login_time"=>time(),
 
 				// "commission"=>$commission_reg,
+				"commission"=>0,
 
 				"integral"=>$jf_reg,
 
@@ -268,10 +270,9 @@ class downAction extends Action{
 
 				"wx_data" => serialize($obj_data),
 
-				"blocking_price" => $commission_reg,	//*****需要注释掉commission字段
+				"blocking_price" => $commission_reg,
 
-				"blocking_price_endtime" => $blocking_price_endtime,	//首单结束期限
-
+				"blocking_price_endtime" => $blocking_price_endtime,	//3天内
 
 			);
 

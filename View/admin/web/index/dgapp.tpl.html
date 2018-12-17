@@ -1,2473 +1,1271 @@
-<!DOCTYPE html>
-
-<html lang="en">
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <title>后台</title>
-
-    <link rel="stylesheet" href="../../css/index/index_home.css">
-
-    <link rel="stylesheet" href="../../css/comm/ocomm.css">
-
-    <script src="../../js/comm/jquery.min.js" type="text/javascript"></script>
-
-    <script src="../../js/index/home_stretch.js" type="text/javascript"></script>
-
-    <script type="text/javascript" src="../../js/index/index_home.js"></script>
-
-    <script src="../../js/comm/Cookie.js"></script>
-
-    
-
-	<script type="text/javascript">
-
-    var act='{offact}';
-
-    var mod='{offmod}';
-
-    var meurl='{INDEX_WEB_URL}';
-
-    var meadmin='{offadmin}';
-
-    </script>
-
-</head>
-
-<body style="background-image:url({WebIndexImg});background-position: center; width:100%; height:100%;background-size:cover">
-
-<div class="bj_out-box">
-
-   <!-- <div class="landscape"></div>
-
-    <div class="filter"></div>
-
-    <canvas id="canvas" class="bj_canvas"></canvas>-->
-
-    
-
-</div>
-
-<div class="content">
-
-    <div class="nav-box">
-
-        <div class="nav_l"><p "end_time"="{array:sq_arr:end_time}" "info"="{array:sq_arr:info}" >版本：{versionNo}&nbsp;&nbsp;
-
-        <if condition="'{array:sq_arr:show}'=='1'">{array:sq_arr:info}</if>
-
-        </p></div>
-
-        <div class="nav_r">
-
-            <ul class="nav-ul">
-
-                <li class="nav-li">
-
-                   <a href="#" class="nav-sbox"><span>欢迎使用，admin</span></a>
-
-                </li>
-
-               <!--  <li class="nav-li">
-
-                    <a href="{INDEX_WEB_URL}" target="_blank" class="nav-sbox"><span>网站首页</span></a>
-
-                </li>
-
-                <if condition="'{fnuo_set_onoff}'=='0'">
-
-               <li class="nav-li">
-
-                    <a href="http://www.fanlios.com" target="_blank" class="nav-sbox"><span>开发官网</span></a>
-
-                </li>
-
-                </if>
-
-                <li class="nav-li">
-
-                    <a href="http://www.fanlichengxu.com/support.php" target="_blank" class="nav-sbox"><span>支持教程</span></a>
-
-                </li> -->
-
-<script>
-
-$(document).ready(function(e) {
-
-	$("*[open_window='on']").click(function(){
-
-		$("*[window='"+$(this).attr("window_val")+"']").click();
-
-		return false;	
-
-	});
-
-});
-
-</script>
-
-                <!-- <li class="nav-li">
-
-                    <a href="#" class="nav-sbox" id="hot_nav"><span>热门点击</span></a>
-
-                    <div class="nav-erj">
-
-                        <a class="erj_item" href="#" open_window="on" window_val="cwbb">财务报表</a>
-
-                        <a class="erj_item" href="#" open_window="on" window_val="ddgl">订单管理</a>
-
-                    </div>
-
-                </li> -->
-
-                <!--<li class="nav-li">
-
-                    <a href="#" class="nav-sbox" id="set_nav"><span>设置</span></a>
-
-                    <div class="nav-erj">
-
-                        <a class="erj_item" href="#">更改背景图片</a>
-
-                        <a class="erj_item" href="#">更多设置</a>
-
-                    </div>
-
-                </li>-->
-
-                <li class="nav-li">
-
-                    <a href="{link:login-adminLoginOut}" class="nav-sbox"><span>退出登录</span></a>
-
-                </li>
-
-            </ul>
-
-        </div>
-
-    </div>
-
-    <div class="tabs-box">
-
-        <ul class="tabs-ul">
-
-            <li n="0" class="tabs-li" id="index_li" key="00">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/icon01.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/icon01.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">后台首页</p>
-
-                <div class="tabs-bk"></div>
-
-                <!--<span class="window_discou">1</span>-->
-
-            </li>
-
-             <li n="10" class="tabs-li">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/icon11.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/icon11.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">程序管理</p>
-
-               <div class="tabs-bk"></div>
-
-            </li>
-
-            <li n="1" class="tabs-li">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/icon02.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/icon02.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">订单管理</p>
-
-               <div class="tabs-bk"></div>
-
-            </li>
-
-            <li n="2" class="tabs-li">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/icon03.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/icon03.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">网站设置</p>
-
-               <div class="tabs-bk"></div>
-
-            </li>
-
-            <li n="3" class="tabs-li">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/icon04.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/icon04.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">商品管理</p>
-
-               <div class="tabs-bk"></div>
-
-            </li>
-
-            <li n="4" class="tabs-li">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/icon05.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/icon05.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">会员管理</p>
-
-               <div class="tabs-bk"></div>
-
-            </li>
-
-            <li n="5" class="tabs-li">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/icon06.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/icon06.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">商家管理</p>
-
-               <div class="tabs-bk"></div>
-
-            </li>
-
-            <li n="6" class="tabs-li">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/icon07.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/icon07.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">积分商城</p>
-
-               <div class="tabs-bk"></div>
-
-            </li>
-
-            <!--<li n="16" class="tabs-li">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/icon17.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/icon17.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">一元购</p>
-
-               <div class="tabs-bk"></div>
-
-            </li>-->
-
-          
-
-            <li n="7" class="tabs-li">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/icon08.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/icon08.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">权限管理</p>
-
-               <div class="tabs-bk"></div>
-
-            </li>
-
-            <li n="8" class="tabs-li">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/icon09.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/icon09.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">文章资讯</p>
-
-               <div class="tabs-bk"></div>
-
-            </li>
-
-            <li n="9" class="tabs-li">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/icon10.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/icon10.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">财务管理</p>
-
-               <div class="tabs-bk"></div>
-
-            </li>
-
-           
-
-            <!--<li n="11" class="tabs-li">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/icon12.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/icon12.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">帮帮管理</p>
-
-               <div class="tabs-bk"></div>
-
-            </li>
-
-            -->
-
-              
-
-            <li n="17" class="tabs-li">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/icon18.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/icon18.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">反馈管理</p>
-
-               <div class="tabs-bk"></div>
-
-            </li>
-
-            
-
-            <li n="19" class="tabs-li">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/icon16.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/icon16.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">WAP设置</p>
-
-               <div class="tabs-bk"></div>
-
-            </li>
-
-            
-
-             <li n="20" class="tabs-li">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/miniapps.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/miniapps.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">小程序</p>
-
-               <div class="tabs-bk"></div>
-
-            </li>
-
-            
-
-             <li n="18" class="tabs-li">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/icon15.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/icon15.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">导购APP</p>
-
-               <div class="tabs-bk"></div>
-
-            </li>
-
-            
-
-           
-
-            
-
-            <!--<li n="15" class="tabs-li">
-
-                <div class="t_img-box">
-
-                    <img class="icon1" src="../../img/index/index_home/icon16.png" alt="">
-
-                    <img class="icon2" src="../../img/index/index_home/icon16.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">商城APP</p>
-
-               <div class="tabs-bk"></div>
-
-            </li>-->
-
-            
-
-            <li class="tabs-li">
-
-                <img class="home_boundary" src="../../img/index/index_home/home_boundary.png" alt="">
-
-            </li>
-
-            <li n="18" class="small_li-box ">
-
-                <div class="t_img-box">
-
-                    <img class="s_icon1" src="../../img/index/index_home/icon00.png" alt="">
-
-                    <img class="s_icon2" src="../../img/index/index_home/icon00.png" alt="">
-
-                </div>
-
-                <p class="tabs-text">化小窗口</p>
-
-               <div class="tabs-bk"></div>
-
-                <span class="window_discou">1</span>
-
-            </li>
-
-        </ul>
-
-        <!--二级菜单-->
-
-        <div class="menu-box">
-
-            <ul class="menu-ul">
-
-                
-
-                
-
-                <li n="0" class="menu-li menu-li1">
-
-                </li>
-
-                
-
-                <li n="10" class="menu-li menu-li2">
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b">基本设置</b>
-
-                            <div> 
-
-                                <i url="{link:website-basic_set}">基础设置</i>
-
-                                <i url="{link:website-navigation_manage}">导航管理</i>
-
-                                <i url="{link:procedure_manage-debugging_demo}">调试模式</i>
-
-                                <i url="{link:website-map_column}">网站地图栏目管理</i>
-
-                                <i url="{link:website-map_navigation_manage}">网站地图导航管理</i>
-
-                                <i url="{link:website-sigin_deal}">注册协议</i>
-
-                                <i url="{link:website-copyright_set}">版权设置</i>
-
-                                <i url="{link:website-share_set}">分享设置</i>
-
-                                <i url="{link:website-sigin_share_set}">注册分享设置</i>
-
-                                <i url="{link:index_r_qrcode-index}">pc搜索框右侧二维码</i>
-
-                            </div>
-
-                    
-
-                       
-
-                        <b val="3" class="menu2-b">缓存管理</b>
-
-                        <div> 
-
-                            <i url="{link:cache-index}">模块缓存</i>
-
-                            <i url="{link:cache-datacache}">数据缓存</i>
-
-                            <i url="{link:cache-clear}">清除缓存</i>
-
-                        </div>
-
-                        <b val="4" class="menu2-b">系统修复</b>
-
-                        <div> 
-
-                             <i url="{link:repair-index}">系统还原</i>
-
-                            <i url="{link:repair-restore}">清除还原点</i>
-
-             
-
-                        </div>
-
-                        <b val="5" class="menu2-b">搜索系统</b>
-
-                        <div> 
-
-                            <i url="{link:procedure_manage-statistics}">搜索统计</i>
-
-                        </div>
-
-                        <b val="6" class="menu2-b">操作日志</b>
-
-                        <div> 
-
-                            <i url="{link:procedure_manage-operation_log}">操作日志</i>
-
-                     
-
-                        </div>
-
-                    </div>
-
-                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
-
-                </li>
-
-                
-
-                <li n="1" class="menu-li menu-li3">
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b" window="ddgl">订单管理</b>
-
-                        <div> 
-
-                            <i url="{link:shop_manage-order_list}">淘宝订单列表</i>
-
-                            <i url="{link:filter_order_set-index}">淘宝订单导入过滤设置</i>
-
-                            <i url="{link:tb_order_xcmr-index}">淘宝跟单设置</i> 
-
-                            <i url="{link:pdd_manage-order_list}">拼多多列表</i>
-
-                            <i url="{link:jd_manage-order_list}">京东订单列表</i>
-
-                            <i url="{link:update_order-index}">升级订单列表</i>
-
-                            <i url="{link:shop_manage-czk_list}">充值卡订单</i>
-
-                            <!--<i url="{link:tbkorder-index}">一键检测有效订单</i>-->
-
-                            
-
-
-
-                        </div>
-
-                        
-
-                        <!--<b val="1" class="menu2-b">退款管理</b>
-
-                        <div>
-
-                            <i url="{link:shop_manage-reimburse_manage}">退款管理</i>
-
-                        </div>
-
-                        <b val="2" class="menu2-b">申诉管理</b>
-
-                        <div>
-
-                            <i url="{link:shop_manage-appeal_manage}">申诉管理</i>
-
-                        </div>-->
-
-                      
-
-                    </div>
-
-                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
-
-                </li>
-
-                <li n="2" class="menu-li menu-li4">
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b">首页风格</b>
-
-                        <div> 
-
-                            <i url="{link:diy-index}">首页风格</i>
-
-                            <!--<i url="{link:website-one_buy_style}">一元购风格</i>-->
-
-                        </div>
-
-                         <b val="1" class="menu2-b">广告管理</b>
-
-                        <div> 
-
-                            <i url="{link:shop_manage-ad_list}">广告列表</i>
-
-                            <i url="{link:shop_manage-ad_silde_list}">幻灯片列表</i>
-
-                        </div>
-
-                        <b val="2" class="menu2-b">制度设置</b>
-
-                        <div> 
-
-                       
-
-                           <i url="{link:website-jf_set}">积分设置</i>
-
-                           <!--<i url="{link:website-shop_enter}">入驻商设置</i>-->
-
-                           
-
-                           <i url="{link:website-rebate_set}">返利设置</i>
-
-                        </div>
-
-                        <b val="3" class="menu2-b">客服管理</b>
-
-                        <div> 
-
-                            <i url="{link:website-service}">客服管理</i>
-
-                        </div>
-
-                        <b val="4" class="menu2-b">搜索引擎优化</b>
-
-                        <div> 
-
-                            <i url="{link:pss-set}">伪静态</i>
-
-                            <i url="{link:pss-create}">一键伪静态</i>
-
-                            <i url="{link:website-seo_message}">SEO信息</i>
-
-                            
-
-                        </div>
-
-                        <b val="5" class="menu2-b">系统集成</b>
-
-                        <div> 
-
-                        	 <i url="{link:zm_jd_set-zm_set}">智盟设置</i>
-
-                            <i url="{link:website-threelogin}">第三方登录集成</i>
-
-                            <i url="{link:website-taobao_alliance}">淘宝联盟</i>
-
-                           
-
-                            <i url="{link:website-alipay_set}">支付宝设置</i>
-
-                            <i url="{link:alipay_set-index}">支付宝转账</i>
-
-                            <!--<i url="{link:website-tenpay_set}">财付通设置</i>-->
-
-                            <i url="{link:website-mailbox_set}">邮箱设置</i>
-
-                            <i url="{link:website-mobile_set}">手机设置</i>
-
-                            <!--
-
-                            <i url="{link:website-jingdong_set}">京东设置</i>
-
-                            <i url="{link:jdpayset-set}">京东支付</i>-->
-
-                            
-
-                            <i url="{link:website-jd_zeus}">京东宙斯设置</i>
-
-                            <i url="{link:website-jd_kepler}">京东开普勒设置</i>
-
-                            <i url="{link:website-duomai_set}">多麦设置</i>
-
-                            <!--<i url="{link:website-rivers_set}">百川设置</i>-->
-
-                            <i url="{link:taobaoapi-index}">淘宝api设置</i>
-
-                            <i url="{link:website-juhe_set}">聚合设置</i>
-
-                            
-
-                            <!--<i url="{link:almm_tongxun-index}">阿里妈妈设置</i>-->
-
-                            <i url="{link:almm_hyq-index}">优惠券设置</i>
-
-                        </div>
-
-                        <!--<b val="5" class="menu2-b">帮助中心</b>-->
-
-                        <!--<div> &lt;!&ndash;三级菜单&ndash;&gt;-->
-
-                            <!--<i url="{link:website-help_center}">分类管理</i>-->
-
-                            <!--<i url="{link:website-article_manage}">文章管理</i>-->
-
-                        <!--</div>-->
-
-                        <b val="6" class="menu2-b">城市管理</b>
-
-                        <div> 
-
-                            <i url="{link:website-city_manage}">城市管理</i>
-
-                        </div>
-
-                        
-
-                        <b val="7" class="menu2-b">友情链接</b>
-
-                        <div> 
-
-                            <i url="{link:dg_friendlink-index}">友情链接</i>
-
-                        </div>
-
-                        
-
-                        <b val="8" class="menu2-b">智莺助手</b>
-
-                        <div> 
-
-                            <i url="{link:CSharp-apikey}">智莺助手</i>
-
-                        </div>
-
-                        
-
-                        
-
-                    </div>
-
-                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
-
-                </li>
-
-                <li n="3" class="menu-li menu-li5">
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b">商品管理</b>
-
-                        <div> 
-
-                            <i url="{link:goods_manage-goods_list}">商品列表</i>
-
-                            <i url="{link:goods_manage-taobaoaddgoods}">发布淘宝商品</i>
-
-                            <i url="{link:commoditymana-generalinfo}">添加新商品</i>
-
-                            <i url="{link:jdgoods-add}">京东商品发布</i>
-
-                            <i url="{link:jdgoods-getgoodslist}">京东批量添加</i>
-
-                            <i url="{link:goods_manage-add_goods_column}">添加商品栏目</i>
-
-                            <i url="{link:goods_manage-coupon_goods}">优惠券商品</i>
-
-                        </div>
-
-                        
-
-                        <b val="0" class="menu2-b">淘宝商品采集</b>
-
-                        <div>
-
-                            <i url="{link:wuliao_goods-rule}">物料商品采集</i>
-
-                            <i url="{link:tbapi-rule}">淘宝商品采集</i>
-
-                            <i url="{link:highcommission-showgroup}">超高返商品采集</i>
-
-                            <i url="{link:alapi-rule}">淘宝超级采集器</i>
-
-                        </div>
-
-                        
-
-                        <b val="1" class="menu2-b">商品基础设置</b>
-
-                        <div> 
-
-                            <i url="{link:category-index}">淘宝商品分类</i>
-
-                             <i url="{link:JdCategory-index}">京东商品分类</i>
-
-                             <i url="{link:PddCategory-index}">拼多多商品分类</i>
-
-                            <!--<i url="{link:goods_manage-goods_type}">商品类型</i>-->
-
-                            <!--<i url="{link:goods_manage-propert_manage}">属性管理</i>-->
-
-                        </div>
-
-                        <b val="2" class="menu2-b">商城返利</b>
-
-                        <div> 
-
-                            <i url="{link:goods_manage-goods_rebate}">商城返利</i>
-
-                        </div>
-
-                        <b val="3" class="menu2-b">活动管理</b>
-
-                        <div> 
-
-                            <i url="{link:goods_manage-activity_manage}">活动管理</i>
-
-                        </div>
-
-                        <b val="4" class="menu2-b">优惠券商品采集</b>
-
-                        <div> 
-
-                            <i url="{link:goods_manage-caiji_1}">优惠券商品采集</i>
-
-                            <i url="{link:goods_manage-column_set}">采集设置</i>
-
-                        </div>
-
-                        
-
-                        <!--<b val="4" class="menu2-b">供应商商品</b>
-
-                        <div>
-
-                            <i url="{link:goods_manage-store_agency_goods}">商品列表</i>
-
-                        </div>-->
-
-                        
-
-                        <b val="4" class="menu2-b">油卡、充值管理  </b>
-
-                        <div> 
-
-                            <i url="{link:goods_manage-paycz_sjk}">手机卡设置</i>
-
-                            <i url="{link:goods_manage-paycz_jyk1}">中石化加油卡设置</i>
-
-                            <i url="{link:goods_manage-paycz_jyk2}">中石油加油卡设置</i>
-
-                        </div>
-
-                    </div>
-
-                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
-
-                </li>
-
-                <li n="4" class="menu-li menu-li6">
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b">会员管理</b>
-
-                        <div> 
-
-                            <i url="{link:member_manage-member_list}">会员列表</i>
-
-                            <i url="{link:member_manage-integral_handle_log}">积分明细</i>
-
-                            <i url="{link:commission_record-index}">订单佣金明细</i>
-
-                            <i url="{link:user_pid-index}">会员推广位</i>
-
-                            <!--<i url="{link:member_manage-member_rz}" style="display:none">会员认证</i>
-
-                            <i url="{link:member_manage-member_level}">会员等级</i>-->
-
-                        </div>
-
-                        <b val="1" class="menu2-b">分佣管理</b>
-
-                        <div> 
-
-                        	<i url="{link:update_goods-index}">商品列表</i>
-
-                            <i url="{link:update_goods-set}">购买商品升级设置</i>
-
-							<i url="{link:operator-set}">分佣模式</i>
-
-							<i url="{link:dg_newdl-index}">代理审核</i>
-
-							<i url="{link:hhr_set-set}">代理相关设置</i>
-
-							<i url="{link:pc_appModel-appgaolist}">代理海报</i>
-
-							<i url="{link:fx_newset-fx_set}">会员等级设置</i>
-
-							<i url="{link:fx_newset-fx_set_hy}">推广分佣</i>
-
-                         	<i url="{link:memLV_strategy-strategy}">会员等级页面设置</i>
-
-                        </div>
-
-                        
-
-                        <b val="1" class="menu2-b">代理费分佣</b>
-
-                        <div> 
-
-							<i url="{link:fx_newset-fx_set_dl}">代理费分佣</i>
-
-                            <i url="{link:hhr_td_dlf-index}">团队代理费分佣</i>
-
-                        </div>
-
-                        
-
-                        <b val="1" class="menu2-b">区域代理</b>
-
-                        <div> 
-
-                            <i url="{link:website-agency_set}">区域代理设置</i>
-
-                            <i url="{link:sjdl-index}">区域代理审核</i>
-
-                        </div>
-
-                        
-
-                        <b val="1" class="menu2-b">抽成管理</b>
-
-                        <div> 
-
-                            <i url="{link:choucheng-set}">联盟抽成设置</i>
-
-                            <i url="{link:choucheng-pingtai}">平台抽成设置</i>
-
-                        </div>
-
-                        
-
-                        <b val="1" class="menu2-b">提现管理</b>
-
-                        <div>
-
-                        	<i url="{link:member_manage-agency_audit}">提现审核</i>
-
-                        	<i url="{link:agency-agency_tx}">代理提现审核</i>
-
-                        </div>
-
-                        
-
-                        <b val="2" class="menu2-b">站内消息</b>
-
-                        <div> 
-
-                          <i url="{link:stationmsg-messagebox}">消息发件箱</i>
-
-                            <i url="{link:stationmsg-manage_tz}">发送消息</i>
-
-                        </div>
-
-                    </div>
-
-                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
-
-                </li>
-
-                <li n="5" class="menu-li menu-li7">
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b">店铺管理</b>
-
-                        <div> 
-
-                            <i url="{link:store_manage-shopping_store}">导购店铺</i>
-
-                            <i url="{link:store_manage-rule}">店铺采集</i>
-
-                            <i url="{link:store_manage-shopping_storeCates}">导购店铺分类</i>
-
-                            <i url="{link:store_manage-store_banner}">店铺默认banner</i>
-
-                        </div>
-
-                       
-
-                       <!--
-
-                        <b val="1" class="menu2-b">店铺信息审核</b>
-
-                        <div>
-
-                            <i url="{link:store_manage-store_audit_list}">店铺审核列表</i>
-
-                            <i url="{link:store_manage-store_agency_list}">供应商审核列表</i>
-
-                            <i url="{link:store_manage-store_cate_manage}">店铺分类管理</i>
-
-                            <i url="{link:store_manage-store_name_approve}">商家实名认证</i>
-
-                            <i url="{link:store_manage-supplier_name_approve}">供应商实名认证</i>
-
-                            <i url="{link:store_manage-store_upShop_approve}">商家开店认证</i>
-
-                            <i url="{link:store_manage-supplier_upshop_approve}">供应商开店认证</i>
-
-                        </div>
-
-                        -->
-
-                        
-
-                        <!--<b val="2" class="menu2-b">物流管理</b>
-
-                        <div> 
-
-                            <i url="{link:store_manage-logistics_manage}">物流管理</i>
-
-                            <i url="{link:store_manage-logistics_key}">物流接口Key</i>
-
-                        
-
-                        </div>-->
-
-                        
-
-                    </div>
-
-                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
-
-                </li>
-
-                <li n="6" class="menu-li menu-li17">
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b">积分管理</b>
-
-                        <div> 
-
-                            <i url="{link:integral_manage-integral_shop_list}">积分商品列表</i>
-
-                            <i url="{link:integral_manage-integral_goods_class}">积分商品分类</i>
-
-                            <i url="{link:integral_manage-exchange_audit}">兑换审核</i>
-
-                        </div>
-
-                    </div>
-
-                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
-
-                </li>
-
-                
-
-                <!--<li n="16" class="menu-li menu-li8">
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b">一元购</b>
-
-                        <div> 
-
-                            <i url="{link:website-one_buy_style}">一元购风格</i>
-
-                           
-
-                        </div>
-
-                        <b val="0" class="menu2-b">一元管理</b>
-
-                        <div> 
-
-                            <i url="{link:one_buy-oneBuy_goods_list}">商品列表</i>
-
-                            <i url="{link:one_buy-oneBuy_goods_class}">商品分类</i>
-
-                            <i url="{link:one_buy-user_share}">用户晒单</i>
-
-                            <i url="{link:one_buy-prize_details}">中奖明细</i>
-
-                        </div>
-
-                    </div>
-
-                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
-
-                </li>-->
-
-                <li n="7" class="menu-li menu-li8">
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b">管理员</b>
-
-                        <div> 
-
-                            <i url="{link:authority_management-admin_list}">管理员列表</i>
-
-                            <i url="{link:authority_management-authority_grouping}">权限分组</i>
-
-                            <i url="{link:authority_management-authority_demo_manage}">权限模块管理</i>
-
-                            <i url="{link:authority_management-admin_authority}">管理员权限</i>
-
-                        </div>
-
-                        <b val="0" class="menu2-b">修改后台密码</b>
-
-                        <div> 
-
-                            <i url="{link:authority_management-reset_password}">后台修改密码</i>
-
-                          
-
-                        </div>
-
-                    </div>
-
-                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
-
-                </li>
-
-                <li n="8" class="menu-li menu-li9">
-
-                  
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b">分类管理</b>
-
-                        <div> 
-
-                            <!--<i url="{link:fnuo_mailbox-fnuo_mailbox}">文章咨询</i>-->
-
-                            <i url="{link:website-help_center}">分类管理</i>
-
-                            <i url="{link:website-article_manage}">文章管理</i>
-
-                        </div>
-
-                    </div>
-
-                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
-
-                </li>
-
-                <li n="9" class="menu-li menu-li10">
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b" window="cwbb">财务报表</b>
-
-                        <div> 
-
-                            <i url="{link:financial_statement-financial_statement}">网站收益佣金</i>
-
-                        
-
-                        </div>
-
-                    
-
-                    </div>
-
-                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
-
-                </li>
-
-                
-
-                <!--
-
-                <li n="11" class="menu-li menu-li11">
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b">帮帮管理</b>
-
-                        <div> 
-
-                            <i url="{link:bangbang_manage-fw}">帮帮服务审核</i>
-
-                            <i url="{link:bangbang_manage-xq}">帮帮需求审核</i>
-
-                            <i url="{link:bangbang_manage-fwlx}">帮帮服务类型设置</i>
-
-                            <i url="{link:bangbang_manage-fwfs}">帮帮服务方式设置</i>
-
-                            <i url="{link:bangbang_manage-ly}">帮帮留言管理</i>
-
-                        </div>
-
-                    </div>
-
-                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
-
-                </li>-->
-
-                
-
-                <li n="17" class="menu-li menu-li12">
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b">反馈管理</b>
-
-                        <div> 
-
-                             <i url="{link:fkgl-ideasBoxlist}">反馈列表</i>
-
-                             <i url="{link:fkgl-ideasBoxtype}">反馈类型</i>
-
-                        </div>
-
-                    </div>
-
-                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
-
-                </li>
-
-               
-
-               
-
-                
-
-                 <li n="19" class="menu-li menu-li11">
-
-                  
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b">基础设置</b>
-
-                        <div> 
-
-                           <!-- <i url="{link:wap_set-index}">WAP首页风格</i>-->
-
-                            <i url="{link:wap_index_model-index|web_type=index}">WAP首页风格</i>
-
-							<i url="{link:wap_jbset-index}">基本设置</i>
-
-                            <i url="{link:wap_footnav-footnav}">底部图标设置</i>
-
-                            <i url="{link:wap_mem_set-index}">会员中心设置</i>
-
-                          	<i url="{link:wap_userico-indexkeyword}">热搜关键词</i>
-
-                            
-
-                        </div>
-
-                         <b val="0" class="menu2-b">图标管理</b>
-
-                        <div> 
-
-                            <i url="{link:wap_userico-index}">会员中心图标</i>
-
-                            <i url="{link:wap_fxiconset-wap_fxzxico}">分销中心图标</i>
-
-                            <i url="{link:wap_fxiconset-wap_userico}">合伙人中心图标</i>
-
-                            <i url="{link:wap_set_guanggao-huandengpian}">广告幻灯片</i>
-
-                       		<i url="{link:wap_jdpdd_set-getmodels}">热搜设置</i>
-
-                        </div>
-
-                         <b val="0" class="menu2-b">商品页面</b>
-
-                        <div> 
-
-                            <i url="{link:wap_goods_set-index}">频道</i>
-
-                            <i url="{link:wap_goods_set-goodsindex}">详情相关设置</i>
-
-                        </div>
-
-                       <!-- <b val="0" class="menu2-b">幻灯片设置</b>
-
-                        <div> 
-
-                            <i url="{link:wap_set-advplace}">幻灯片设置</i>
-
-                            <i url="{link:wap_appadver-appgaolist}">广告设置</i> 
-
-                            
-
-                        </div>-->
-
-                         <b val="0" class="menu2-b">分享页面</b>
-
-                        <div> 
-
-                            <i url="{link:wap_shareset-fx_index}">分享页面内容</i>
-
-                            <i url="{link:wap_mem_set-invite}">邀请页面设置</i>
-
-                            <i url="{link:wap_goods_fenxiang-index}">淘宝分享设置</i>
-
-                            <i url="{link:wap_goods_fenxiang-pddindex}">拼多多分享设置</i>
-
-                            <i url="{link:wap_goods_fenxiang-jdindex}">京东分享设置</i>
-
-
-
-                        </div>
-
-                        <b val="0" class="menu2-b">红包设置</b>
-
-                        <div> 
-
-                            <i url="{link:wap_hongbao-set}">红包概率</i>
-
-                            <i url="{link:wap_hongbao-index}">红包列表</i>
-
-                            <i url="{link:wap_hongbao-hbset}">红包设置</i>
-
-                        </div>
-
-                        <b val="0" class="menu2-b">反馈中心</b>
-
-                        <div> 
-
-                            <i url="{link:wap_ides-index}">反馈类型</i>
-
-                            <i url="{link:wap_ides-ideasBoxlist}">WAP反馈管理</i>
-
-                        
-
-                        </div>
-
-                        
-
-                        <b val="0" class="menu2-b">文章管理</b>
-
-                        <div> 
-
-                            <i url="{link:wap_artical-index}">WAP文章管理</i>
-
-                            <i url="{link:wap_artical-helperart}">WAP帮助中心</i>
-
-                        
-
-                        </div>
-
-                        
-
-                        <b val="0" class="menu2-b">微信设置</b>
-
-                        <div> 
-
-                            <i url="{link:weixinset-miyao}">密钥设置</i>
-
-                            <i url="{link:weixinset-menu}">菜单设置</i>
-
-                            <i url="{link:weixinset-set}">微信基本设置</i>
-
-                        </div>
-
-
-
-                    </div>
-
-                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
-
-                </li>
-
-                
-
-                 <li n="20" class="menu-li menu-li20">
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b" window="ddgl">小程序</b>
-
-                        <div> 
-
-                            <i url="{link:xcxSet-index}">小程序设置</i>
-
-                        </div>
-
-                    </div>
-
-                       <div class="menu2-box">
-
-                        <b val="0" class="menu2-b">基础设置</b>
-
-                        <div>
-
-                            <i url="{link:xcx_jdpdd_set-jd_set}">京东基本设置</i>
-
-                            <i url="{link:xcx_jdpdd_set-pdd_set}">拼多多基本设置</i>
-
-                            <i url="{link:xcx_admin_fls-mem_set}">会员中心相关</i>
-
-                            <i url="{link:xcx_appsetting-indexkeyword}">小程序热搜关键词</i>
-
-                            <i url="{link:tbNewUser-teamCount}">团队拉新汇总</i>
-
-                        </div>
-
-                    </div>
-
-                    
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b">图标导航</b>
-
-                        <div>
-
-                           <i url="{link:xcx_jdpdd_set-getmodels}">两大模块设置</i>
-
-                           <i url="{link:xcx_appsetting-dgapp_userico}">会员中心图标</i>
-
-                            <i url="{link:xcx_fxiconset-dgapp_userico}">合伙人中心图标</i>
-
-                             <i url="{link:xcx_fxiconset-dgapp_fxzxico}">分销中心图标</i>
-
-                        </div>
-
-                    </div>
-
-                    <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">文字设置</b>
-
-                        <div>
-
-                            <i url="{link:xcx_strset-set}">文字设置</i>
-
-                            <i url="{link:xcx_jzcy-jzcy}">家族成员1,2,3度名称设置</i>
-
-                             
-
-                        </div>
-
-                    </div>
-
-                    
-
-                    
-
-                    <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">商品设置</b>
-
-                        <div>
-
-                            <i url="{link:xcx_appgoodsset-index}">商品显示设置</i>
-
-                            <i url="{link:xcx_ksms-appset}">频道管理</i>
-
-                            <i url="{link:xcx_app_goods-indexset}">小程序首页商品</i>
-
-                            <i url="{link:xcx_app_goods-app_miaosha2}">限时抢购</i>
-
-                            <i url="{link:xcx_lqjl-index}">商品详情领券购买动态记录</i>
-
-                        </div>
-
-                    </div>
-
-                    
-
-                    <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">广告</b>
-
-                        <div> 
-
-                            <i url="{link:xcx_appadver-appgaolist}">小程序广告列表</i>
-
-                            <i url="{link:xcx_appadver-appslide}">小程序幻灯片</i>
-
-                            <i url="{link:xcx_appadver-yqimg}">邀请图片设置</i>
-
-                             <!-- <i url="{link:xcx_admin_fls-index}">福利社</i> -->
-
-                        </div>
-
-                    </div>
-
-                    <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">文章</b>
-
-                        <div> 
-
-                            <i url="{link:xcx_appwz-helperartical}">小程序文章管理</i>
-
-                            <i url="{link:xcx_appwz-help}">小程序帮助中心</i>
-
-                        </div>
-
-                    </div>
-
-                      <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">签到设置</b>
-
-                        <div> 
-
-                            <i url="{link:xcx_admin_fls-qiandao}">会员中心签到设置</i>
-
-                        </div>
-
-                    </div>
-
-                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
-
-                </li>
-
-                <li n="18" class="menu-li menu-li15">
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b">基础设置</b>
-
-                        <div>
-
-                        	<i url="{link:dg_appsetting-appset}">淘宝基本设置</i>
-
-                            <i url="{link:dg_jdpdd_set-jd_set}">京东基本设置</i>
-
-                            <i url="{link:dg_jdpdd_set-pdd_set}">拼多多基本设置</i>
-
-                            <i url="{link:dg_admin_fls-mem_set}">会员中心相关</i>
-
-                          <!--  <i url="{link:dgapp_huancun-index}">缓存管理</i>-->
-
-                            <i url="{link:dg_appsetting-indexkeyword}">app热搜关键词</i>
-
-                            <i url="{link:dg_appsetting-addapk}">app版本管理</i>
-
-                           
-
-                            
-
-                            <i url="{link:tbNewUser-tbOrderList}">淘宝拉新用户订单</i>
-
-                            <i url="{link:tbNewUser-TbNewUserActivity}">淘宝拉新活动设置</i>
-
-                            <i url="{link:tbNewUser-teamCount}">团队拉新汇总</i>
-
-                        </div>
-
-                    </div>
-
-                    <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">app样式DIY</b>
-
-                        <div>
-
-                        	<i url="{link:dg_index_model-index|web_type=index}">首页</i>
-
-                        </div>
-
-                    </div>
-
-                    <div class="menu2-box">
-
-                        <b val="0" class="menu2-b">图标导航</b>
-
-                        <div>
-
-                           <i url="{link:dg_appsetting-index}">首页图标</i>
-
-                           <i url="{link:appindexset-index}">首页弹窗搜素图标</i>
-
-                           
-
-                           <i url="{link:dg_jdpdd_set-getmodels}">三大模块设置</i>
-
-                           <i url="{link:dg_appsetting-dgapp_userico}">会员中心图标</i>
-
-                           <i url="{link:dg_cgf_yhq_ggw-footnav}">app底部导航</i>
-
-                           <i url="{link:dg_fxiconset-dgapp_userico}">合伙人中心图标</i>
-
-                           <i url="{link:dg_fxiconset-dgapp_fxzxico}">分销中心图标</i>
-
-                           <i url="{link:dg_index_model-cgf_set}">超高返优惠券页面图标</i>
-
-                        </div>
-
-                    </div>
-
-                    
-
-                    <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">APP文字图标设置</b>
-
-                        <div>
-
-                        	<i url="{link:dg_strset-set}">文字设置</i>
-
-                             <i url="{link:dg_login_str-index}">登录页面设置</i>
-
-                        	<i url="{link:jzcy-jzcy}">家族成员1,2,3度名称设置</i>
-
-                            <i url="{link:dg_agentreport-set}">收益报表页面设置</i>
-
-                            <i url="{link:dg_strset-img_set}">图标设置</i>
-
-                            <i url="{link:dg_strset-msg}">验证码短信文字设置</i>
-
-                        </div>
-
-                    </div>
-
-                    <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">圈子相关</b>
-
-                        <div>
-
-                        	<i url="{link:dg_circle_of_friends-set}">基本设置</i>
-
-                            <i url="{link:dg_circle_of_friends-cate}">分类设置</i>
-
-                        	<i url="{link:dg_circle_of_friends-index}">官方文案发布</i>
-
-                            <i url="{link:dg_circle_of_friends-auto_index}">自动文案管理</i>
-
-                            <i url="{link:dg_circle_of_friends-user_index}">用户文案管理</i>
-
-                        </div>
-
-                    </div>
-
-                    
-
-                    <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">商品设置</b>
-
-                        <div>
-
-                        	<i url="{link:appgoodsset-index}">商品显示设置</i>
-
-                            <i url="{link:taoqianggou-index}">淘抢购页面设置</i>
-
-                        	<i url="{link:dg_ksms-appset}">频道管理</i>
-
-                           
-
-                           <!-- <i url="{link:dg_app_goods-indexset}">app首页商品</i>-->
-
-                            <i url="{link:dg_app_goods-app_miaosha2}">限时抢购</i>
-
-                            <i url="{link:dg_lqjl-index}">商品详情领券购买动态记录</i>
-
-                        </div>
-
-                    </div>
-
-                     <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">支付相关</b>
-
-                        <div> 
-
-                            <i url="{link:dg_zfxg-app_alipay}">支付设置</i>
-
-                            <i url="{link:dg_zfxg-zficon}">支付方式图标</i>
-
-                            <i url="{link:dg_zfxg-msgicon}">消息类型图标</i>
-
-                            
-
-                        </div>
-
-                    </div>
-
-                    <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">广告</b>
-
-                        <div> 
-
-                        	<i url="{link:dg_appadver-appgaolist}">app广告列表</i>
-
-                            <i url="{link:dg_taolj-appgaolist}">淘礼金幻灯片</i>
-
-                            <i url="{link:dg_cgf_yhq_ggw-appgaolist}">超级券超高返图文设置</i>
-
-                            <i url="{link:dg_appadver-appslide}">app幻灯片</i>
-
-                            <i url="{link:dg_admin_fls-index}">福利社</i>
-
-                            <i url="{link:dg_mem_guanggao-appgaolist}">会员等级页面广告位</i>
-
-                            <i url="{link:dg_paomadeng-index}">首页跑马灯</i>
-
-                            <i url="{link:dg_paomadeng-set}">首页设置</i>
-
-                        </div>
-
-                    </div>
-
-                    <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">文章</b>
-
-                        <div> 
-
-                            <i url="{link:dg_appwz-helperartical}">app文章管理</i>
-
-                            <i url="{link:dg_appwz-help}">app帮助中心</i>
-
-                            <i url="{link:dg_appwz-yinsi}">隐私政策</i>
-
-                        </div>
-
-                    </div>
-
-                    
-
-                    
-
-                    <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">红包</b>
-
-                        <div> 
-
-                            <i url="{link:dg_hongbao-index}">红包列表</i>
-
-                            <i url="{link:dg_hongbao-set}">红包概率</i>
-
-                            <i url="{link:dg_hongbao-hbset}">红包设置</i>
-
-                        </div>
-
-                    </div>
-
-                    
-
-                     <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">活动营销</b>
-
-                        <div> 
-
-                            <i url="{link:dg_taolj-set}">淘礼金设置</i>
-
-                            <i url="{link:dg_taolj-rule}">淘礼金栏目商品规则</i>
-
-                            <i url="{link:choujiang-set}">抽奖设置</i>
-
-                            <i url="{link:dg_choujiangjilu-index}">抽奖记录</i>
-
-                        </div>
-
-                    </div>
-
-                    
-
-                    <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">分享设置</b>
-
-                        <div> 
-
-                            <i url="{link:dg_strset-fx_index}">分享页面内容</i>
-
-                            <i url="{link:dg_app_goods_fenxiang-index}">淘宝商品分享设置</i>
-
-                            <i url="{link:dg_app_goods_fenxiang-pddindex}">拼多多商品分享设置</i>
-
-                            <i url="{link:dg_app_goods_fenxiang-jdindex}">京东商品分享设置</i>
-
-                            <i url="{link:dg_appadver-yqimg}">app分享管理</i>
-
-							<i url="{link:dg_down-index}">邀请好友分享方式设置</i>
-
-                           	<i url="{link:appindexset-share}">分享后的图片设置</i>
-
-                            <i url="{link:dg_down-haibao_index}">海报分享设置</i>
-
-                            <i url="{link:pc_appModel-appgaolist}">海报管理</i>
-
-                        </div>
-
-                    </div>
-
-                     <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">签到设置</b>
-
-                        <div> 
-
-                            <i url="{link:dg_admin_fls-qiandao}">会员中心签到设置</i>
-
-                        </div>
-
-                    </div>
-
-                   <!-- <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">合伙人设置</b>
-
-                        <div> 
-
-                            <i url="{link:dg_apphhr-addapk}">合伙人申请设置</i>
-
-                        </div>
-
-                    </div>-->
-
-                     <div class="menu2-box {display}" >
-
-                     	 <b val="1" class="menu2-b">资金池相关</b>
-
-                        <div> 
-
-                            <i url="{link:dg_zjc-appset}">制度设置</i>
-
-                            <i url="{link:dg_zjc-zjc}">资金池明细</i>
-
-                            <i url="{link:dg_zjc-fenpei}">分配明细</i>
-
-                            <i url="{link:dg_zjc-zjc_money}">资金池金额</i>
-
-                        </div>
-
-                        
-
-                     <div>
-
-             <!--       <div class="menu2-box">
-
-                        <b val="1" class="menu2-b">成为代理</b>
-
-                        <div> 
-
-                            <i url="{link:dg_dl-index}">代理审核</i>
-
-                            <i url="{link:dg_dl-appset}">代理相关设置</i>
-
-                           <i url="{link:dg_dl-fanli}">返利设置</i>
-
-                            
-
-                            <i url="{link:dg_appModel-appgaolist}">代理海报</i>
-
-                            <i url="{link:fx_set-fx_set}">会员等级设置</i>
-
-                            <i url="{link:fx_set-fx_set_hy}">推广会员分佣设置</i>
-
-                            <i url="{link:fx_set-fx_set_dl}">推广代理分佣设置</i>
-
-                            
-
-                            
-
-                        </div>
-
-                    </div>-->
-
-                    
-
-                    <!--<div class="menu2-box" >
-
-                        <b val="1" class="menu2-b">VIP相关</b>
-
-                        <div> 
-
-                            <i url="{link:hdyBuy-index}">VIP协议</i>
-
-                            <i url="{link:hdy-hdy}">VIP介绍图</i>
-
-                            <i url="{link:hdyVip-index}">VIP相关设置</i>
-
-                        </div>
-
-                    </div>-->
-
-                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
-
-                </li>
-
-               
-
-                
-
-                <li class=" menu-li18 menu_small">
-
-                    <div class="small-box">
-
-                        <b small_="0" class="small-b">WAP风格</b>
-
-                    </div>
-
-                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
-
-                </li>
-
-            </ul>
-
-        </div>
-
-        <!--可化窗口-->
-
-    </div>
-
-      <div class="out-box" id="outwarp">
-
-           <textarea id="msgdate" style="display: none">
-
-           <div class="window-box controlBox" id="controlBox" style="z-index:[zindex];display:none;">
-
-               <!--<div class="resize lt"></div>-->
-
-               <!--<div class="resize tr"></div>-->
-
-               <div class="resize rb"></div>
-
-               <!--<div class="resize bl"></div>-->
-
-               <div class="hide__"></div>
-
-               <div class="head-box">
-
-                   <a href="javascript:void(0);" onclick="window.history.go(-1)"  class="back-box">
-
-                       <img class="back-img" src="../../img/comm/turn_left.png" alt=""/></a>
-
-                  <div class="download-box"> <img class="download-img" src="../../img/comm/dl.png" alt=""/></div>
-
-                   <div class="left-box">
-
-                       <i class="close-bk"></i>
-
-                       <i class="big-bk"></i>
-
-                       <i class="small-bk"></i>
-
-                   </div>
-
-                   <p class="h_title-text">[title]</p>
-
-               </div>
-
-               <div class="title-box">
-
-                   <div class="tit-sbox">
-
-                       [span]
-
-                   </div>
-
-               </div>
-
-               <div class="body-box">
-
-                   <iframe class="content-box" src="{link:index-ifarme_index}" frameborder="0" scrolling="auto"></iframe>
-
-               </div>
-
-           </div>
-
-       </textarea>
-
-      </div>
-
-   </div>
-
-<script type="text/javascript" src="../../js/index/index_home.js"></script>
-
-<script type="text/javascript">
-
-$(document).ready(function(){
-
-    $(".menu-li .menu2-box .menu2-b").click(function(){
-
-       var ttt= $(this).attr("key");
-
-        var widths = $(".window-box[kkid='"+ttt+"']").width();
-
-        var heights = $(".window-box[kkid='"+ttt+"']").height();
-
-        $(".window-box[kkid='"+ttt+"']").css({"width":widths,"height":heights});
-
-    });
-
-});
-
-    //控制div窗口移动
-
-function addmove(obj) {
-
-    //divWin外部窗口,objnav导航栏，colse关闭按钮，min化小按钮,max放大按钮,small_title被化小窗口标题
-
-    var divWin = $(obj), objnav = $(obj).find(".head-box .h_title-text"),
-
-            colse = $(obj).find(".close-bk"), min = $(obj).find(".small-bk"), max = $(obj).find(".big-bk");
-
-    var move = false;
-
-    //记录窗口元素的宽高，用于窗口最小最大还原窗口
-
-    var lefts, tops, widths, heights;
-
-    widths = divWin.width();
-
-    heights = divWin.height();
-
-    lefts=obj.offset().left;
-
-    tops=obj.offset().top;
-
-    //窗口最大化
-
-    var big = 0;
-
-    //双击导航框缩放窗口
-
-    objnav.dblclick(function () {
-
-        max.click();
-
-    })
-
-    //双击导航框缩放窗口
-
-    var leftg, topg, widthg, heightg;
-
-    objnav.dblclick(function () {
-
-        max.click();
-
-    })
-
-    //单击缩放导航框缩放窗口
-
-    max.click(function () {
-
-        //记录窗口元素的宽高，用于窗口最大化后还原窗口
-
-        var divWin_kkid=$(divWin).attr("kkid");
-
-        if (big == 0) {
-
-            widthg = divWin.width();
-
-            heightg = divWin.height();
-
-            leftg=obj.offset().left;
-
-            topg=obj.offset().top;
-
-            var out_boxH = $(".out-box").height();
-
-            var out_boxW = $(".out-box").width();
-
-            divWin.animate({
-
-                width: out_boxW,
-
-                height: out_boxH,
-
-                left: "0px",
-
-                top: "0px"
-
-            }, 200);
-
-            big = 1;
-
-        } else if (big == 1) {
-
-            divWin.animate({
-
-                width: widthg,
-
-                height: heightg,
-
-                left: leftg,
-
-                top: topg
-
-            }, 200);
-
-            big = 0;
-
-        }
-
-        window.setTimeout(function(){
-
-            var contentW=$(".content").height();
-
-            $(".out-box").height(contentW-105);
-
-            var win_boxH = $(" .window-box[kkid='"+divWin_kkid+"']").height();
-
-            $(" .window-box[kkid='"+divWin_kkid+"']").find(".body-box").height(win_boxH-80);  //点击最大化body_box高度变动
-
-        },200);
-
-        if(big==0){
-
-            $(".big-bk").parent().removeClass("big")
-
-        }else {
-
-            $(".big-bk").parent().addClass("big");
-
-        }
-
-    });
-
-    //窗口化小
-
-    var small=1;
-
-    //此处获取浏览器可视窗口的高度，也存在问题，当我们的窗口拉到浏览器上或下可视窗口外的时候，
-
-    // 那么浏览器可视窗口的高度也被增大了，所以当我们的窗口拉到浏览器可视窗口上或下的外面的时候，
-
-    // 我们缩小窗口到任务栏的话就将看不到缩小后的窗口，最简单的办法就是把此变量设置成全局变量，
-
-    // 当页面加载的时候此变量就初始化了就不会被窗口拉出的时候增大
-
-    min.click(function(){
-
-        var obj=$(this).parent().parent().parent();
-
-        $(obj).attr("old_style",$(obj).attr("style"));    //当点击化小按钮时，存贮初始样式到old_style
-
-        var tmpval=(obj.attr("style"));          //中间取值法
-
-        $(obj).attr("min_style",tmpval);
-
-        //添加被化小的窗口标题
-
-        var li_key = $("#index_li").attr("key");
-
-        var title_id = $(this).parent().parent().parent().attr("kkid");
-
-        var s = $(document).height();
-
-        divWin.animate({
-
-//                right:"0px",
-
-            top:s-138,
-
-            width:"0px",
-
-            height:'0px'
-
-//                overflow: "hidden"
-
-        },200);
-
-        small=0;
-
-        $(".window-box[kkid='"+title_id+"']").attr("min",1);
-
-        $(".window-box[kkid='"+li_key+"']").attr("min",1);
-
-        var is_min=0;
-
-        $(".window-box").each(function(){
-
-            if($(this).attr("min")==1)is_min=1;
-
-        });
-
-        if(is_min==1){                       //有一个不是最小化
-
-            $(".out-box").show();
-
-//            添加一个小球(只有新窗口化小后才有小球动画)
-
-            if($(".sport[num='"+title_id+"']").length==0)$(".tabs-ul").append("<span class='sport' num='"+title_id+"'></span>");
-
-            var sport_L = $(".window-box[min='1']").length;
-
-            $(".tabs-ul .sport[num='"+title_id+"']").show();
-
-            $(".tabs-ul .sport[num='"+title_id+"']").animate({
-
-                "opacity": "1",
-
-                "left": (($(".tabs-ul .tabs-li").length*60)+40)+"px"
-
-            },800,function(){
-
-                $(".tabs-ul .sport[num='"+title_id+"']").animate({
-
-                    "top":"5px"
-
-                },300,function(){
-
-                    $(".tabs-ul .sport[num='"+title_id+"']").animate({
-
-                        "opacity": "0"
-
-                    },300,function(){
-
-                        $(".tabs-ul .sport[num='"+title_id+"']").css({
-
-                            "left": "0px",
-
-                            "top": "-20px"
-
-                        })
-
-                        $(".tabs-ul .sport[num='"+title_id+"']").fadeOut();
-
-                    });
-
-                    $(".window_discou").fadeIn().html(sport_L);
-
-                })
-
-            })
-
-        }
-
-        else{
-
-            window.setTimeout(function(){
-
-                $(".out-box").hide();
-
-            },400)
-
-        }
-
-    });
-
-}
-
-</script>
-
-<img src="../../img/index/index_home/close_on.png" alt="" style="display: none" id="close_off" />
-
-<script type="text/javascript">
-
-    //    if(navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion .split(";")[1].replace(/[ ]/g,"")=="MSIE6.0")
-
-    //    {
-
-    //        alert("IE 6.0");
-
-    //    }  min.click(function(){
-
-    if(navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion .split(";")[1].replace(/[ ]/g,"")=="MSIE7.0")
-
-    {
-
-        alert("温馨提示:您当前浏览器版本较低，推荐使用ie9或以上版本，体验效果更好");
-
-    }
-
-    else if(navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion .split(";")[1].replace(/[ ]/g,"")=="MSIE8.0")
-
-    {
-
-        alert("温馨提示:您当前浏览器版本较低，推荐使用ie9或以上版本，体验效果更好");
-
-    }
-
-    //    else if(navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion .split(";")[1].replace(/[ ]/g,"")=="MSIE9.0")
-
-    //    {
-
-    //        alert("温馨提示:您当前浏览器版本较低，推荐使用ie9或以上版本，体验效果更好");
-
-    //    }
-
-var open_new={};
-
-$(document).ready(function(e) {
-
-	window.setInterval(function(){
-
-		$(".tit-sbox span").each(function(index, element) {
-
-			if($(this).attr("window_onoff")!=null)return;
-
-			$(this).attr("window_onoff","on");
-
-			$(this).click(function(){
-
-				open_new.url=$(this).attr("url");	
-
-			});
-
-		});
-
-	},100);
-
-	document.onkeydown=function(e){
-
-		e=e?e:window.event;
-
-		switch(e.keyCode){
-
-			case 115:
-
-				//return false;
-
-			break;
-
-			case 114:
-
-				window.open(open_new.url);
-
-			break;	
-
-		}
-
-	}
-
-	$("a").each(function(index, element) {
-
-       if($(this).attr("href")!='#')return;
-
-	   $(this).attr("href","javascript:void(0);"); 
-
-    });
-
-	var tmp_left=-84;
-
-	$(".menu-box .menu-ul .menu-li").each(function(index, element) {
-
-		tmp_left+=60;
-
-        $(this).css({"left":tmp_left+"px","margin-left":"0px","right":"auto","margin-right":"0px"});
-
-    });
-
-	$(".tabs-box .tabs-ul").width(($(".tabs-ul .tabs-li").length*60)+65);
-
-	$(".tabs-box .menu-box .menu-ul").width(($(".tabs-ul .tabs-li").length*60)+65);
-
-   $(".menu_small").css({"left":(tmp_left+120)+"px","margin-left":"0px","right":"auto","margin-right":"0px"});
-
-});
-
-//jj explosion
-
-var s_d={};
-
-s_d.data={};
-
-s_d.set=function(obj1,obj2){
-
-	if(obj1==null||obj1==''){alert("error name is null");return;}
-
-	s_d.data[obj1]=obj2;
-
-}
-
-s_d.get=function(obj1){
-
-	if(obj1==null)return null;
-
-	if(s_d.data[obj1]==null)return null;
-
-	return s_d.data[obj1];
-
-}
-
-s_d.del=function(obj1){
-
-	if(obj1==null)return;
-
-	if(s_d.data[obj1]==null)return;
-
-	delete s_d.data[obj1];
-
-}
-
-$(document).ready(function(e) {
-
-	$(".menu2-box.on").hide();
-
-	var tmplocation=window.location.href;
-
-	if(tmplocation.indexOf("localhost")!=-1)return;
-
-    $.get("{INDEX_WEB_URL}comm/timer/timer.php?_ctrl=re",{},function(){});
-
-	
-
-});
-
-</script>
-
-<!--<script src="../../js/index/bj_star.js"></script>-->
-
-</body>
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>后台</title>
+    <link rel="stylesheet" href="../../css/index/index_home.css">
+    <link rel="stylesheet" href="../../css/comm/ocomm.css">
+    <script src="../../js/comm/jquery.min.js" type="text/javascript"></script>
+    <script src="../../js/index/home_stretch.js" type="text/javascript"></script>
+    <script type="text/javascript" src="../../js/index/index_home.js"></script>
+    <script src="../../js/comm/Cookie.js"></script>
+    
+	<script type="text/javascript">
+    var act='{offact}';
+    var mod='{offmod}';
+    var meurl='{INDEX_WEB_URL}';
+    var meadmin='{offadmin}';
+    </script>
+
+
+<!--底部限制-->
+{admin_bottom_style_type}
+
+</head>
+<body style="background-image:url({WebIndexImg});background-position: center; width:100%; height:100%;background-size:cover">
+
+<div class="bj_out-box">
+   <!-- <div class="landscape"></div>
+    <div class="filter"></div>
+    <canvas id="canvas" class="bj_canvas"></canvas>-->
+   
+</div>
+<div class="content">
+    <div class="nav-box">
+        <div class="nav_l"><p "end_time"="{array:sq_arr:end_time}" "info"="{array:sq_arr:info}" >版本：{versionNo}&nbsp;&nbsp;
+        <if condition="'{array:sq_arr:show}'=='1'">{array:sq_arr:info}</if>
+        </p></div>
+        <div class="nav_r">
+            <ul class="nav-ul">
+                <li class="nav-li">
+                   <a href="#" class="nav-sbox"><span>欢迎使用，{lighteshop_username}</span></a>
+                </li>
+
+                <li class="nav-li">
+                    <a  class="nav-sbox" open_window="on" window_val="admin_style">
+                        <span >后台样式设置</span>
+                    </a>
+                </li>
+
+
+               <li class="nav-li">
+
+                    <a href="{INDEX_WEB_URL}" target="_blank" class="nav-sbox"><span>网站首页</span></a>
+
+                </li>
+
+                <if condition="'{fnuo_set_onoff}'=='0'">
+
+                <li class="nav-li">
+                    <a href="http://www.fanlios.com" target="_blank" class="nav-sbox"><span>开发官网</span></a>
+                </li>
+                </if>
+                <li class="nav-li">
+                    <a href="http://www.fanlichengxu.com/support.php" target="_blank" class="nav-sbox"><span>支持教程</span></a>
+                </li>
+
+<script>
+$(document).ready(function(e) {
+	$("*[open_window='on']").click(function(){
+		$("*[window='"+$(this).attr("window_val")+"']").click();
+		return false;	
+	});
+});
+</script>
+                <li class="nav-li">
+                    <a href="#" class="nav-sbox" id="hot_nav"><span>热门点击</span></a>
+                    <div class="nav-erj">
+                        <a class="erj_item" href="#" open_window="on" window_val="cwbb">财务报表</a>
+                        <a class="erj_item" href="#" open_window="on" window_val="ddgl">订单管理</a>
+                    </div>
+                </li>
+                <!--<li class="nav-li">
+                    <a href="#" class="nav-sbox" id="set_nav"><span>设置</span></a>
+                    <div class="nav-erj">
+                        <a class="erj_item" href="#">更改背景图片</a>
+                        <a class="erj_item" href="#">更多设置</a>
+                    </div>
+                </li>-->
+                <li class="nav-li">
+                    <a href="{link:login-adminLoginOut}" class="nav-sbox"><span>退出登录</span></a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="tabs-box">
+        <ul class="tabs-ul">
+            <li n="0" class="tabs-li" id="index_li" key="00">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/icon01.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/icon01.png" alt="">
+                </div>
+                <p class="tabs-text">后台首页</p>
+                <div class="tabs-bk"></div>
+                <!--<span class="window_discou">1</span>-->
+            </li>
+             <li n="10" class="tabs-li">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/icon11.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/icon11.png" alt="">
+                </div>
+                <p class="tabs-text">程序管理</p>
+               <div class="tabs-bk"></div>
+            </li>
+            <li n="1" class="tabs-li">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/icon02.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/icon02.png" alt="">
+                </div>
+                <p class="tabs-text">订单管理</p>
+               <div class="tabs-bk"></div>
+            </li>
+            <li n="2" class="tabs-li">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/icon03.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/icon03.png" alt="">
+                </div>
+                <p class="tabs-text">网站设置</p>
+               <div class="tabs-bk"></div>
+            </li>
+            <li n="3" class="tabs-li">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/icon04.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/icon04.png" alt="">
+                </div>
+                <p class="tabs-text">商品管理</p>
+               <div class="tabs-bk"></div>
+            </li>
+            <li n="4" class="tabs-li">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/icon05.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/icon05.png" alt="">
+                </div>
+                <p class="tabs-text">会员管理</p>
+               <div class="tabs-bk"></div>
+            </li>
+            <li n="5" class="tabs-li">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/icon06.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/icon06.png" alt="">
+                </div>
+                <p class="tabs-text">商家管理</p>
+               <div class="tabs-bk"></div>
+            </li>
+            <li n="6" class="tabs-li">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/icon07.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/icon07.png" alt="">
+                </div>
+                <p class="tabs-text">积分商城</p>
+               <div class="tabs-bk"></div>
+            </li>
+            <!--<li n="16" class="tabs-li">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/icon17.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/icon17.png" alt="">
+                </div>
+                <p class="tabs-text">一元购</p>
+               <div class="tabs-bk"></div>
+            </li>-->
+          
+            <li n="7" class="tabs-li">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/icon08.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/icon08.png" alt="">
+                </div>
+                <p class="tabs-text">权限管理</p>
+               <div class="tabs-bk"></div>
+            </li>
+            <li n="8" class="tabs-li">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/icon09.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/icon09.png" alt="">
+                </div>
+                <p class="tabs-text">文章资讯</p>
+               <div class="tabs-bk"></div>
+            </li>
+            <li n="9" class="tabs-li">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/icon10.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/icon10.png" alt="">
+                </div>
+                <p class="tabs-text">财务管理</p>
+               <div class="tabs-bk"></div>
+            </li>
+           
+            <!--<li n="11" class="tabs-li">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/icon12.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/icon12.png" alt="">
+                </div>
+                <p class="tabs-text">帮帮管理</p>
+               <div class="tabs-bk"></div>
+            </li>
+            -->
+              
+            <li n="17" class="tabs-li">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/icon18.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/icon18.png" alt="">
+                </div>
+                <p class="tabs-text">反馈管理</p>
+               <div class="tabs-bk"></div>
+            </li>
+            
+            <li n="19" class="tabs-li">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/icon16.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/icon16.png" alt="">
+                </div>
+                <p class="tabs-text">WAP设置</p>
+               <div class="tabs-bk"></div>
+            </li>
+            
+             <li n="20" class="tabs-li">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/miniapps.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/miniapps.png" alt="">
+                </div>
+                <p class="tabs-text">小程序</p>
+               <div class="tabs-bk"></div>
+            </li>
+            
+             <li n="18" class="tabs-li">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/icon15.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/icon15.png" alt="">
+                </div>
+                <p class="tabs-text">导购APP</p>
+               <div class="tabs-bk"></div>
+            </li>
+            
+           
+            
+            <!--<li n="15" class="tabs-li">
+                <div class="t_img-box">
+                    <img class="icon1" src="../../img/index/index_home/icon16.png" alt="">
+                    <img class="icon2" src="../../img/index/index_home/icon16.png" alt="">
+                </div>
+                <p class="tabs-text">商城APP</p>
+               <div class="tabs-bk"></div>
+            </li>-->
+            
+            <li class="tabs-li">
+                <img class="home_boundary" src="../../img/index/index_home/home_boundary.png" alt="">
+            </li>
+            <li n="18" class="small_li-box ">
+                <div class="t_img-box">
+                    <img class="s_icon1" src="../../img/index/index_home/icon00.png" alt="">
+                    <img class="s_icon2" src="../../img/index/index_home/icon00.png" alt="">
+                </div>
+                <p class="tabs-text">化小窗口</p>
+               <div class="tabs-bk"></div>
+                <span class="window_discou">1</span>
+            </li>
+        </ul>
+        <!--二级菜单-->
+        <div class="menu-box">
+            <ul class="menu-ul">
+                
+                
+                <li n="0" class="menu-li menu-li1">
+                </li>
+                
+                <li n="10" class="menu-li menu-li2">
+                    <div class="menu2-box">
+
+                        <!--顶部自定义栏目-->
+                        <b val="0" class="menu2-b" window="admin_style" style="display:none;">后台样式设置</b>
+                        <div  style="display:none;">
+                            <i url="{link:admin_style-index}">后台样式设置</i>
+                        </div>
+
+                        <b val="0" class="menu2-b">基本设置</b>
+                            <div> 
+                                <i url="{link:website-basic_set}">基础设置</i>
+                                <i url="{link:website-navigation_manage}">导航管理</i>
+                                <i url="{link:procedure_manage-debugging_demo}">调试模式</i>
+                                <i url="{link:website-map_column}">网站地图栏目管理</i>
+                                <i url="{link:website-map_navigation_manage}">网站地图导航管理</i>
+                                <i url="{link:website-sigin_deal}">注册协议</i>
+                                <i url="{link:website-copyright_set}">版权设置</i>
+                                <i url="{link:website-share_set}">分享设置</i>
+                                <i url="{link:website-sigin_share_set}">注册分享设置</i>
+                                <i url="{link:index_r_qrcode-index}">pc搜索框右侧二维码</i>
+                            </div>
+                    
+                       
+                        <b val="3" class="menu2-b">缓存管理</b>
+                        <div> 
+                            <i url="{link:cache-index}">模块缓存</i>
+                            <i url="{link:cache-datacache}">数据缓存</i>
+                            <i url="{link:cache-clear}">清除缓存</i>
+                        </div>
+                        <b val="4" class="menu2-b">系统修复</b>
+                        <div> 
+                             <i url="{link:repair-index}">系统还原</i>
+                            <i url="{link:repair-restore}">清除还原点</i>
+             
+                        </div>
+                        <b val="5" class="menu2-b">搜索系统</b>
+                        <div> 
+                            <i url="{link:procedure_manage-statistics}">搜索统计</i>
+                        </div>
+                        <b val="6" class="menu2-b">操作日志</b>
+                        <div> 
+                            <i url="{link:procedure_manage-operation_log}">操作日志</i>
+                     
+                        </div>
+                    </div>
+                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
+                </li>
+                
+                <li n="1" class="menu-li menu-li3">
+                    <div class="menu2-box">
+                        <b val="0" class="menu2-b" window="ddgl">订单管理</b>
+                        <div> 
+                            <i url="{link:shop_manage-order_list}">淘宝订单列表</i>
+                            <i url="{link:filter_order_set-index}">淘宝订单导入过滤设置</i>
+                            <i url="{link:tb_order_xcmr-index}">淘宝跟单设置</i> 
+                            <i url="{link:pdd_manage-order_list}">拼多多列表</i>
+                            <i url="{link:jd_manage-order_list}">京东订单列表</i>
+                            <i url="{link:update_order-index}">升级订单列表</i>
+                            <i url="{link:shop_manage-czk_list}">充值卡订单</i>
+                            <!--<i url="{link:tbkorder-index}">一键检测有效订单</i>-->
+                            
+
+                        </div>
+                        
+                        <!--<b val="1" class="menu2-b">退款管理</b>
+                        <div>
+                            <i url="{link:shop_manage-reimburse_manage}">退款管理</i>
+                        </div>
+                        <b val="2" class="menu2-b">申诉管理</b>
+                        <div>
+                            <i url="{link:shop_manage-appeal_manage}">申诉管理</i>
+                        </div>-->
+                      
+                    </div>
+                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
+                </li>
+                <li n="2" class="menu-li menu-li4">
+                    <div class="menu2-box">
+                        <b val="0" class="menu2-b">首页风格</b>
+                        <div> 
+                            <i url="{link:diy-index}">首页风格</i>
+                            <!--<i url="{link:website-one_buy_style}">一元购风格</i>-->
+                        </div>
+                         <b val="1" class="menu2-b">广告管理</b>
+                        <div> 
+                            <i url="{link:shop_manage-ad_list}">广告列表</i>
+                            <i url="{link:shop_manage-ad_silde_list}">幻灯片列表</i>
+                        </div>
+                        <b val="2" class="menu2-b">制度设置</b>
+                        <div> 
+                       
+                           <i url="{link:website-jf_set}">积分设置</i>
+                           <!--<i url="{link:website-shop_enter}">入驻商设置</i>-->
+                           
+                           <i url="{link:website-rebate_set}">返利设置</i>
+                        </div>
+                        <b val="3" class="menu2-b">客服管理</b>
+                        <div> 
+                            <i url="{link:website-service}">客服管理</i>
+                        </div>
+                        <b val="4" class="menu2-b">搜索引擎优化</b>
+                        <div> 
+                            <i url="{link:pss-set}">伪静态</i>
+                            <i url="{link:pss-create}">一键伪静态</i>
+                            <i url="{link:website-seo_message}">SEO信息</i>
+                            
+                        </div>
+                        <b val="5" class="menu2-b">系统集成</b>
+                        <div> 
+                        	 <i url="{link:zm_jd_set-zm_set}">智盟设置</i>
+                            <i url="{link:website-threelogin}">第三方登录集成</i>
+                            <i url="{link:website-taobao_alliance}">淘宝联盟</i>
+                           
+                            <i url="{link:website-alipay_set}">支付宝设置</i>
+                            <i url="{link:alipay_set-index}">支付宝转账</i>
+                            <!--<i url="{link:website-tenpay_set}">财付通设置</i>-->
+                            <i url="{link:website-mailbox_set}">邮箱设置</i>
+                            <i url="{link:website-mobile_set}">手机设置</i>
+                            <!--
+                            <i url="{link:website-jingdong_set}">京东设置</i>
+                            <i url="{link:jdpayset-set}">京东支付</i>-->
+                            
+                            <i url="{link:website-jd_zeus}">京东宙斯设置</i>
+                            <i url="{link:website-jd_kepler}">京东开普勒设置</i>
+                            <i url="{link:website-duomai_set}">多麦设置</i>
+                            <!--<i url="{link:website-rivers_set}">百川设置</i>-->
+                            <i url="{link:taobaoapi-index}">淘宝api设置</i>
+                            <i url="{link:website-juhe_set}">聚合设置</i>
+                            
+                            <!--<i url="{link:almm_tongxun-index}">阿里妈妈设置</i>-->
+                            <i url="{link:almm_hyq-index}">优惠券设置</i>
+                        </div>
+                        <!--<b val="5" class="menu2-b">帮助中心</b>-->
+                        <!--<div> &lt;!&ndash;三级菜单&ndash;&gt;-->
+                            <!--<i url="{link:website-help_center}">分类管理</i>-->
+                            <!--<i url="{link:website-article_manage}">文章管理</i>-->
+                        <!--</div>-->
+                        <b val="6" class="menu2-b">城市管理</b>
+                        <div> 
+                            <i url="{link:website-city_manage}">城市管理</i>
+                        </div>
+                        
+                        <b val="7" class="menu2-b">友情链接</b>
+                        <div> 
+                            <i url="{link:dg_friendlink-index}">友情链接</i>
+                        </div>
+                        
+                        <b val="8" class="menu2-b">智莺助手</b>
+                        <div> 
+                            <i url="{link:CSharp-apikey}">智莺助手</i>
+                        </div>
+                        
+                        
+                    </div>
+                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
+                </li>
+                <li n="3" class="menu-li menu-li5">
+                    <div class="menu2-box">
+                        <b val="0" class="menu2-b">商品管理</b>
+                        <div> 
+                            <i url="{link:goods_manage-goods_list}">商品列表</i>
+                            <i url="{link:goods_manage-taobaoaddgoods}">发布淘宝商品</i>
+                          <!--  <i url="{link:commoditymana-generalinfo}">添加新商品</i>-->
+                            <i url="{link:jdgoods-add}">京东商品发布</i>
+                            <i url="{link:jdgoods-getgoodslist}">京东批量添加</i>
+                            <i url="{link:goods_manage-add_goods_column}">添加商品栏目</i>
+                            <i url="{link:goods_manage-coupon_goods}">优惠券商品</i>
+                            <i url="{link:taolj_goods-goods_list}">淘礼金商品</i>
+                        </div>
+                        
+                        <b val="0" class="menu2-b">淘宝商品采集</b>
+                        <div>
+                            <i url="{link:wuliao_goods-rule}">物料商品采集</i>
+                            <i url="{link:tbapi-rule}">淘宝商品采集</i>
+                            <i url="{link:highcommission-showgroup}">超高返商品采集</i>
+                            <i url="{link:alapi-rule}">淘宝超级采集器</i>
+                        </div>
+                        
+                        <b val="1" class="menu2-b">商品基础设置</b>
+                        <div> 
+                            <i url="{link:category-index}">淘宝商品分类</i>
+                             <i url="{link:JdCategory-index}">京东商品分类</i>
+                             <i url="{link:PddCategory-index}">拼多多商品分类</i>
+                            <!--<i url="{link:goods_manage-goods_type}">商品类型</i>-->
+                            <!--<i url="{link:goods_manage-propert_manage}">属性管理</i>-->
+                        </div>
+                        <b val="2" class="menu2-b">商城返利</b>
+                        <div> 
+                            <i url="{link:goods_manage-goods_rebate}">商城返利</i>
+                        </div>
+                        <b val="3" class="menu2-b">活动管理</b>
+                        <div> 
+                            <i url="{link:goods_manage-activity_manage}">活动管理</i>
+                        </div>
+                        <b val="4" class="menu2-b">优惠券商品采集</b>
+                        <div> 
+                            <i url="{link:goods_manage-caiji_1}">优惠券商品采集</i>
+                            <i url="{link:goods_manage-column_set}">采集设置</i>
+                        </div>
+                        
+                        <!--<b val="4" class="menu2-b">供应商商品</b>
+                        <div>
+                            <i url="{link:goods_manage-store_agency_goods}">商品列表</i>
+                        </div>-->
+                        
+                        <b val="4" class="menu2-b">油卡、充值管理  </b>
+                        <div> 
+                            <i url="{link:goods_manage-paycz_sjk}">手机卡设置</i>
+                            <i url="{link:goods_manage-paycz_jyk1}">中石化加油卡设置</i>
+                            <i url="{link:goods_manage-paycz_jyk2}">中石油加油卡设置</i>
+                        </div>
+                    </div>
+                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
+                </li>
+                <li n="4" class="menu-li menu-li6">
+                    <div class="menu2-box">
+                        <b val="0" class="menu2-b">会员管理</b>
+                        <div> 
+                            <i url="{link:member_manage-member_list}">会员列表</i>
+                            <i url="{link:member_manage-integral_handle_log}">积分明细</i>
+                            <i url="{link:commission_record-index}">订单佣金明细</i>
+                            <i url="{link:user_pid-index}">会员推广位</i>
+                            <i url="{link:user_yqid}">邀请ID设置</i>
+                            <!--<i url="{link:member_manage-member_rz}" style="display:none">会员认证</i>
+                            <i url="{link:member_manage-member_level}">会员等级</i>-->
+                        </div>
+                        <b val="1" class="menu2-b">分佣管理</b>
+                        <div> 
+                        	<i url="{link:update_goods-index}">商品列表</i>
+                            <i url="{link:update_goods-set}">购买商品升级设置</i>
+							<i url="{link:operator-set}">分佣模式</i>
+							<i url="{link:dg_newdl-index}">代理审核</i>
+							<i url="{link:hhr_set-set}">代理相关设置</i>
+							<i url="{link:pc_appModel-appgaolist}">代理海报</i>
+							<i url="{link:fx_newset-fx_set}">会员等级设置</i>
+							<i url="{link:fx_newset-fx_set_hy}">推广分佣</i>
+                         	<i url="{link:memLV_strategy-strategy}">会员等级页面设置</i>
+                        </div>
+                        
+                        <b val="1" class="menu2-b">代理费分佣</b>
+                        <div> 
+							<i url="{link:fx_newset-fx_set_dl}">代理费分佣</i>
+                            <i url="{link:hhr_td_dlf-index}">团队代理费分佣</i>
+                        </div>
+                        
+                        <b val="1" class="menu2-b">区域代理</b>
+                        <div> 
+                            <i url="{link:website-agency_set}">区域代理设置</i>
+                            <i url="{link:sjdl-index}">区域代理审核</i>
+                        </div>
+                        
+                        <b val="1" class="menu2-b">抽成管理</b>
+                        <div> 
+                            <i url="{link:choucheng-set}">联盟抽成设置</i>
+                            <i url="{link:choucheng-pingtai}">平台抽成设置</i>
+                        </div>
+                        
+                        <b val="1" class="menu2-b">提现管理</b>
+                        <div>
+                        	<i url="{link:member_manage-agency_audit}">提现审核</i>
+                        	<i url="{link:agency-agency_tx}">代理提现审核</i>
+                        </div>
+                        
+                        <b val="2" class="menu2-b">站内消息</b>
+                        <div> 
+                          <i url="{link:stationmsg-messagebox}">消息发件箱</i>
+                            <i url="{link:stationmsg-manage_tz}">发送消息</i>
+                        </div>
+                    </div>
+                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
+                </li>
+                <li n="5" class="menu-li menu-li7">
+                    <div class="menu2-box">
+                        <b val="0" class="menu2-b">店铺管理</b>
+                        <div> 
+                            <i url="{link:store_manage-shopping_store}">导购店铺</i>
+                            <!--<i url="{link:store_manage-rule}">店铺采集</i>-->
+                            <i url="{link:store_manage-shopping_storeCates}">导购店铺分类</i>
+                          <!--  <i url="{link:store_manage-store_banner}">店铺默认banner</i>-->
+                        </div>
+                       
+                       <!--
+                        <b val="1" class="menu2-b">店铺信息审核</b>
+                        <div>
+                            <i url="{link:store_manage-store_audit_list}">店铺审核列表</i>
+                            <i url="{link:store_manage-store_agency_list}">供应商审核列表</i>
+                            <i url="{link:store_manage-store_cate_manage}">店铺分类管理</i>
+                            <i url="{link:store_manage-store_name_approve}">商家实名认证</i>
+                            <i url="{link:store_manage-supplier_name_approve}">供应商实名认证</i>
+                            <i url="{link:store_manage-store_upShop_approve}">商家开店认证</i>
+                            <i url="{link:store_manage-supplier_upshop_approve}">供应商开店认证</i>
+                        </div>
+                        -->
+                        
+                        <!--<b val="2" class="menu2-b">物流管理</b>
+                        <div> 
+                            <i url="{link:store_manage-logistics_manage}">物流管理</i>
+                            <i url="{link:store_manage-logistics_key}">物流接口Key</i>
+                        
+                        </div>-->
+                        
+                    </div>
+                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
+                </li>
+                <li n="6" class="menu-li menu-li17">
+                    <div class="menu2-box">
+                        <b val="0" class="menu2-b">积分管理</b>
+                        <div> 
+                            <i url="{link:integral_manage-integral_shop_list}">积分商品列表</i>
+                            <i url="{link:integral_manage-integral_goods_class}">积分商品分类</i>
+                            <i url="{link:integral_manage-exchange_audit}">兑换审核</i>
+                        </div>
+                    </div>
+                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
+                </li>
+                
+                <!--<li n="16" class="menu-li menu-li8">
+                    <div class="menu2-box">
+                        <b val="0" class="menu2-b">一元购</b>
+                        <div> 
+                            <i url="{link:website-one_buy_style}">一元购风格</i>
+                           
+                        </div>
+                        <b val="0" class="menu2-b">一元管理</b>
+                        <div> 
+                            <i url="{link:one_buy-oneBuy_goods_list}">商品列表</i>
+                            <i url="{link:one_buy-oneBuy_goods_class}">商品分类</i>
+                            <i url="{link:one_buy-user_share}">用户晒单</i>
+                            <i url="{link:one_buy-prize_details}">中奖明细</i>
+                        </div>
+                    </div>
+                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
+                </li>-->
+                <li n="7" class="menu-li menu-li8">
+                    <div class="menu2-box">
+                        <b val="0" class="menu2-b">管理员</b>
+                        <div> 
+                            <i url="{link:authority_management-admin_list}">管理员列表</i>
+                            <i url="{link:authority_management-authority_grouping}">权限分组</i>
+                            <i url="{link:authority_management-authority_demo_manage}">权限模块管理</i>
+                            <i url="{link:authority_management-admin_authority}">管理员权限</i>
+                        </div>
+                        <b val="0" class="menu2-b">修改后台密码</b>
+                        <div> 
+                            <i url="{link:authority_management-reset_password}">后台修改密码</i>
+                          
+                        </div>
+                    </div>
+                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
+                </li>
+                <li n="8" class="menu-li menu-li9">
+                  
+                    <div class="menu2-box">
+                        <b val="0" class="menu2-b">分类管理</b>
+                        <div> 
+                            <!--<i url="{link:fnuo_mailbox-fnuo_mailbox}">文章咨询</i>-->
+                            <i url="{link:website-help_center}">分类管理</i>
+                            <i url="{link:website-article_manage}">文章管理</i>
+                        </div>
+                    </div>
+                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
+                </li>
+                <li n="9" class="menu-li menu-li10">
+                    <div class="menu2-box">
+                        <b val="0" class="menu2-b" window="cwbb">财务报表</b>
+                        <div> 
+                            <i url="{link:financial_statement-financial_statement}">网站收益佣金</i>
+                        
+                        </div>
+                    
+                    </div>
+                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
+                </li>
+                
+                <!--
+                <li n="11" class="menu-li menu-li11">
+                    <div class="menu2-box">
+                        <b val="0" class="menu2-b">帮帮管理</b>
+                        <div> 
+                            <i url="{link:bangbang_manage-fw}">帮帮服务审核</i>
+                            <i url="{link:bangbang_manage-xq}">帮帮需求审核</i>
+                            <i url="{link:bangbang_manage-fwlx}">帮帮服务类型设置</i>
+                            <i url="{link:bangbang_manage-fwfs}">帮帮服务方式设置</i>
+                            <i url="{link:bangbang_manage-ly}">帮帮留言管理</i>
+                        </div>
+                    </div>
+                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
+                </li>-->
+                
+                <li n="17" class="menu-li menu-li12">
+                    <div class="menu2-box">
+                        <b val="0" class="menu2-b">反馈管理</b>
+                        <div> 
+                             <i url="{link:fkgl-ideasBoxlist}">反馈列表</i>
+                             <i url="{link:fkgl-ideasBoxtype}">反馈类型</i>
+                        </div>
+                    </div>
+                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
+                </li>
+               
+               
+                
+                 <li n="19" class="menu-li menu-li11">
+                  
+                    <div class="menu2-box">
+                        <b val="0" class="menu2-b">基础设置</b>
+                        <div> 
+                           <!-- <i url="{link:wap_set-index}">WAP首页风格</i>-->
+                            <i url="{link:wap_index_model-index|web_type=index}">WAP首页风格</i>
+							<i url="{link:wap_jbset-index}">基本设置</i>
+                            <i url="{link:wap_footnav-footnav}">底部图标设置</i>
+                            <i url="{link:wap_mem_set-index}">会员中心设置</i>
+                          	<i url="{link:wap_userico-indexkeyword}">热搜关键词</i>
+                            
+                        </div>
+                         <b val="0" class="menu2-b">图标管理</b>
+                        <div> 
+                            <i url="{link:wap_userico-index}">会员中心图标</i>
+                            <i url="{link:wap_fxiconset-wap_fxzxico}">分销中心图标</i>
+                            <i url="{link:wap_fxiconset-wap_userico}">合伙人中心图标</i>
+                            <i url="{link:wap_set_guanggao-huandengpian}">广告幻灯片</i>
+                               <i url="{link:wap_jdpdd_set-getmodels}">热搜设置</i>
+                               <i url="{link:wap_mem_set-font_set}">图标文字设置</i>
+                        </div>
+                         <b val="0" class="menu2-b">商品页面</b>
+                        <div> 
+                            <i url="{link:wap_goods_set-index}">频道</i>
+                            <i url="{link:wap_goods_set-goodsindex}">详情相关设置</i>
+                        </div>
+                       <!-- <b val="0" class="menu2-b">幻灯片设置</b>
+                        <div> 
+                            <i url="{link:wap_set-advplace}">幻灯片设置</i>
+                            <i url="{link:wap_appadver-appgaolist}">广告设置</i> 
+                            
+                        </div>-->
+                         <b val="0" class="menu2-b">分享页面</b>
+                        <div> 
+                            <i url="{link:wap_shareset-fx_index}">分享页面内容</i>
+                            <i url="{link:wap_mem_set-invite}">邀请页面设置</i>
+                            <i url="{link:wap_goods_fenxiang-index}">淘宝分享设置</i>
+                            <i url="{link:wap_goods_fenxiang-pddindex}">拼多多分享设置</i>
+                            <i url="{link:wap_goods_fenxiang-jdindex}">京东分享设置</i>
+
+                        </div>
+                        <b val="0" class="menu2-b">红包设置</b>
+                        <div> 
+                            <i url="{link:wap_hongbao-set}">红包概率</i>
+                            <i url="{link:wap_hongbao-index}">红包列表</i>
+                            <i url="{link:wap_hongbao-hbset}">红包设置</i>
+                        </div>
+                        <b val="0" class="menu2-b">反馈中心</b>
+                        <div> 
+                            <i url="{link:wap_ides-index}">反馈类型</i>
+                            <i url="{link:wap_ides-ideasBoxlist}">WAP反馈管理</i>
+                        
+                        </div>
+                        
+                        <b val="0" class="menu2-b">文章管理</b>
+                        <div> 
+                            <i url="{link:wap_artical-index}">WAP文章管理</i>
+                            <i url="{link:wap_artical-helperart}">WAP帮助中心</i>
+                        
+                        </div>
+                        
+                        <b val="0" class="menu2-b">微信设置</b>
+                        <div> 
+                            <i url="{link:weixinset-miyao}">密钥设置</i>
+                            <i url="{link:weixinset-menu}">菜单设置</i>
+                            <i url="{link:weixinset-set}">微信基本设置</i>
+                        </div>
+
+                    </div>
+                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
+                </li>
+                
+                 <li n="20" class="menu-li menu-li20">
+                    <div class="menu2-box">
+                        <b val="0" class="menu2-b" window="ddgl">小程序</b>
+                        <div> 
+                            <i url="{link:xcxSet-index}">小程序设置</i>
+                        </div>
+                    </div>
+                       <div class="menu2-box">
+                        <b val="0" class="menu2-b">基础设置</b>
+                        <div>
+                            <i url="{link:xcx_jdpdd_set-jd_set}">京东基本设置</i>
+                            <i url="{link:xcx_jdpdd_set-pdd_set}">拼多多基本设置</i>
+                            <i url="{link:xcx_admin_fls-mem_set}">会员中心相关</i>
+                            <i url="{link:xcx_appsetting-indexkeyword}">小程序热搜关键词</i>
+                            <i url="{link:tbNewUser-teamCount}">团队拉新汇总</i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu2-box">
+                        <b val="0" class="menu2-b">图标导航</b>
+                        <div>
+                           <i url="{link:xcx_jdpdd_set-getmodels}">两大模块设置</i>
+                           <i url="{link:xcx_appsetting-dgapp_userico}">会员中心图标</i>
+                            <i url="{link:xcx_fxiconset-dgapp_userico}">合伙人中心图标</i>
+                             <i url="{link:xcx_fxiconset-dgapp_fxzxico}">分销中心图标</i>
+                        </div>
+                    </div>
+                    <div class="menu2-box">
+                        <b val="1" class="menu2-b">文字设置</b>
+                        <div>
+                            <i url="{link:xcx_strset-set}">文字设置</i>
+                            <i url="{link:xcx_jzcy-jzcy}">家族成员1,2,3度名称设置</i>
+                             
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="menu2-box">
+                        <b val="1" class="menu2-b">商品设置</b>
+                        <div>
+                            <i url="{link:xcx_appgoodsset-index}">商品显示设置</i>
+                            <i url="{link:xcx_ksms-appset}">频道管理</i>
+                            <i url="{link:xcx_app_goods-indexset}">小程序首页商品</i>
+                            <i url="{link:xcx_app_goods-app_miaosha2}">限时抢购</i>
+                            <i url="{link:xcx_lqjl-index}">商品详情领券购买动态记录</i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu2-box">
+                        <b val="1" class="menu2-b">广告</b>
+                        <div> 
+                            <i url="{link:xcx_appadver-appgaolist}">小程序广告列表</i>
+                            <i url="{link:xcx_appadver-appslide}">小程序幻灯片</i>
+                            <i url="{link:xcx_appadver-yqimg}">邀请图片设置</i>
+                             <!-- <i url="{link:xcx_admin_fls-index}">福利社</i> -->
+                        </div>
+                    </div>
+                    <div class="menu2-box">
+                        <b val="1" class="menu2-b">文章</b>
+                        <div> 
+                            <i url="{link:xcx_appwz-helperartical}">小程序文章管理</i>
+                            <i url="{link:xcx_appwz-help}">小程序帮助中心</i>
+                        </div>
+                    </div>
+                      <div class="menu2-box">
+                        <b val="1" class="menu2-b">签到设置</b>
+                        <div> 
+                            <i url="{link:xcx_admin_fls-qiandao}">会员中心签到设置</i>
+                        </div>
+                    </div>
+                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
+                </li>
+                <li n="18" class="menu-li menu-li15">
+                    <div class="menu2-box">
+                        <b val="0" class="menu2-b">基础设置</b>
+                        <div>
+                        	<i url="{link:dg_appsetting-appset}">淘宝基本设置</i>
+                            <i url="{link:dg_jdpdd_set-jd_set}">京东基本设置</i>
+                            <i url="{link:dg_jdpdd_set-pdd_set}">拼多多基本设置</i>
+                            <i url="{link:dg_admin_fls-mem_set}">会员中心相关</i>
+                          <!--  <i url="{link:dgapp_huancun-index}">缓存管理</i>-->
+                            <i url="{link:dg_appsetting-indexkeyword}">app热搜关键词</i>
+                            <i url="{link:dg_appsetting-addapk}">app版本管理</i>
+                           
+                            
+                            <i url="{link:tbNewUser-tbOrderList}">淘宝拉新用户订单</i>
+                            <i url="{link:tbNewUser-TbNewUserActivity}">淘宝拉新活动设置</i>
+                            <i url="{link:tbNewUser-teamCount}">团队拉新汇总</i>
+                        </div>
+                    </div>
+                    <div class="menu2-box">
+                        <b val="1" class="menu2-b">app样式DIY</b>
+                        <div>
+                        	<i url="{link:dg_index_model-index|web_type=index}">首页</i>
+                        </div>
+                    </div>
+                    <div class="menu2-box">
+                        <b val="0" class="menu2-b">图标导航</b>
+                        <div>
+                           <i url="{link:dg_appsetting-index}">首页图标</i>
+                           <i url="{link:appindexset-index}">首页弹窗搜素图标</i>
+                            <i url="{link:dg_jdpdd_set-getmodels}">三大模块设置</i>
+                           <i url="{link:dg_appsetting-dgapp_userico}">会员中心图标</i>
+                           <i url="{link:dg_cgf_yhq_ggw-footnav}">app底部导航</i>
+                           <i url="{link:dg_fxiconset-dgapp_userico}">合伙人中心图标</i>
+                           <i url="{link:dg_fxiconset-dgapp_fxzxico}">分销中心图标</i>
+                           <i url="{link:dg_index_model-cgf_set}">超高返优惠券页面图标</i>
+                           <i url="{link:dg_kftype-index}">客服中心图标</i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu2-box">
+                        <b val="1" class="menu2-b">APP文字图标设置</b>
+                        <div>
+                            <i url="{link:dg_strset-set}">文字设置</i>
+                            <i url="{link:dg_alipay_set-index}">支付宝红包图标设置</i>
+                             <i url="{link:dg_login_str-index}">登录页面设置</i>
+                        	<i url="{link:jzcy-jzcy}">家族成员1,2,3度名称设置</i>
+                            <i url="{link:dg_agentreport-set}">收益报表页面设置</i>
+                            <i url="{link:dg_strset-img_set}">图标设置</i>
+                            <i url="{link:dg_strset-msg}">验证码短信文字设置</i>
+                            <i url="{link:dg_laxin_share-index}">分享后拉新页面</i>
+                            <i url="{link:dg_admin_fls-mywallet}">我的钱包栏目文字</i>
+                        </div>
+                    </div>
+                    <div class="menu2-box">
+                        <b val="1" class="menu2-b">圈子相关</b>
+                        <div>
+                        	<i url="{link:dg_circle_of_friends-set}">基本设置</i>
+                            <i url="{link:dg_circle_of_friends-cate}">分类设置</i>
+                        	<i url="{link:dg_circle_of_friends-index}">官方文案发布</i>
+                            <i url="{link:dg_circle_of_friends-auto_index}">自动文案管理</i>
+                            <i url="{link:dg_circle_of_friends-user_index}">用户文案管理</i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu2-box">
+                        <b val="1" class="menu2-b">商品设置</b>
+                        <div>
+                        	<i url="{link:appgoodsset-index}">商品显示设置</i>
+                            <i url="{link:taoqianggou-index}">淘抢购页面设置</i>
+                        	<i url="{link:dg_ksms-appset}">频道管理</i>
+                           
+                           <!-- <i url="{link:dg_app_goods-indexset}">app首页商品</i>-->
+                            <i url="{link:dg_app_goods-app_miaosha2}">限时抢购</i>
+                            <i url="{link:dg_lqjl-index}">商品详情领券购买动态记录</i>
+                        </div>
+                    </div>
+                     <div class="menu2-box">
+                        <b val="1" class="menu2-b">支付相关</b>
+                        <div> 
+                            <i url="{link:dg_zfxg-app_alipay}">支付设置</i>
+                            <i url="{link:dg_zfxg-zficon}">支付方式图标</i>
+                            <i url="{link:dg_zfxg-msgicon}">消息类型图标</i>
+                            
+                        </div>
+                    </div>
+                    <div class="menu2-box">
+                        <b val="1" class="menu2-b">广告</b>
+                        <div> 
+                        	<i url="{link:dg_appadver-appgaolist}">app广告列表</i>
+                            <i url="{link:dg_taolj-appgaolist}">淘礼金幻灯片</i>
+                            <i url="{link:dg_cgf_yhq_ggw-appgaolist}">超级券超高返图文设置</i>
+                            <i url="{link:dg_appadver-appslide}">app幻灯片</i>
+                            <i url="{link:dg_admin_fls-index}">福利社</i>
+                            <i url="{link:dg_mem_guanggao-appgaolist}">会员等级页面广告位</i>
+                            <i url="{link:dg_paomadeng-index}">首页跑马灯</i>
+                            <i url="{link:dg_paomadeng-set}">首页设置</i>
+                        </div>
+                    </div>
+                    <div class="menu2-box">
+                        <b val="1" class="menu2-b">文章</b>
+                        <div> 
+                            <i url="{link:dg_appwz-helperartical}">app文章管理</i>
+                            <i url="{link:dg_appwz-help}">app帮助中心</i>
+                            <i url="{link:dg_appwz-yinsi}">隐私政策</i>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="menu2-box">
+                        <b val="1" class="menu2-b">红包</b>
+                        <div> 
+                            <i url="{link:dg_hongbao-index}">红包列表</i>
+                            <i url="{link:dg_hongbao-set}">红包概率</i>
+                            <i url="{link:dg_hongbao-hbset}">红包设置</i>
+                        </div>
+                    </div>
+                    
+                     <div class="menu2-box">
+                        <b val="1" class="menu2-b">活动营销</b>
+                        <div> 
+                            <i url="{link:dg_taolj-set}">淘礼金设置</i>
+                            <i url="{link:dg_taolj-lm_list}">淘礼金页面分类管理</i>
+                            <i url="{link:dg_taolj-rule}">淘礼金栏目商品规则</i>
+                            <i url="{link:dg_tb_activity-set}">淘宝双12会场相关设置</i>
+                            <i url="{link:choujiang-set}">抽奖设置</i>
+                            <i url="{link:dg_choujiangjilu-index}">抽奖记录</i>
+                        </div>
+                    </div>
+                    
+                    <div class="menu2-box">
+                        <b val="1" class="menu2-b">分享设置</b>
+                        <div> 
+                            <i url="{link:dg_strset-fx_index}">分享页面内容</i>
+                            <i url="{link:dg_app_goods_fenxiang-index}">淘宝商品分享设置</i>
+                            <i url="{link:dg_app_goods_fenxiang-pddindex}">拼多多商品分享设置</i>
+                            <i url="{link:dg_app_goods_fenxiang-jdindex}">京东商品分享设置</i>
+                            <i url="{link:dg_appadver-yqimg}">app分享管理</i>
+							<i url="{link:dg_down-index}">邀请好友分享方式设置</i>
+                           	<i url="{link:appindexset-share}">分享后的图片设置</i>
+                            <i url="{link:dg_down-haibao_index}">海报分享设置</i>
+                            <i url="{link:pc_appModel-appgaolist}">海报管理</i>
+                        </div>
+                    </div>
+                     <div class="menu2-box">
+                        <b val="1" class="menu2-b">签到设置</b>
+                        <div> 
+                            <i url="{link:dg_admin_fls-qiandao}">会员中心签到设置</i>
+                        </div>
+                    </div>
+                   <!-- <div class="menu2-box">
+                        <b val="1" class="menu2-b">合伙人设置</b>
+                        <div> 
+                            <i url="{link:dg_apphhr-addapk}">合伙人申请设置</i>
+                        </div>
+                    </div>-->
+                     <div class="menu2-box {display}" >
+                     	 <b val="1" class="menu2-b">资金池相关</b>
+                        <div> 
+                            <i url="{link:dg_zjc-appset}">制度设置</i>
+                            <i url="{link:dg_zjc-zjc}">资金池明细</i>
+                            <i url="{link:dg_zjc-fenpei}">分配明细</i>
+                            <i url="{link:dg_zjc-zjc_money}">资金池金额</i>
+                        </div>
+                        
+                     <div>
+             <!--       <div class="menu2-box">
+                        <b val="1" class="menu2-b">成为代理</b>
+                        <div> 
+                            <i url="{link:dg_dl-index}">代理审核</i>
+                            <i url="{link:dg_dl-appset}">代理相关设置</i>
+                           <i url="{link:dg_dl-fanli}">返利设置</i>
+                            
+                            <i url="{link:dg_appModel-appgaolist}">代理海报</i>
+                            <i url="{link:fx_set-fx_set}">会员等级设置</i>
+                            <i url="{link:fx_set-fx_set_hy}">推广会员分佣设置</i>
+                            <i url="{link:fx_set-fx_set_dl}">推广代理分佣设置</i>
+                            
+                            
+                        </div>
+                    </div>-->
+                    
+                    <!--<div class="menu2-box" >
+                        <b val="1" class="menu2-b">VIP相关</b>
+                        <div> 
+                            <i url="{link:hdyBuy-index}">VIP协议</i>
+                            <i url="{link:hdy-hdy}">VIP介绍图</i>
+                            <i url="{link:hdyVip-index}">VIP相关设置</i>
+                        </div>
+                    </div>-->
+                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
+                </li>
+               
+                
+                <li class=" menu-li18 menu_small">
+                    <div class="small-box">
+                        <b small_="0" class="small-b">WAP风格</b>
+                    </div>
+                    <img class="tri-img" src="../../img/index/index_home/tri.png" alt="">
+                </li>
+            </ul>
+        </div>
+        <!--可化窗口-->
+    </div>
+      <div class="out-box" id="outwarp">
+           <textarea id="msgdate" style="display: none">
+           <div class="window-box controlBox" id="controlBox" style="z-index:[zindex];display:none;">
+               <!--<div class="resize lt"></div>-->
+               <!--<div class="resize tr"></div>-->
+               <div class="resize rb"></div>
+               <!--<div class="resize bl"></div>-->
+               <div class="hide__"></div>
+               <div class="head-box">
+                   <a href="javascript:void(0);" onclick="window.history.go(-1)"  class="back-box">
+                       <img class="back-img" src="../../img/comm/turn_left.png" alt=""/></a>
+                  <div class="download-box"> <img class="download-img" src="../../img/comm/dl.png" alt=""/></div>
+                   <div class="left-box">
+                       <i class="close-bk"></i>
+                       <i class="big-bk"></i>
+                       <i class="small-bk"></i>
+                   </div>
+                   <p class="h_title-text">[title]</p>
+               </div>
+               <div class="title-box">
+                   <div class="tit-sbox">
+                       [span]
+                   </div>
+               </div>
+               <div class="body-box">
+                   <iframe class="content-box" src="{link:index-ifarme_index}" frameborder="0" scrolling="auto"></iframe>
+               </div>
+           </div>
+       </textarea>
+      </div>
+   </div>
+<script type="text/javascript" src="../../js/index/index_home.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+    $(".menu-li .menu2-box .menu2-b").click(function(){
+       var ttt= $(this).attr("key");
+        var widths = $(".window-box[kkid='"+ttt+"']").width();
+        var heights = $(".window-box[kkid='"+ttt+"']").height();
+        $(".window-box[kkid='"+ttt+"']").css({"width":widths,"height":heights});
+    });
+});
+    //控制div窗口移动
+function addmove(obj) {
+    //divWin外部窗口,objnav导航栏，colse关闭按钮，min化小按钮,max放大按钮,small_title被化小窗口标题
+    var divWin = $(obj), objnav = $(obj).find(".head-box .h_title-text"),
+            colse = $(obj).find(".close-bk"), min = $(obj).find(".small-bk"), max = $(obj).find(".big-bk");
+    var move = false;
+    //记录窗口元素的宽高，用于窗口最小最大还原窗口
+    var lefts, tops, widths, heights;
+    widths = divWin.width();
+    heights = divWin.height();
+    lefts=obj.offset().left;
+    tops=obj.offset().top;
+    //窗口最大化
+    var big = 0;
+    //双击导航框缩放窗口
+    objnav.dblclick(function () {
+        max.click();
+    })
+    //双击导航框缩放窗口
+    var leftg, topg, widthg, heightg;
+    objnav.dblclick(function () {
+        max.click();
+    })
+    //单击缩放导航框缩放窗口
+    max.click(function () {
+        //记录窗口元素的宽高，用于窗口最大化后还原窗口
+        var divWin_kkid=$(divWin).attr("kkid");
+        if (big == 0) {
+            widthg = divWin.width();
+            heightg = divWin.height();
+            leftg=obj.offset().left;
+            topg=obj.offset().top;
+            var out_boxH = $(".out-box").height();
+            var out_boxW = $(".out-box").width();
+            divWin.animate({
+                width: out_boxW,
+                height: out_boxH,
+                left: "0px",
+                top: "0px"
+            }, 200);
+            big = 1;
+        } else if (big == 1) {
+            divWin.animate({
+                width: widthg,
+                height: heightg,
+                left: leftg,
+                top: topg
+            }, 200);
+            big = 0;
+        }
+        window.setTimeout(function(){
+            var contentW=$(".content").height();
+            $(".out-box").height(contentW-105);
+            var win_boxH = $(" .window-box[kkid='"+divWin_kkid+"']").height();
+            $(" .window-box[kkid='"+divWin_kkid+"']").find(".body-box").height(win_boxH-80);  //点击最大化body_box高度变动
+        },200);
+        if(big==0){
+            $(".big-bk").parent().removeClass("big")
+        }else {
+            $(".big-bk").parent().addClass("big");
+        }
+    });
+    //窗口化小
+    var small=1;
+    //此处获取浏览器可视窗口的高度，也存在问题，当我们的窗口拉到浏览器上或下可视窗口外的时候，
+    // 那么浏览器可视窗口的高度也被增大了，所以当我们的窗口拉到浏览器可视窗口上或下的外面的时候，
+    // 我们缩小窗口到任务栏的话就将看不到缩小后的窗口，最简单的办法就是把此变量设置成全局变量，
+    // 当页面加载的时候此变量就初始化了就不会被窗口拉出的时候增大
+    min.click(function(){
+        var obj=$(this).parent().parent().parent();
+        $(obj).attr("old_style",$(obj).attr("style"));    //当点击化小按钮时，存贮初始样式到old_style
+        var tmpval=(obj.attr("style"));          //中间取值法
+        $(obj).attr("min_style",tmpval);
+        //添加被化小的窗口标题
+        var li_key = $("#index_li").attr("key");
+        var title_id = $(this).parent().parent().parent().attr("kkid");
+        var s = $(document).height();
+        divWin.animate({
+//                right:"0px",
+            top:s-138,
+            width:"0px",
+            height:'0px'
+//                overflow: "hidden"
+        },200);
+        small=0;
+        $(".window-box[kkid='"+title_id+"']").attr("min",1);
+        $(".window-box[kkid='"+li_key+"']").attr("min",1);
+        var is_min=0;
+        $(".window-box").each(function(){
+            if($(this).attr("min")==1)is_min=1;
+        });
+        if(is_min==1){                       //有一个不是最小化
+            $(".out-box").show();
+//            添加一个小球(只有新窗口化小后才有小球动画)
+            if($(".sport[num='"+title_id+"']").length==0)$(".tabs-ul").append("<span class='sport' num='"+title_id+"'></span>");
+            var sport_L = $(".window-box[min='1']").length;
+            $(".tabs-ul .sport[num='"+title_id+"']").show();
+            $(".tabs-ul .sport[num='"+title_id+"']").animate({
+                "opacity": "1",
+                "left": (($(".tabs-ul .tabs-li").length*60)+40)+"px"
+            },800,function(){
+                $(".tabs-ul .sport[num='"+title_id+"']").animate({
+                    "top":"5px"
+                },300,function(){
+                    $(".tabs-ul .sport[num='"+title_id+"']").animate({
+                        "opacity": "0"
+                    },300,function(){
+                        $(".tabs-ul .sport[num='"+title_id+"']").css({
+                            "left": "0px",
+                            "top": "-20px"
+                        })
+                        $(".tabs-ul .sport[num='"+title_id+"']").fadeOut();
+                    });
+                    $(".window_discou").fadeIn().html(sport_L);
+                })
+            })
+        }
+        else{
+            window.setTimeout(function(){
+                $(".out-box").hide();
+            },400)
+        }
+    });
+}
+</script>
+<img src="../../img/index/index_home/close_on.png" alt="" style="display: none" id="close_off" />
+<script type="text/javascript">
+    //    if(navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion .split(";")[1].replace(/[ ]/g,"")=="MSIE6.0")
+    //    {
+    //        alert("IE 6.0");
+    //    }  min.click(function(){
+    if(navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion .split(";")[1].replace(/[ ]/g,"")=="MSIE7.0")
+    {
+        alert("温馨提示:您当前浏览器版本较低，推荐使用ie9或以上版本，体验效果更好");
+    }
+    else if(navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion .split(";")[1].replace(/[ ]/g,"")=="MSIE8.0")
+    {
+        alert("温馨提示:您当前浏览器版本较低，推荐使用ie9或以上版本，体验效果更好");
+    }
+    //    else if(navigator.appName == "Microsoft Internet Explorer" && navigator.appVersion .split(";")[1].replace(/[ ]/g,"")=="MSIE9.0")
+    //    {
+    //        alert("温馨提示:您当前浏览器版本较低，推荐使用ie9或以上版本，体验效果更好");
+    //    }
+var open_new={};
+$(document).ready(function(e) {
+	window.setInterval(function(){
+		$(".tit-sbox span").each(function(index, element) {
+			if($(this).attr("window_onoff")!=null)return;
+			$(this).attr("window_onoff","on");
+			$(this).click(function(){
+				open_new.url=$(this).attr("url");	
+			});
+		});
+	},100);
+	document.onkeydown=function(e){
+		e=e?e:window.event;
+		switch(e.keyCode){
+			case 115:
+				//return false;
+			break;
+			case 114:
+				window.open(open_new.url);
+			break;	
+		}
+	}
+	$("a").each(function(index, element) {
+       if($(this).attr("href")!='#')return;
+	   $(this).attr("href","javascript:void(0);"); 
+    });
+	var tmp_left=-84;
+	$(".menu-box .menu-ul .menu-li").each(function(index, element) {
+		tmp_left+=60;
+        $(this).css({"left":tmp_left+"px","margin-left":"0px","right":"auto","margin-right":"0px"});
+    });
+	$(".tabs-box .tabs-ul").width(($(".tabs-ul .tabs-li").length*60)+65);
+	$(".tabs-box .menu-box .menu-ul").width(($(".tabs-ul .tabs-li").length*60)+65);
+   $(".menu_small").css({"left":(tmp_left+120)+"px","margin-left":"0px","right":"auto","margin-right":"0px"});
+});
+//jj explosion
+var s_d={};
+s_d.data={};
+s_d.set=function(obj1,obj2){
+	if(obj1==null||obj1==''){alert("error name is null");return;}
+	s_d.data[obj1]=obj2;
+}
+s_d.get=function(obj1){
+	if(obj1==null)return null;
+	if(s_d.data[obj1]==null)return null;
+	return s_d.data[obj1];
+}
+s_d.del=function(obj1){
+	if(obj1==null)return;
+	if(s_d.data[obj1]==null)return;
+	delete s_d.data[obj1];
+}
+$(document).ready(function(e) {
+	$(".menu2-box.on").hide();
+	var tmplocation=window.location.href;
+	if(tmplocation.indexOf("localhost")!=-1)return;
+    $.get("{INDEX_WEB_URL}comm/timer/timer.php?_ctrl=re",{},function(){});
+	
+});
+</script>
+<!--<script src="../../js/index/bj_star.js"></script>-->
+</body>
 </html>

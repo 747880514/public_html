@@ -30,12 +30,12 @@ class set_order_user_lvAction extends Action{
 		//if(empty($_GET['run']))zfun::fecho("测试中断");
 		ignore_user_abort();set_time_limit(0);
 		self::check_buy_share_uid();//匹配旧的订单的 分享人购买人id
-		$where="(uid>0 or share_uid >0) and status IN('创建订单','订单付款','订单结算','订单失效') and is_rebate=0";
-		//fpre(zfun::f_count("Order",$where));
+		$where="(uid>0 or share_uid >0) and status IN('创建订单','订单付款','订单成功','订单结算','订单失效') and is_rebate=0";
+		fpre(zfun::f_count("Order",$where));
 		$order=zfun::f_select("Order",$where,"id,orderId,status,orderType,uid,share_uid,is_rebate,commission,createDate,now_user,returnstatus",100,0,"id asc");
 		if(empty($order))$order=array();
 		$order=zfun::ordercommission($order);
-
+		
 		foreach($order as $k=>$v){
 			order::$set['tmp_oid']=$v['orderId'];
 			$uid=$v['uid'];
@@ -46,6 +46,7 @@ class set_order_user_lvAction extends Action{
 			if(empty(order::$set['now_user']))order::$set['now_user']=array();
 			if($v['orderType'].''=='1')$v['orderType']='tb';
 			$ex_user=order::get_extend($uid);
+
 			$ex_user=$ex_user['user_arr'];
 			$order_arr=array();
 			if(empty($now_user)){//存入当前 会员等级
@@ -56,10 +57,9 @@ class set_order_user_lvAction extends Action{
 				$order_arr['now_user']=addslashes(json_encode($now_user));
 			}
 
-
 			//百里.花蒜重置返佣比,记得修改下方循环的2处bili=>hs_bili
 			$ex_user = self::hs_fenyong($ex_user);
-
+			
 			foreach($ex_user as $k1=>$v1){
 				$arr=array(
 					"uid"=>$v1['id'],
@@ -86,7 +86,7 @@ class set_order_user_lvAction extends Action{
 					if($v['share_uid'].''!='0')$arr['comment']="分享";
 					else $arr['comment']='自购';
 				}
-
+				$comment=$arr['comment'];
 				$where="uid='".$arr['uid']."' and oid='".$arr['oid']."'";
 				$tmp=zfun::f_row("Rebate",$where);
 
@@ -96,6 +96,7 @@ class set_order_user_lvAction extends Action{
 					$arr=array();
 					$arr['fcommission']=zfun::dian(doubleval($v['commission'])*doubleval($tmp['bili']),1000);//返利佣金;
 					$arr['status']=$v['status'];//订单状态
+					$arr['comment']=$comment;
 					zfun::f_update("Rebate",$where,$arr);
 				}
 			}
@@ -104,12 +105,13 @@ class set_order_user_lvAction extends Action{
 			$order_arr['is_rebate']=1;
 			zfun::f_update("Order","id='".$v['id']."'",$order_arr);
 		}
+		
 		/*
-		if(count($order)==25){
+		if(count($order)!=0){
 			echo '<script>window.location=window.location.href;</script>';
 		}
-		else{die("完成");}
-		*/
+		else{die("完成");}*/
+		
 		zfun::fecho("run ".count($order),array(),1);
 	}
 
@@ -309,5 +311,6 @@ class set_order_user_lvAction extends Action{
 
 		return $ex_user;
 	}
+
 }
 ?>

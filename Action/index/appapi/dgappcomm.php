@@ -48,7 +48,7 @@ class appcomm{
 			$goods['goods_price']=$goodsact['goods_price'];
 		}
 		if(!empty($goodsact['commission'])){//佣金比例
-			$goods['commission']=$goodsact['commission'];
+			$goods['commission']=$goodsact['commission'];	
 		}
 		if(!empty($goodsact['discount'])){//折扣
 			$goods['discount']=$goodsact['discount'];
@@ -87,7 +87,7 @@ class appcomm{
 	public static function f_goods($Da,$where,$field,$sort,$arr,$limit){
 		if(!empty($_GET['f_goods']))fpre($where);
 		$_GET['p']=intval($_POST['p']);if(empty($_GET['p']))$_GET['p']=1;
-		return zfun::f_goods($Da,$where,$field,$sort,$arr,$limit);
+		return zfun::f_goods($Da,$where,$field,$sort,$arr,$limit);	
 	}
 	public static function simg($str='',$path='slide',$filename='',$filetype='jpg'){
 		if(empty($str))return array();
@@ -164,7 +164,7 @@ class appcomm{
 			'right-top'=>array('lat'=>$lat + $dlat, 'lng'=>$lng + $dlng),
 			'right-bottom'=>array('lat'=>$lat - $dlat, 'lng'=>$lng + $dlng)
 		);
-		$where=" and ".$lat_.">{$squares['right-bottom']['lat']} and ".$lat_."<{$squares['left-top']['lat']} and
+		$where=" and ".$lat_.">{$squares['right-bottom']['lat']} and ".$lat_."<{$squares['left-top']['lat']} and 
 				".$lng_.">{$squares['left-top']['lng']} and  ".$lng_."<{$squares['right-bottom']['lng']}";
 		return $where;
 	 }
@@ -174,7 +174,7 @@ class appcomm{
 		if($type=="desc")$type=SORT_NUMERIC;
 		else $type=SORT_NUMERIC;
 		array_multisort($arr,$type,$tmp);
-		return $arr;
+		return $arr;	
 	}
 	public static function getheadimg($user=array()){
 		foreach($user as $k=>$v){
@@ -209,16 +209,16 @@ class appcomm{
 		$result=zfun::f_insert("Interal",$arr);//插入记录
 		$store_send_msg_onoff=intval($GLOBALS['action']->getSetting("store_send_msg_onoff"));
 		if($store_send_msg_onoff){
-			zfun::sendphonemsg($store['phone'],"你有一条已付款".$order['orderId']);
+			zfun::sendphonemsg($store['phone'],"你有一条已付款".$order['orderId']);		
 		}
 		return true;
 	}
-
+	
 	public static function goodsfanlioff(&$goods=array(),$set=array()){
 		if(empty($goods))return array();
 		$str="checkVersion,fan_all_str,fxdl_show_fl1,fxdl_show_fl2,fxdl_show_fl3,fxdl_show_fl4,fxdl_show_fl5,fxdl_show_fl6,fxdl_show_fl7,";
 		$str.="fxdl_show_fl8,fxdl_show_fl9,fxdl_show_fl10,fxdl_show_fl11,fxdl_show_fl12";
-		$set=zfun::f_getset($str.",app_fanli_onoff,app_choujiang_onoff,app_fanli_off_str,app_fanli_ico,app_hongbao_ico");
+		$set=zfun::f_getset($str.",app_fanli_onoff,app_choujiang_onoff,app_fanli_off_str,app_fanli_ico,app_hongbao_ico");	
 		$lv=1;
 		if(!empty($_POST['token'])){
 			$userid=zfun::f_row("User","token='".filter_check($_POST['token'])."'");
@@ -249,45 +249,45 @@ class appcomm{
 				$goods[$k]['fxz']='';
 				$goods[$k]['is_hide_fl']=1;
 				$goods[$k]['is_hide_sharefl']=1;
-
+				
 			}
 			if($goods[$k]['is_hide_fl']==1)$goods[$k]['fcommission']="0";
-
+			
 		}
-
+		
 		if(intval($set['app_fanli_onoff'])==1)return $goods;
 		foreach($goods as $k=>$v){
-
-			$goods[$k]['q']=$goods[$k]['fcommission']=$goods[$k]['returnfb']=$goods[$k]['return_title']=$goods[$k]['returnbl']=$goods[$k]['commission']='';
+			
+			$goods[$k]['q']=$goods[$k]['fcommission']=$goods[$k]['returnfb']=$goods[$k]['return_title']=$goods[$k]['returnbl']=$goods[$k]['commission']='';	
 			if(empty($v['app_fanli_off_str']))$goods[$k]['app_fanli_off_str']=$set['app_fanli_off_str'];
-			$goods[$k]['fan_all_str']=$set['fan_all_str'];
+			$goods[$k]['fan_all_str']=$set['fan_all_str'];	
 		}
-
-		return $goods;
+		
+		return $goods;	
 	}
 	public static function goodsfeixiang(&$goods=array()){
 		if(empty($goods))return array();
-		$is_operator=0;
+		$is_operator=0; 
 		if(!empty($_POST['token'])){
 			$user=$userid=zfun::f_row("User","token='".filter_check($_POST['token'])."'");
 			if($userid['operator_lv'].''!='0')$is_operator=1;
 		}
 		$set=zfun::f_getset("checkVersion,goods_list_city_onoff,fx_goods_fl,operator_wuxian_bili,operator_onoff");
 		$set['operator_wuxian_bili']=doubleval($set['operator_wuxian_bili'])/100;
-
+		
 		$dl_id_val=(intval($userid['is_sqdl'])+1);
-
-		$sety=zfun::f_getset("taoqianggou_quan_color,goodsyhqstr_color,goodsfcommissionstr_color,goods_yhqlist_str,fan_all_str,hhrapitype,fxdl_fxyjbili".$dl_id_val.",fxdl_tjhy_bili1_".$dl_id_val);
+		
+		$sety=zfun::f_getset("fxdl_hhrshare_onoff,hhrshare_flstr,taoqianggou_quan_color,goodsyhqstr_color,goodsfcommissionstr_color,goods_yhqlist_str,fan_all_str,hhrapitype,fxdl_fxyjbili".$dl_id_val.",fxdl_tjhy_bili1_".$dl_id_val);
 		if(empty($sety['goodsyhqstr_color']))$sety['goodsyhqstr_color']='f43e79';
 		if(empty($sety['goodsfcommissionstr_color']))$sety['goodsfcommissionstr_color']='f43e79';
 
 		$dian=100;
-
+		
 		foreach($goods as $k=>$v){
 			$goods[$k]['fxz']="";
 			$goods[$k]['fx_commission']='';
 			if(intval($set['fx_goods_fl'])!=1){
-
+				
 				//如果开启了推广模式 读取一级佣金比例
 				if(intval($set['operator_onoff'])==1){//读取 一级推广佣金比例
 					$bili=$sety["fxdl_tjhy_bili1_".$dl_id_val]/100;
@@ -297,80 +297,86 @@ class appcomm{
 				}
 				//如果是运营商修改比例
 				if($is_operator)$bili=$set['operator_wuxian_bili'];
-
 				if($set['operator_onoff']=='2'){//双轨模式
 					actionfun("comm/twoway");$twoset=twoway::set();
 					$one_set=$twoset[intval($userid['is_sqdl']).''];
 
 					// 百里.修改前
 					// $bili=doubleval($one_set['自购比例'])/100;
-
 					// 百里.修改后
 					$baili_bili = $one_set['自购比例']+$one_set['推广1级比例']+$one_set['团队存在1合伙人比例']+$one_set['团队存在2合伙人比例']+$one_set['团队存在1同级比例']+$one_set['团队存在2同级比例'];
 					$bili=doubleval($baili_bili)/100;
+
 
 					if($user['is_sqdl']==0&&$is_operator==0){//下一个等级的比例 普通会员显示
 						$one_set=$twoset[intval($userid['is_sqdl']+1).''];
 
 						// 百里.修改前
 						// $bili=doubleval($one_set['自购比例'])/100;
-
 						// 百里.修改后
 						$baili_bili = $one_set['自购比例']+$one_set['推广1级比例']+$one_set['团队存在1合伙人比例']+$one_set['团队存在2合伙人比例']+$one_set['团队存在1同级比例']+$one_set['团队存在2同级比例'];
 						$bili=doubleval($baili_bili)/100;
 
+					}elseif($user['is_sqdl']==0&&$is_operator==0&&$sety['fxdl_hhrshare_onoff']==1){
+						$one_set=$twoset[intval($userid['is_sqdl']).''];
+
+						// 百里.修改前
+						// $bili=doubleval($one_set['自购比例'])/100;
+						// 百里.修改后
+						$baili_bili = $one_set['自购比例']+$one_set['推广1级比例']+$one_set['团队存在1合伙人比例']+$one_set['团队存在2合伙人比例']+$one_set['团队存在1同级比例']+$one_set['团队存在2同级比例'];
+						$bili=doubleval($baili_bili)/100;
 					}
 					if($is_operator)$bili=0;
 				}
-
-
-				$commission=round($v['goods_price']*($v['commission']/100)*$bili*$dian)/$dian;	//首页显示分享赚
+				$commission=round($v['goods_price']*($v['commission']/100)*$bili*$dian)/$dian;
 				$goods[$k]['fx_commission']=$commission;
 				$goods[$k]['fx_commission_bili']=round(($commission/$v['goods_price'])*100*$dian)/$dian;
-				$goods[$k]['fxz']="分享赚: ".$commission;
+				$goods[$k]['fxz']=$sety['hhrshare_flstr']." ".$commission;
 				//升级赚
 				$data=self::tuiguang($goods[$k],$user,$set);
 				if(!empty($data['fx_commission']))$goods[$k]['fx_commission']=$data['fx_commission'];
 				if(!empty($data['fx_commission_bili']))$goods[$k]['fx_commission_bili']=$data['fx_commission_bili'];
 				if(!empty($data['fxz']))$goods[$k]['fxz']=$data['fxz'];
 				if($set['goods_list_city_onoff']==1){$goods[$k]['provcity']='';$goods[$k]['ciry']='';}
-
+				
 			}
 			if($_POST['appVersion']==$set['checkVersion']&&!empty($set['checkVersion'])&&$_POST['platform']=='iOS'){
-
+				
 				$goods[$k]['is_hide_fl']=1;
 				$goods[$k]['is_hide_sharefl']=1;
 			}
-
+			
 		}
-
+		
 		//商品相关 设置
 		self::goodsSet02($goods);
-
-		return $goods;
+		
+		return $goods;	
 	}
 	//这是未登录 和 普通会员时的
 	static function tuiguang($goods=array(),$user=array(),$set=array()){
 		if(!empty($user['is_sqdl'])||!empty($user['operator_lv']))return;
-
+		$set3=zfun::f_getset("hhrshare_ptstr,hhrshare_flstr,fxdl_hhrshare_onoff");
 		//如果开启了推广模式 读取一级佣金比例
 		if(intval($set['operator_onoff'])==1){//读取 一级推广佣金比例
 			$str="fxdl_lv";
 			for($i=1;$i<=10;$i++)$str.=",fxdl_tjhy_bili1_".$i;
 			$tuiguang_set=zfun::f_getset($str);unset($tuiguang_set['fxdl_lv']);
 			$key = array_search(max($tuiguang_set),$tuiguang_set); //最大值下标
-
+			
 			if(empty($user)){$bili=$set['operator_wuxian_bili'];}
 			else $bili=$tuiguang_set[$key]/100;
+			if(!empty($user)&&$set3['fxdl_hhrshare_onoff']==1)$bili=$tuiguang_set['fxdl_tjhy_bili1_'.($user['is_sqdl']+1)]/100;
 		}
 		else{//读取 分享佣金比例
 			$str="fxdl_lv";
 			for($i=1;$i<=10;$i++)$str.=",fxdl_fxyjbili".$i;
 			$fanli_set=zfun::f_getset($str);unset($fanli_set['fxdl_lv'],$fanli_set['fxdl_fxyjbili1']);
 			$key = array_search(max($fanli_set),$fanli_set); //最大值下标
-
+			
 			if(empty($user)){$bili=$fanli_set[$key]/100;}
 			else $bili=$fanli_set["fxdl_fxyjbili2"]/100;
+			if(!empty($user)&&$set3['fxdl_hhrshare_onoff']==1)$bili=$tuiguang_set['fxdl_fxyjbili'.($user['is_sqdl']+1)]/100;
 		}
 		if($set['operator_onoff']=='2'){//双轨模式
 			actionfun("comm/twoway");$twoset=twoway::set();
@@ -380,17 +386,20 @@ class appcomm{
 			}
 			$one_set=$twoset[$k];
 			if(!empty($user)){$one_set=$twoset[1];}
-
+			if(!empty($user)&&$set3['fxdl_hhrshare_onoff']==1){$one_set=$twoset[$user['is_sqdl']];}
 			$bili=doubleval($one_set['自购比例'])/100;
+		
 		}
-
+		
 		$dian=100;
 		$commission=round($goods['goods_price']*($goods['commission']/100)*$bili*$dian)/$dian;
-
+		if(empty($set3['hhrshare_ptstr']))$set3['hhrshare_ptstr']='升级赚';
+		if(intval($set3['fxdl_hhrshare_onoff'])==1&&!empty($user))$set3['hhrshare_ptstr']=$set3['hhrshare_flstr'];
+		
 		$data=array();
 		$data['fx_commission']=$commission;
 		$data['fx_commission_bili']=round(($commission/$goods['goods_price'])*100*$dian)/$dian;
-		$data['fxz']="升级赚 ".$commission;
+		$data['fxz']=$set3['hhrshare_ptstr'].$commission;
 		return $data;
 	}
 	//商品相关 设置
@@ -413,13 +422,15 @@ class appcomm{
 			$goods[$k]['pdd']=intval($v['pdd']);
 			$goods[$k]['jd']=intval($v['jd']);
 			$goods[$k]['str_count']='2';
+			$goods[$k]['goods_ico_one']=INDEX_WEB_URL."View/index/img/appapi/comm/list_discount_quan.png";
+			if(($v['yhq_price'])!=0)$good[$k]['goods_ico_one']=INDEX_WEB_URL."View/index/img/appapi/comm/list_after_quan.png";
 			$goods[$k]['shop_img']=INDEX_WEB_URL."View/index/img/appapi/comm/taobao.png?time=".time();
 			if($v['shop_id']==2)$goods[$k]['shop_img']=INDEX_WEB_URL."View/index/img/appapi/comm/tmall.png?time=".time();
 			if($v['shop_id']==3||$goods[$k]['jd']==1)$goods[$k]['shop_img']=INDEX_WEB_URL."View/index/img/appapi/comm/jd.png?time=".time();
 			if($goods[$k]['pdd']==1){$goods[$k]['str_count']='3';$goods[$k]['shop_img']=INDEX_WEB_URL."View/index/img/appapi/comm/pdd.png?time=".time();}
 			if(intval($v['isJdSale'])==1&&$goods[$k]['jd']==1){$goods[$k]['str_count']='4';$goods[$k]['shop_img']=INDEX_WEB_URL."View/index/img/appapi/comm/jd1.png?time=".time();}
-			$goods[$k]['fan_all_str']=$sety['fan_all_str'];
-
+			$goods[$k]['fan_all_str']=$sety['fan_all_str'];	
+			
 			$str='';
 			if(strstr($goods[$k]['goods_sales'],"已售")){
 				$goods[$k]['goods_sales']=str_replace("已售","",$goods[$k]['goods_sales']);
@@ -453,22 +464,30 @@ class appcomm{
 			$goods[$k]['goods_sales_ico']=INDEX_WEB_URL."View/index/img/appapi/comm/goods_sales_ico.png?time=".time();
 			$goods[$k]['goods_sharezhuan_img']=INDEX_WEB_URL."View/index/img/appapi/comm/goods_sharezhuan_img.png?time=".time();
 			$goods[$k]['goodssharestr_color']=str_replace("#","",$sety['goodssharestr_color']);
+			if(empty($v['yhq_url']))$v['yhq_url']='';
 			$goods[$k]['yhq_url']=($v['yhq_url']);
 			if(empty($goods[$k]['shop_type'])&&$goods[$k]['shop_id']==1)$goods[$k]['shop_type']="淘宝";
 			if(empty($goods[$k]['shop_type'])&&$goods[$k]['shop_id']==2)$goods[$k]['shop_type']="天猫";
 			//这是淘礼金的判断
 			$goods[$k]['is_tlj']=0;
-
+			
 			//全部商品
 			if(strstr($set['tb_tlj_source_onoff'],",all,")&&$set['tb_tlj_onoff'].''=='1'){
 				$goods[$k]['is_tlj']=1;
 			}
 			//淘礼金栏目
-			if($_POST['tlj']==1&&strstr($set['tb_tlj_source_onoff'],",tlj,")&&$set['tb_tlj_onoff'].''=='1'){
+			if(isset($_POST['tlj'])&&$_POST['tlj']==1&&strstr($set['tb_tlj_source_onoff'],",tlj,")&&$set['tb_tlj_onoff'].''=='1'){
 				$goods[$k]['is_tlj']=1;
 			}
 			$goods[$k]['one_tlj_val']=floatval($set['one_tlj_val']);
-			if(floatval($zngoods[$v['fnuo_id']]['one_tlj_val'])!=0)$goods[$k]['one_tlj_val']=floatval($zngoods[$v['fnuo_id']]['one_tlj_val']);
+			if(!empty($zngoods[$v['fnuo_id']]['one_tlj_val'])&&floatval($zngoods[$v['fnuo_id']]['one_tlj_val'])!=0)$goods[$k]['one_tlj_val']=floatval($zngoods[$v['fnuo_id']]['one_tlj_val']);
+			if(empty($v['start_time']))$v['start_time']=time();
+			if(empty($v['end_time']))$v['end_time']=time();
+			$goods[$k]['yhq_use_time']='';
+			if(floatval($v['yhq_price'])>0)$goods[$k]['yhq_use_time']="使用期限：".date("Y.m.d",$v['start_time'])."-".date("Y.m.d",$v['end_time']);
+			$goods[$k]['id']=$v['fnuo_id'];
+			$goods[$k]['yhq']=intval($v['yhq']);
+			if(floatval($v['yhq_price'])>0)$goods[$k]['yhq']=1;
 		}
 	}
 	//设置缓存
@@ -489,7 +508,7 @@ class appcomm{
 		$dir_path=ROOT_PATH."Temp/dgapp";
 		if(file_exists($dir_path)==false)mkdir ($dir_path,0777,true);
 		zfun::wfile($url,json_encode(array("data"=>$data,"end_time"=>time()+$end_time)));
-
+		
 	}
 	//读取缓存
 	public static function read_app_cookie(){
@@ -497,20 +516,20 @@ class appcomm{
 		if(dgapp_huancun_onoff==false)return;//开关
 		if(!empty($_GET['cookie'])&&$_GET['cookie']=="off")return;//测试用
 		$c=zfun::thisurl();
-
+		
 		//设置显示 喜欢的 商品链接
 		$get_mylike_url_str=array(
 			'act=api&ctrl=getgoods',
 		);
 		$is_mylike_url=0;
 		foreach($get_mylike_url_str as $k=>$v){
-			if(strstr($c,$v))$is_mylike_url=1;
+			if(strstr($c,$v))$is_mylike_url=1;	
 		}
 		$mylike=array();
 		if($is_mylike_url){
 			$mylike=self::check_app_cookie_mylike();
 		}
-
+		
 		//mylike end
 		if(!isset($_GET['ctrl']))$_GET['ctrl']='';
 		foreach($_POST as $k=>$v){
@@ -523,11 +542,11 @@ class appcomm{
 		if(file_exists($url)==false)return;
 		$data=json_decode(zfun::get($url),true);
 		if($data['end_time']<time())return;
-
+		
 		//mylike start
 		if($is_mylike_url){
 			$arr=$data;
-
+			
 			if(!empty($data['data']['success']))$arr=$arr['data']['data'];
 			foreach($arr as $k=>$v){
 				$arr[$k]['is_mylike']=0;
@@ -541,11 +560,11 @@ class appcomm{
 		if(!empty($data['data']['success'])){
 			$data['data']['msg'].="_缓存";
 			echo json_encode($data['data']);exit;
-
+			
 		}
 		echo json_encode(array("msg"=>"缓存","success"=>1,"data"=>$data['data']));exit;
 	}
-
+	
 	//检测我的喜欢 缓存
 	public static function check_app_cookie_mylike(){
 		if(empty($GLOBALS['uid']))return array();
@@ -568,7 +587,7 @@ class appcomm{
 	public static function set_app_cookie_mylike($uid=0){
 		if(empty($uid))return;
 		$data=zfun::f_select("MyLike","uid=$uid and goodsid>0","goodsid");
-
+		
 		if(empty($data))$data=array();
 		$arr=array();
 		foreach($data as $k=>$v)$arr[$v['goodsid'].'']=1;
@@ -577,7 +596,7 @@ class appcomm{
 		$url=ROOT_PATH."Temp/dgapp/".$c.".cache";
 		@unlink($url);
 		zfun::wfile($url,zfun::f_json_encode($data));
-		return $data;
+		return $data;	
 	}
 	//获取我的喜欢 缓存
 	public static function get_app_cookie_mylike($uid=0){
@@ -588,15 +607,15 @@ class appcomm{
 		$data=json_decode(zfun::get($url),true);
 		return $data;
 	}
-
-
+	
+	
 	public static function set_cookie($name="",$file_arr=array(),$data=array(),$cookie_path="dgapp"){
 		if(empty($name)||empty($file_arr))zfun::fecho("set_cookie error");
 		$str=$name."_";
 		foreach($file_arr as $k=>$v){
 			if(empty($v)||$k=='time'||$k=='sign'||$k=='token')continue;
-			$str.=$k.$v;
-		}
+			$str.=$k.$v;	
+		}	
 		$name=md5($str);
 		$path=ROOT_PATH."Temp/".$cookie_path."/".$name.".cache";
 		$arr=array(
@@ -606,14 +625,14 @@ class appcomm{
 		zfun::wfile($path,json_encode($arr));
 		return true;
 	}
-
+	
 	public static function read_cookie($name="",$file_arr=array(),$cookie_path="dgapp"){
 		if(empty($name)||empty($file_arr))zfun::fecho("set_cookie error");
 		$str=$name."_";
 		foreach($file_arr as $k=>$v){
 			if(empty($v)||$k=='time'||$k=='sign'||$k=='token')continue;
-			$str.=$k.$v;
-		}
+			$str.=$k.$v;	
+		}	
 		$name=md5($str);
 		$path=ROOT_PATH."Temp/".$cookie_path."/".$name.".cache";
 		$arr=array(
@@ -625,7 +644,7 @@ class appcomm{
 		if($data['end_time']<time())return array();
 		return $data['data'];
 	}
-
+	
 	public static function addFootMark($fnuo_id='',$uid=0){
 		if(empty($fnuo_id)||empty($uid))return;
 		$where="goodsid='$fnuo_id' and uid=$uid";
@@ -641,7 +660,7 @@ class appcomm{
 			"goods_img"=>"https:".str_replace(array("https:","http:"),"",$tmp['pictUrl'])."_400x400.jpg",
 			"goods_sales"=>intval($tmp['biz30day']),
 			"commission"=>floatval($tmp['tkRate']),
-			"shop_id"=>$shop_arr[$tmp['userType']],
+			"shop_id"=>$shop_arr[$tmp['userType']],	
 			"fnuo_id"=>$tmp['auctionId'],
 			"yhq"=>0,
 			"yhq_price"=>0,
@@ -668,7 +687,7 @@ class appcomm{
 		}
 		return 1;
 	}
-
+	
 }
 $tmp=json_decode(zfun::get(ROOT_PATH."Config/dgapp_huancun.config"),true);
 setconst("dgapp_huancun_onoff",$tmp['dgapp_huancun_onoff']);//是否开启app缓存

@@ -23,7 +23,7 @@ class rebate_DGAction extends Action{
 		self::assign("isjflogin",intval(self::getSetting('isjflogin')));
 	}
 
-	public static function get_bc_detail($fnuo_id){
+	public static function get_bc_detail($fnuo_id,$shop_id){
 		if(empty($fnuo_id))zfun::fecho("rebate_FG get_bc_detail val empry");
 		fun("bcapi");
 		$arr=array(
@@ -74,7 +74,7 @@ class rebate_DGAction extends Action{
 			$detail_img[$k]=$v."_500x500.jpg";
 		}*/
 		actionfun("comm/tb_web_api");
-		$detail_img=tb_web_api::detail_img($fnuo_id);
+		$detail_img=tb_web_api::pc_html_detail_img($fnuo_id,$shop_id);
 		$data['detail_img']=$detail_img;
 		//fpre($detail_img);exit;
 		return $data;
@@ -106,7 +106,6 @@ class rebate_DGAction extends Action{
 			$set=zfun::f_getset("share_host");
 			$downappurl = "http://".$set['share_host']."/?mod=appapi&act=down&ctrl=get_unionid&tgid=".$tgid;
 			self::assign("downappurl",$downappurl);
-			self::assign("tgid", $tgid);
 
 			self::assign("url",$url);
 			self::assign("title","详情");
@@ -359,7 +358,7 @@ class rebate_DGAction extends Action{
         self::assign("tgurl",$tg_url);
 		self::assign("app_goods_tw_url",$set['app_goods_tw_url']);
 		//zheli boom
-		$detail=self::get_bc_detail($fnuo_id);
+		$detail=self::get_bc_detail($fnuo_id,$goods['shop_id']);
 		//fpre($detail);
 		$iswx=self::iswx();
 		//echo $_SERVER['HTTP_USER_AGENT'];

@@ -1,5 +1,6 @@
 <?php
 actionfun("appapi/dgappcomm");
+actionfun("comm/tbmaterial");
 class circleFunctionAction extends Action{
 	//公共方法查询
 	public static function commSelect($where='',$type=''){
@@ -15,6 +16,7 @@ class circleFunctionAction extends Action{
 		if(!empty($GLOBALS['cate']['img']))$head_img=$GLOBALS['cate']['img'];
 		$user=appcomm::getheadimg($user);
 		foreach($data as $k=>$v){
+			
 			if(is_numeric($user[$v['uid']]['nickname']))$data[$k]['nickname']=self::xphone($user[$v['uid']]['nickname']);
 			else if(strstr($user[$v['uid']]['nickname'],"@"))$data[$k]['nickname']=self::xphone($user[$v['uid']]['nickname']);
 			else $data[$k]['nickname']=$user[$v['uid']]['nickname'];
@@ -30,6 +32,7 @@ class circleFunctionAction extends Action{
 				
 			}
 			$data[$k]['img']=array_values($img);
+			
 			$data[$k]['shop_img']=self::imgs($v['shop_type']);
 			unset($data[$k]['thumbs_id'],$data[$k]['evaluate_id']);
 			$data[$k]['is_thumb']=0;
@@ -40,25 +43,46 @@ class circleFunctionAction extends Action{
 			$data[$k]['is_need_js']=0;
 			$json=json_decode($v['data'],true);$data[$k]['imgData']=array();
 			$count=$GLOBALS['goods_count']=count($json['goods_data']);
-			if(!empty($v['fnuo_id'])&&($v['goods_type']=='taobao'||$v['goods_type']=='buy_taobao')&&$count<=1){
-				//$data[$k]['jsurl']=INDEX_WEB_URL."?mod=appapi&act=goods_fenxiang&ctrl=tdj&fnuo_id=".$v['fnuo_id'];
-				//$data[$k]['is_need_js']=1;
-			}
+			
 			$data[$k]['content']=self::wenanUpdate($v,$type);
-			$data[$k]['type']="pub_guanggao";
+			$data[$k]['type']=$v['type']="pub_guanggao";
 			if(!empty($json['goods_show_type'])){
-				$data[$k]['type']="pub_".$json['goods_show_type'];
+				$data[$k]['type']=$v['type']="pub_".$json['goods_show_type'];
 			}
+			$goods_data='';
 			if($count>1){
 				foreach($json['goods_data'] as $k1=>$v1){
+					if($data[$k]['type']=='pub_more_goods'){
+						$goods_data=$v1;
+						$goods_data=self::goods_comm_doing($goods_data);
+						if(!empty($goods_data)){
+							$data[$k]['imgData'][$k1]=$goods_data;
+						}
+					}
 					$data[$k]['imgData'][$k1]['fnuo_id']=$v1['fnuo_id'];
 					$data[$k]['imgData'][$k1]['goods_type']=$v1['goods_type'];
 					$data[$k]['imgData'][$k1]['img']=$v1['img'];
 					$data[$k]['imgData'][$k1]['type']=$data[$k]['type'];
 				}
-				
 			}else {
+				if($v['goods_type']=='dtk'){$data[$k]['goods_type']=$v['goods_type']='buy_taobao';$data[$k]['type']='pub_one_goods';}
+				if($data[$k]['type']=='pub_one_goods'){
+					$str=str_replace(array("，",","),",",$v['content']);
+					$tmpstr=explode(",",$str);
+					$str='-1';$j=2;$i=0;
+					foreach($tmpstr as $k1=>$v1){if($k1==$j*$i){$i++;$str.=",\n".$v1;}else $str.=",".$v1;}
+					$str=substr($str,3);
+					$data[$k]['content']=str_replace(array("!","!"),"\n",$str);
+					//一个商品的时候
+					$goods_data=zfun::arr64_decode($v['goods_data']);
+					
+					if(empty($goods_data))$goods_data=$v;
+					$goods_data=self::goods_comm_doing($goods_data);
+				}
+			
 				foreach($data[$k]['img'] as $k1=>$v1){
+					if(!empty($goods_data))$data[$k]['imgData'][$k1]=$goods_data;
+					
 					$data[$k]['imgData'][$k1]['fnuo_id']=$v['fnuo_id'];
 					$data[$k]['imgData'][$k1]['goods_type']=$v['goods_type'];
 					$data[$k]['imgData'][$k1]['img']=$v1;
@@ -70,6 +94,21 @@ class circleFunctionAction extends Action{
 			
 		}	
 		return $data;
+	}
+	static function goods_comm_doing($goods=array()){
+		$goods_data=$goods;
+		if(empty($goods_data['goods_title'])){
+			$goods_arr=self::goodsMsg($goods['fnuo_id'],'',$goods['goods_type']);
+			
+			$goods_data=$goods_arr['goods'];
+		}
+		
+		if(empty($goods_data['goods_title']))return $goods;
+		$goods_data=array($goods_data);
+		$goods_data=zfun::f_fgoodscommission($goods_data);
+		appcomm::goodsfanlioff($goods_data);
+		appcomm::goodsfeixiang($goods_data);$goods_data=reset($goods_data);
+		return $goods_data;
 	}
 	public static function imgs($type=''){
 		$img='';
@@ -222,6 +261,7 @@ class circleFunctionAction extends Action{
 	
 	//读取商品信息
 	public static function goodsMsg($fnuo_id='',$tgid='',$goods_type='',$type=''){
+		if(empty($fnuo_id))return array();
 		$arr=array();
 		$data=array();
 		switch($goods_type.''){
@@ -230,7 +270,7 @@ class circleFunctionAction extends Action{
 				actionfun("comm/tbmaterial");
 				$data=tbmaterial::id($fnuo_id);
 				actionfun("default/gototaobao");
-				if($type='getcode')$tmp_yhq_url=gototaobaoAction::check_yhq_url(array("goods_title"=>$data['goods_title'],"fnuo_id"=>$fnuo_id),1);
+			//	if($type='getcode')$tmp_yhq_url=gototaobaoAction::check_yhq_url(array("goods_title"=>$data['goods_title'],"fnuo_id"=>$fnuo_id),1);
 				if(!empty($tmp_yhq_url)&&empty($data['yhq_url'])){
 					$data['yhq_url']=$tmp_yhq_url;
 					$data['yhq']=1;
@@ -286,7 +326,6 @@ class circleFunctionAction extends Action{
 		return $tg_url;
 	}
 	//生成二维码
-	//百里
 	public static function qrcode2($arr=array(),$user=array(),$tg_url='',$tgid=0){//生成二维码
 		$img=str_replace(array("https:","ttps:"),"http:",$arr['goods_img']);
 		$img=str_replace("_250x250.jpg","_800x800.jpg",$img);

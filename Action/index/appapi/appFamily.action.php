@@ -18,8 +18,10 @@ class appFamilyAction extends Action{
 		}
 		$set2=zfun::f_getset($str);
 		for($i=0;$i<$show_lv;$i++){
+			$count=zfun::f_count("Nexus","extend_uid='{$uid}' and bili > 0 and tg_lv='".($i+1)."'");
 			$data[$i]['str']=$arr[$i+1]."度成员";
 			if(!empty($set2["fxdl_djnames_".($i+1)]))$data[$i]['str']=$set2["fxdl_djnames_".($i+1)];
+			$data[$i]['str'].="(".$count."人)";
 			$data[$i]['lv']=$i;
 		}
 		
@@ -29,23 +31,172 @@ class appFamilyAction extends Action{
 		$name_arr=explode(",",$set['jzcy_three_name']);
 		
 		if($user['operator_lv'].''!='0'){
+			$operator=zfun::f_count("Nexus","extend_uid='{$uid}' and bili > 0 and lower_operator_lv>'0'");
+			$agent=zfun::f_count("Nexus","extend_uid='{$uid}' and bili > 0 and lower_is_sqdl!='0'");
+			$default=zfun::f_count("Nexus","extend_uid='{$uid}' and bili > 0 and lower_is_sqdl='0' and lower_operator_lv='0'");
+	
 			$data=array(
 				array(
-					"str"=>$name_arr[0],
+					"str"=>$name_arr[0]."(".$default."人)",
 					"lv"=>'default',
 				),
 				array(
-					"str"=>$name_arr[1],
+					"str"=>$name_arr[1]."(".$agent."人)",
 					"lv"=>"agent",
 				),
 				array(
-					"str"=>$name_arr[2],
+					"str"=>$name_arr[2]."(".$operator."人)",
 					"lv"=>"operator",
 				),
 			);	
 		}
 		
 		zfun::fecho("家族成员级别",$data,1);
+	}
+	
+	/*一级二级成员*/
+	public function myHhr(){
+		$user=appcomm::signcheck(1);$uid=$user['id'];
+		$is_hhr=($_POST['is_hhr']);
+		
+		if($user['operator_lv'].''!='0'){$is_operator=1;}
+		else $is_operator=0;
+		//$operator_set=zfun::f_getset("");
+		
+		$set=zfun::f_getset("operator_name,operator_name_2,family_strs");
+		$data=array();
+		$data['family']=$this->getUrl("super_new","appfamily",array(),"wap");
+		$data['family_strs']=$set['family_strs'];
+		if(empty($data['family_strs']))$data['family_strs']='点亮星星的成员，代表已经成为联盟合伙人';
+		$where="extend_uid='{$uid}' and bili > 0";
+		actionfun("comm/order");
+		$lv=$is_hhr+1;//我等级从0开始了
+		$uids=-1;
+		//这是筛选的
+		if(strstr($is_hhr,"_")){
+			$lvarr=explode("_",$is_hhr);
+			$is_hhr=$lvarr[0];
+			if($lvarr[1]=='o1'){$where.=" and lower_operator_lv='1'";}
+			elseif($lvarr[1]=='o2'){$where.=" and lower_operator_lv='2'";}
+			elseif($lvarr[1]>0)$where.=" and lower_is_sqdl='".$lvarr[1]."'";
+			else $where.=" and lower_is_sqdl='0' and lower_operator_lv='0'";
+		}
+		if($is_hhr=='operator')$where.=" and lower_operator_lv>'0'";
+		elseif($is_hhr=='agent')$where.=" and lower_is_sqdl!='0'";
+		elseif($is_hhr=='default')$where.=" and lower_is_sqdl='0' and lower_operator_lv='0'";
+		else $where.=" and tg_lv='".($is_hhr+1)."'";
+		
+		$sort="lower_reg_time desc";
+		$nexus=appcomm::f_goods("Nexus",$where,NULL,$sort,NULL,20);
+		$nexus_user=zfun::f_kdata("User",$nexus,"lower_uid","id","id,head_img,is_sqdl,nickname,reg_time,operator_lv,yq_all_count,phone,tg_pid,tb_app_pid,ios_tb_app_pid");	//百里追加
+		//$hhr_next_fl=zfun::f_kdata("HhrNextJl",$user1,"id","uid","uid,sum","  extend_id='$uid'");
+		foreach($nexus  as $k=>$v){
+			$one_user=$nexus_user[$v['lower_uid'].''];
+			$head_img=$one_user['head_img'];
+			if(empty($head_img))$head_img='default.png';
+			if(strstr($head_img,"http")==false)$head_img=UPLOAD_URL."user/".$head_img;
+			$nexus[$k]['head_img']=$head_img;
+			$nexus[$k]['nickname']=appHhrAction::xphone($one_user['nickname']);
+			$nexus[$k]['Vname']=self::getSetting("fxdl_name".($one_user['is_sqdl']+1));
+			
+			//百里.展示状态
+			//仅锁粉待激活（未填写手机号）
+			//未安装APP(有手机号）
+			//未登录APP(无推广位）
+			//待激活(有推广位无首单或订单为0
+			if(empty($one_user['phone']))
+			{
+				$nexus[$k]['Vname'] = '未下载';//"仅锁粉";
+			}
+			else
+			{
+				if($one_user['tg_pid'] != '' || $one_user['tb_app_pid'] != '' || $one_user['ios_tb_app_pid'] != '' )
+				{
+					//查询有效订单
+					$validorder = zfun::f_row("Order", "status != '订单失效' AND uid = '{$one_user['id']}'");
+					if($validorder)
+					{
+						//存在
+						$validorderend = zfun::f_row("Order", "status = '订单结算' AND returnstatus = 1 AND uid = '{$one_user['id']}'");
+						if(!$validorderend)
+						{
+							$nexus[$k]['Vname'] = '解锁中';//"待激活";
+						}
+					}
+					else
+					{
+						$nexus[$k]['Vname'] = '未下单';//"待激活";
+					}
+				}
+				else
+				{
+					$nexus[$k]['Vname'] = "未登录";
+				}
+			}
+			//有手机号，追加手机号
+			if(!empty($one_user['phone']))
+			{
+				$nexus[$k]['Vname'] .= '/'.$one_user['phone'];
+			}
+			
+			if($one_user['operator_lv']=='1')$nexus[$k]['Vname']=$set['operator_name'];//运营商
+			if($one_user['operator_lv']=='2')$nexus[$k]['Vname']=$set['operator_name_2'];//联合创始人
+			
+			$nexus[$k]['commission']=zfun::dian($v['lower_offer']);
+			//$user1[$k]['count']=zfun::f_count("User","extend_id='".$v['id']."'");
+			$nexus[$k]['count']=$one_user['yq_all_count'];
+			$nexus[$k]['reg_time']=$v['lower_reg_time'];//注册时间
+		}
+		$data['fan']=$nexus;
+		zfun::fecho("我的粉丝",$data,1);
+		//set
+	}
+	//会员等级
+	function user_lv(){
+		$user=appcomm::signcheck(1);$uid=$user['id'];
+		
+		$setlv=zfun::f_getset("fxdl_lv");
+		
+		$is_hhr=($_POST['is_hhr']);
+		$str='-1';
+		for($i=1;$i<=$setlv['fxdl_lv'];$i++){$str.=",fxdl_name".$i;}
+		$str=substr($str,3);
+		$set=zfun::f_getset($str.",operator_onoff,operator_name,operator_name_2");
+		
+		$data=array();
+		for($i=1;$i<=$setlv['fxdl_lv'];$i++){
+			$where="extend_uid='{$uid}' and bili > 0 and lower_is_sqdl='".($i-1)."'";
+			if($i==1)$where.=" and lower_operator_lv='0'";
+			$where.=" and tg_lv='".($is_hhr+1)."'";
+			$count=zfun::f_count("Nexus",$where);
+			$data[$i]['str']=$set['fxdl_name'.$i].'('.$count.'人)';
+			$data[$i]['lv']=$is_hhr."_".($i-1);
+		}
+		
+		if($set['operator_onoff'].''=='1'){
+			$where="extend_uid='{$uid}' and bili > 0 and lower_operator_lv='1'";
+			$count1=zfun::f_count("Nexus",$where);
+			$where="extend_uid='{$uid}' and bili > 0 and lower_operator_lv='2'";
+			$count2=zfun::f_count("Nexus",$where);
+			$data[$setlv['fxdl_lv']+1]['str']=$set['operator_name'].'('.$count1.'人)';
+			$data[$setlv['fxdl_lv']+1]['lv']=$is_hhr."_o1";;
+			$data[$setlv['fxdl_lv']+2]['str']=$set['operator_name_2'].'('.$count2.'人)';
+			$data[$setlv['fxdl_lv']+2]['lv']=$is_hhr."_o2";;
+		}
+		$where="extend_uid='{$uid}' and bili > 0 ";
+		$where.=" and tg_lv='".($is_hhr+1)."'";
+		$count=zfun::f_count("Nexus",$where);
+		array_unshift($data,array("str"=>"全部(".$count."人)","lv"=>$is_hhr));
+		$data=array_values($data);
+		
+		$arr=array("default","agent","operator");
+		if(in_array($is_hhr,$arr)){
+			if($is_hhr=='operator')$count=zfun::f_count("Nexus","extend_uid='{$uid}' and bili > 0 and lower_operator_lv>'0'");
+			if($is_hhr=='agent')$count=zfun::f_count("Nexus","extend_uid='{$uid}' and bili > 0 and lower_is_sqdl!='0'");
+			if($is_hhr=='default')$count=zfun::f_count("Nexus","extend_uid='{$uid}' and bili > 0 and lower_is_sqdl='0' and lower_operator_lv='0'");
+			$data=array(array("str"=>"全部","lv"=>$is_hhr));
+		}
+		zfun::fecho("二级等级分类",$data,1);
 	}
 	/*家族成员*/
 	public function teamUser(){
@@ -123,94 +274,6 @@ class appFamilyAction extends Action{
 		}
 		if($_POST['p']>1)$data=array();
 		zfun::fecho("家族成员",$data,1);
-	}
-	/*一级二级成员*/
-	public function myHhr(){
-		$user=appcomm::signcheck(1);$uid=$user['id'];
-		$is_hhr=($_POST['is_hhr']);
-		
-		if($user['operator_lv'].''!='0'){$is_operator=1;}
-		else $is_operator=0;
-		//$operator_set=zfun::f_getset("");
-		
-		$set=zfun::f_getset("operator_name,operator_name_2");
-		$data=array();
-		$data['family']=$this->getUrl("super_new","appfamily",array(),"wap");
-		$where="extend_uid='{$uid}' and bili > 0";
-		actionfun("comm/order");
-		$lv=$is_hhr+1;//我等级从0开始了
-		$uids=-1;
-		
-		if($is_hhr=='operator')$where.=" and lower_operator_lv>'0'";
-		elseif($is_hhr=='agent')$where.=" and lower_is_sqdl!='0'";
-		elseif($is_hhr=='default')$where.=" and lower_is_sqdl='0' and lower_operator_lv='0'";
-		else $where.=" and tg_lv='".($is_hhr+1)."'";
-
-		$sort="lower_reg_time desc";
-		$nexus=appcomm::f_goods("Nexus",$where,NULL,$sort,NULL,20);
-		$nexus_user=zfun::f_kdata("User",$nexus,"lower_uid","id","id,head_img,is_sqdl,nickname,reg_time,operator_lv,yq_all_count,phone,tg_pid,tb_app_pid,ios_tb_app_pid");	//百里追加
-		//$hhr_next_fl=zfun::f_kdata("HhrNextJl",$user1,"id","uid","uid,sum","  extend_id='$uid'");
-		foreach($nexus  as $k=>$v){
-			$one_user=$nexus_user[$v['lower_uid'].''];
-			$head_img=$one_user['head_img'];
-			if(empty($head_img))$head_img='default.png';
-			if(strstr($head_img,"http")==false)$head_img=UPLOAD_URL."user/".$head_img;
-			$nexus[$k]['head_img']=$head_img;
-			$nexus[$k]['nickname']=appHhrAction::xphone($one_user['nickname']);
-			$nexus[$k]['Vname']=self::getSetting("fxdl_name".($one_user['is_sqdl']+1));
-
-			//百里.展示状态
-			//仅锁粉待激活（未填写手机号）
-			//未安装APP(有手机号）
-			//未登录APP(无推广位）
-			//待激活(有推广位无首单或订单为0
-			if(empty($one_user['phone']))
-			{
-				$nexus[$k]['Vname'] = '未下载';//"仅锁粉";
-			}
-			else
-			{
-				if($one_user['tg_pid'] != '' || $one_user['tb_app_pid'] != '' || $one_user['ios_tb_app_pid'] != '' )
-				{
-					//查询有效订单
-					$validorder = zfun::f_row("Order", "status != '订单失效' AND uid = '{$one_user['id']}'");
-					if($validorder)
-					{
-						//存在
-						$validorderend = zfun::f_row("Order", "status = '订单结算' AND returnstatus = 1 AND uid = '{$one_user['id']}'");
-						if(!$validorderend)
-						{
-							$nexus[$k]['Vname'] = '解锁中';//"待激活";
-						}
-					}
-					else
-					{
-						$nexus[$k]['Vname'] = '未下单';//"待激活";
-					}
-				}
-				else
-				{
-					$nexus[$k]['Vname'] = "未登录";
-				}
-			}
-			//有手机号，追加手机号
-			if(!empty($one_user['phone']))
-			{
-				$nexus[$k]['Vname'] .= '/'.$one_user['phone'];
-			}
-
-
-			if($one_user['operator_lv']=='1')$nexus[$k]['Vname']=$set['operator_name'];//运营商
-			if($one_user['operator_lv']=='2')$nexus[$k]['Vname']=$set['operator_name_2'];//联合创始人
-			
-			$nexus[$k]['commission']=zfun::dian($v['lower_offer']);
-			//$user1[$k]['count']=zfun::f_count("User","extend_id='".$v['id']."'");
-			$nexus[$k]['count']=$one_user['yq_all_count'];
-			$nexus[$k]['reg_time']=$v['lower_reg_time'];//注册时间
-		}
-		$data['fan']=$nexus;
-		zfun::fecho("我的粉丝",$data,1);
-		//set
 	}
 	/*邀请页面*/
 	public function invite(){
@@ -337,6 +400,7 @@ class appFamilyAction extends Action{
 			return mb_substr($phone,0,2,"utf-8")."***".mb_substr($phone,-1,1,"utf-8");	
 		}
 		return mb_substr($phone,0,1,"utf-8")."*";	
+		
 	}
 	public static function sortarr($arr=array(),$key='',$type="asc"){//二位数组排序
 		$arr=array_values($arr);

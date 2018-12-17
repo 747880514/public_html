@@ -2,7 +2,6 @@
 fun("zfun");
 actionfun("appapi/dgappcomm");
 actionfun("appapi/tzbs_new");
-// actionfun("appapi/baili");	//百里
 
 class appDiyIndexAction extends Action{
 	//首页数据
@@ -13,11 +12,7 @@ class appDiyIndexAction extends Action{
 		$index_style_id=$set[$type.'_style_id'];
 		$arr=self::getCSS($type);
 		$arr=array_values($arr);
-
 		echo str_replace('"success":1','"success":"1"',json_encode(array("msg"=>"首页数据","style_id"=>$index_style_id,"data"=>$arr,"success"=>1))); exit;
-
-		//百里.自动抓取淘客助手严选直播
-		// baili::get_goods_lists();
 	}
 	//跑马灯
 	public function super_msg(){
@@ -81,13 +76,25 @@ class appDiyIndexAction extends Action{
 		$where="is_show=1 and id>0 and web_type='".$type."'";
 		$arr=zfun::f_select("IndexModel",$where,"type,data,mac,jiange",0,0,"sort desc");
 		$guanggao=zfun::f_row("Guanggao","type ='index_cgfjx_ico' and hide=0","id,img,type");
-		
+		$ggt=array();
+		$gg=zfun::f_select("Guanggao","type IN('index_ksrk','index_tw') and hide=0","img,type");
+		foreach($gg as $k=>$v){
+			$ggarr=explode(",",$v['img']);
+			if(!empty($v['img'])&&$v['type']=='index_ksrk')$ggt['ksrk']=UPLOAD_URL."slide/".$ggarr[0];
+			if(!empty($v['img'])&&$v['type']=='index_tw')$ggt['tw']=UPLOAD_URL."slide/".$ggarr[0];
+		}
 		$data=array();
 		foreach($arr as $k=>$v){
 			$v['data']=str_replace("&#34;",'"',$v['data']);
 			$json_data=$v['data']=json_decode($v['data'],true);
+			$arr[$k]['banner_speed']=$v['banner_speed']=$json_data['banner_speed'];
+			$arr[$k]['banner_bili']=$v['banner_bili']=$json_data['banner_bili'];
+			if(empty($arr[$k]['banner_speed']))$arr[$k]['banner_speed']='4000';
+			if(empty($arr[$k]['banner_bili']))$arr[$k]['banner_bili']='0.52';
 			$arr[$k]['img']='';
 			if(!empty($guanggao['img']))$arr[$k]['img']=UPLOAD_URL."slide/".$guanggao['img'];
+			$arr[$k]['ksrk']=$ggt['ksrk'];
+			$arr[$k]['tw']=$ggt['tw'];
 			$arr[$k]['list']=array();
 			if(!empty($v['mac'])){
 				$mac=explode(" ",$v['mac']);
@@ -98,7 +105,8 @@ class appDiyIndexAction extends Action{
 				$tmp=new $tmpact();
 				
 				if(method_exists($tmp,$mac[2])==false){unset($arr[$k]);continue;}
-				$tmp=$tmp->$mac[2]($user,$v);
+				$actions=$mac[2].'';
+				$tmp=$tmp->$actions($user,$v);
 				$arr[$k]['list']=$tmp;
 				if($v['type']==$type."_miaosha_01"){
 					actionfun("appapi/dgmiaosha02");

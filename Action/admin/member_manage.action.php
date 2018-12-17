@@ -1,7 +1,6 @@
 <?php
 fun("ztp");fun("admin");
 class member_manageAction extends Action{
-	
 	//提现公共where
 	static function tx_comm_where(&$where=""){
 		$_GET=filter_check($_GET);
@@ -13,8 +12,8 @@ class member_manageAction extends Action{
 		}
 		if(!empty($_GET['start_time']))$where.=" and time >=".intval(strtotime($_GET['start_time']));
 		if(!empty($_GET['end_time']))$where.=" and time <=".intval(strtotime($_GET['end_time']));
+		if(!empty($_GET['audit_status']))$where.=" and audit_status=".intval($_GET['audit_status']);
 	}
-	
 	/*提现审核*/
     public function agency_audit(){
 		if(!empty($_GET['daochu'])&&!empty($_GET['start_time'])&&!empty($_GET['end_time'])){$_GET['type']='3,8';self::daochu();return;}//导出excel
@@ -47,6 +46,7 @@ class member_manageAction extends Action{
 		ztp::addtop('text',"结束时间","","time=on get=on name=end_time placeholder='结束时间'");
 		ztp::addtop("text","用户的id","","name=uid get=on");
 		ztp::addtop("text","手机号","","name=phone get=on");
+		ztp::addtop("select","审核状态","全部=,审核中=0_,审核通过=1_,审核不通过=2_","name=audit_status get=on val=".$_GET['audit_status']);
 		ztp::addtop("submit","查询");
 		ztp::settableaction(self::getUrl("member_manage","audit_del"));//设置表单action链接
 		$str="ID`=id/width-50,用户id=uid/width-50,提现事件=info/width-200,提现金额=money/width-100,审核状态=status/width-100,申请时间=time/width-150,";
@@ -91,7 +91,6 @@ class member_manageAction extends Action{
 		foreach($data as $k=>$v){
 			rz::add("删除提现记录".$v['info']." 用户id ".$v['uid'],3);	
 		}
-		
 		$result=zfun::f_delete("Authentication","id IN($ids)");
 		admin::getdel($result);
 	}
@@ -110,7 +109,7 @@ class member_manageAction extends Action{
 		ztp::add("text","用户id",$data['uid'],"disabled");
 		ztp::add("text","用户昵称",$user['nickname'],"disabled");
 		ztp::add("text","提现金额",$data['money'],"disabled");
-		ztp::add("text","冻结金额",$user['freeze_integral'],"disabled");
+		//ztp::add("text","冻结金额",$user['freeze_integral'],"disabled");
 		ztp::add("text","支付宝账号",$user['alipay'],"disabled");
 		ztp::add("text","真实姓名",$user['realname'],"disabled");
 		ztp::add("text","时间",date("Y-m-d H:i:s",$data['time']),"disabled");
@@ -127,16 +126,13 @@ class member_manageAction extends Action{
 		$data['data']=json_decode($data['data'],true);
 		foreach($data['data'] as $k1=>$v1)$data[$k1]=$v1;
 		$user=zfun::f_row("User","id=".intval($data['uid']));
-		
 		//jj explosion
 		$set=zfun::f_getset("alipay_auto_onoff,tixian_auto_onoff,tixian_auto_max_money");
 		$set['alipay_auto_onoff']=floatval($set['alipay_auto_onoff']);
 		$set['tixian_auto_onoff']=floatval($set['tixian_auto_onoff']);
 		$set['tixian_auto_max_money']=floatval($set['tixian_auto_max_money']);
 		foreach($set as $k=>$v)setconst($k,$v);
-		
 		$statusarr=array(0=>"审核中",1=>"审核通过",2=>"审核不通过",);
-		
 		if($data['audit_status']==2)zfun::fecho(1,"审核失败不能改状态",0);
 		if($data['audit_status']==$status)zfun::fecho(1,$statusarr[$data['audit_status']]."`",1);
 		if($status==1){
@@ -155,7 +151,6 @@ class member_manageAction extends Action{
 					$arr["money"]=$commission;
 					break;
 			}
-			
 			zfun::f_update("User","id=".intval($user['id']),$arr);
 			//admin::getadd($result);
 		}
@@ -174,7 +169,6 @@ class member_manageAction extends Action{
 		$Tgidkey=self::getApp("Tgidkey");
 		zfun::f_setadminurl();
 		if(!empty($_GET['start_time'])&&!empty($_GET['end_time'])){self::daochu_user();return;}//导出excel
-
 		//会员等级
 		$set_str="fxdl_lv,fxdl_name1,fxdl_name2,fxdl_name3,fxdl_name4,fxdl_name5,fxdl_name6,fxdl_name7,fxdl_name8,fxdl_name9,fxdl_name10";
 		$set_str.=",operator_name,operator_name_2";
@@ -188,13 +182,10 @@ class member_manageAction extends Action{
 			$arr[$lv]['name']=$set['fxdl_name'.$i];
 			$str_user.=",".$arr[$lv]['name']."=".$i;
 		}
-		
 		ztp::addjs("member_manage/daochu.js");
 		$GLOBALS['ztp']['user_data']=$arr;
-		
 		//运营商人数
 		$GLOBALS['ztp']['operator_num']=zfun::f_count("User","operator_lv > 0");
-		
 		ztp::addjs("website/mem_user.js");
 		//查询语句
 		$where="id>0";
@@ -205,12 +196,10 @@ class member_manageAction extends Action{
 			$lv1=intval($_GET['is_sqdl'])-1;
 			$where.=" AND is_sqdl='$lv1'";
 		}
-		
 		//运营商
 		if(!empty($_GET['is_sqdl'])&&$_GET['is_sqdl']=='operator'){
 			$where.=" and operator_lv >0";	
 		}
-		
 		if(!empty($_GET['ename'])){
 			$esuser=zfun::f_select("User","nickname LIKE '%".filter_check($_GET['ename'])."%' or phone LIKE '%".filter_check($_GET['ename'])."%'");
 			$ids=zfun::f_kstr($esuser);
@@ -229,15 +218,16 @@ class member_manageAction extends Action{
 			$where.=" AND tg_code LIKE '%".filter_check($_GET['tg_code'])."%'";
 		}
 		if(!empty($_GET['tgid'])){
-			
 			$tgid=$Tgidkey->Decodekey($_GET['tgid']);
 			$where.=" and id='{$tgid}'";	
 		}
-		
+		if(!empty($_GET['jh_status'])){
+			if($_GET['jh_status']==1)$where.=" AND phone=''";
+			if($_GET['jh_status']==2)$where.=" AND phone!=''";
+		}
 		if(!empty($_POST['page'])){
           $_GET['p']=$_POST['page'];  
         }
-		
 		//推广位
 		if(!empty($_GET['pid'])){
 			$pid=$_GET['pid'];
@@ -250,7 +240,6 @@ class member_manageAction extends Action{
 		
         $GLOBALS['ztp']['jump']="{link:member_manage-member_list}";
         ztp::addjs("comm/foot_jump.js");
-		
 		$user=zfun::f_goods("User",$where,NULL,"id DESC",filter_check($_GET),20);
 		$edit_url=urlencode(self::getUrl("member_manage","manage_add"));//编辑的链接
 		$tz_url=urlencode(self::getUrl("stationmsg","manage_tz"));//通知的链接
@@ -293,9 +282,9 @@ class member_manageAction extends Action{
 				$n2=$tmp['WdName'];
 			}
 			$user[$k]['dlname']=$n2." ".$user[$k]['dllv'];
-			$user[$k]['reg_time']=date("Y-m-d H:i:s",$v['reg_time']);
+			$user[$k]['reg_time']=date("Y-m-d H:i",$v['reg_time']);
 			if(empty($user[$k]['reg_time']))$user[$k]['reg_time']="-";
-			if(!empty($v['login_time']))$user[$k]['login_time']=date("Y-m-d H:i:s",$v['login_time']);
+			if(!empty($v['login_time']))$user[$k]['login_time']=date("Y-m-d H:i",$v['login_time']);
 			if(empty($user[$k]['login_time']))$user[$k]['login_time']="-";
 			$user[$k]['nickname']=str_replace(array('"',"&#34;"),'',$v['nickname']);
 			$user[$k]['ename']=str_replace(array('"',"&#34;"),'',$user[$k]['ename']);
@@ -303,21 +292,22 @@ class member_manageAction extends Action{
 			//jj explosion
 			if(intval($v['operator_lv'])>0)$user[$k]['vip_name']=$set['operator_name'];
 			if($v['operator_lv']==2)$user[$k]['vip_name']=$set['operator_name_2'];
-			
+			$user[$k]['jh_status']="<span style='color:red'>未激活</span>";
+			if($v['phone'].''!='')$user[$k]['jh_status']="<span style='color:red'>已激活</span>";
 		}
 		zfun::isoff($user);
 		/*html*/
 		//``````````````````````````````````````````````````````````````
-		$str="ID=id/width-50,会员ID=id/width-50,邀请ID=tgid,自定义的邀请ID=tg_code,推荐人=ename,会员姓名=nickname,";
+		$str="ID=id/width-50,会员ID=id/width-50,邀请ID=tgid/width-50,自定邀请ID=tg_code/width-70,推荐人=ename,会员姓名=nickname,";
 		if(empty($_GET['agent'])){
-			$str.="会员等级=vip_name,";
+			$str.="会员等级=vip_name/width-70,";
 		}else{
 			$str.="代理等级=dlname,冻结提现=tx_frozen,";
 		}
-		$str.="手机号码=phone,返利金额=commission,代理返利金额=dlcommission,";
+		$str.="手机号码=phone,返利金额=commission/width-60,";
 		//jj explosion
-		$str.="朋友圈评价权限=stop_comment,朋友圈发布权限=stop_issue,累积直推下级人数=yq_xj_count/width-100,家族累积成员人数=yq_all_count/width-100,累积自购获得返利金额=gm_all_commission/width-100";
-		$str.=",代理推广位=tg_pid,安卓推广位=tb_app_pid,苹果推广位=ios_tb_app_pid,注册时间=reg_time,最近登录时间=login_time,操作=caozuo/width-200";//表格头部
+		$str.="直推人数=yq_xj_count/width-70,家族人数=yq_all_count/width-70,累积返利=gm_all_commission/width-100";
+		$str.=",代理推广位=tg_pid,安卓推广位=tb_app_pid,苹果推广位=ios_tb_app_pid,注册时间=reg_time/width-100,最近登录时间=login_time/width-100,状态=jh_status/width-60,操作=caozuo/width-200";//表格头部
 		ztp::settableaction(self::getUrl("member_manage","manage_del"));//设置表单action链接
 		$GLOBALS['ztp']['daochu']="{link:member_manage-member_list}";
 		ztp::addtop('text',"开始时间","","time=on get=on name=start_time placeholder='开始时间'");
@@ -325,28 +315,34 @@ class member_manageAction extends Action{
 		ztp::addtop('a',"导出会员手机号","javascript:void(0)","name=daochu id=daochu");
 		ztp::addtop("a","添加",self::getUrl("member_manage","manage_add"));//添加头部按钮
 		ztp::addtop("p");
+	
 		ztp::addtop('text',"会员ID",NULL,"name=mid id=info get=on style='width:70px;'","会员ID");
 		ztp::addtop('text',"邀请ID",NULL,"name=tgid get=on style='width:70px;'","邀请ID");
 		ztp::addtop('text',"自定义的邀请ID",NULL,"name=tg_code get=on style='width:70px;'","邀请ID");
 		ztp::addtop('text',"推广位",NULL,"name=pid get=on style='width:70px;'","推广位");
-		ztp::addtop('text',"会员姓名",NULL,"name=nickname get=on","会员  姓名");
-		ztp::addtop('text',"手机号码",NULL,"name=phone get=on","手机号码");
-		ztp::addtop('text',"推荐人",NULL,"name=ename get=on","推荐人");
+		ztp::addtop('text',"会员姓名",NULL,"name=nickname style='width:70px;' get=on","会员  姓名");
+		ztp::addtop('text',"手机号码",NULL,"name=phone style='width:70px;' get=on","手机号码");
+		ztp::addtop('text',"推荐人",NULL,"name=ename style='width:70px;' get=on","推荐人");
+		
+		ztp::addtop('select',"激活状态","请选择=0,未激活=1,已激活=2","name=jh_status  get=on","");
 		//添加运营商
 		$str_user.=",运营商=operator";
 		ztp::addtop('select',"会员等级",$str_user,"name=is_sqdl  get=on","我是消息3");
+		
 		ztp::addtop("submit","查询");
 		ztp::addtable($str,$user);//添加表格
 		ztp::addhtml("member_manage/sjf.tpl.html");
 		ztp::addjs("member_manage/sjf.js");
 		ztp::play();
-    }
+	}
 	//添加会员页面
 	public function manage_add(){
 		$set=zfun::f_getset("operator_name,operator_name_2,operator_onoff");
 		ztp::title("添加/编辑会员");//网站标题
 		$id=intval($_GET['id']);
 		$user=zfun::f_row("User","id=".intval($_GET['id']));
+		//清空上级关系 时间
+		if(!empty($user))self::clean_nexus($user['id']);
 		//会员等级
 		$dl_lv = intval(self::getSetting("fxdl_lv"));
 		$str='';
@@ -364,7 +360,6 @@ class member_manageAction extends Action{
 		if($user['operator_lv']!='0')$user['is_sqdl']='operator';//我是运营商
 		if($user['operator_lv']=='2')$user['is_sqdl']='operator_2';//联合创世人
 		zfun::isoff($user,1);
-		
 		if(empty($user['head_img']))$user['head_img']='default.png';
 		if(strstr($user['head_img'],"http")==false)$user['head_img']=UPLOAD_URL."user/".$user['head_img'];
 		$isdl=0;
@@ -372,18 +367,15 @@ class member_manageAction extends Action{
 		if(!empty($user['dllv2']))$isdl=1;
 		if(!empty($user['dllv3']))$isdl=1;
 		if(!empty($user['dllv4']))$isdl=1;
-		
 		//jj explosion
 		$user['vip']=intval($user['vip']);
 		if(!empty($user['vip']))$user['is_sqdl']=$user['vip'];
-		
 		$Tgidkey=self::getApp("Tgidkey");
 		$user['tgid']=$Tgidkey->addkey($user['id']);
 		if(!empty($user['hhr_gq_time']))$user['hhr_gq_time']=date("Y-m-d H:i:s",$user['hhr_gq_time']);
 		else $user['hhr_gq_time']='';
 		if(!empty($user['operator_time']))$user['operator_time']=date("Y-m-d H:i:s",$user['operator_time']);
 		else $user['operator_time']='';
-
 		/*html*/
 		//``````````````````````````````````````````````````````````````
 		ztp::setaction(self::getUrl("member_manage","manage_save",array("id"=>intval($_GET['id']))));//设置表单action链接
@@ -401,7 +393,6 @@ class member_manageAction extends Action{
 		//jj explosion
 		//ztp::add("radio",$set['operator_name'],"是=1,否=0","name=operator_lv val=".$user['operator_lv']);
 		ztp::add("text","所属".$set['operator_name']."ID",$user['operator_id'],"name=operator_id");
-		
 		ztp::add("text","代理推广单元ID",filter_check($user['tg_pid']),"name=tg_pid");
 		ztp::add("text","安卓APP推广位",filter_check($user['tb_app_pid']),"name=tb_app_pid");
 		ztp::add("text","苹果APP推广位",filter_check($user['ios_tb_app_pid']),"name=ios_tb_app_pid");
@@ -423,14 +414,11 @@ class member_manageAction extends Action{
 		ztp::add("text","weixin_au",$user['weixin_au'],"style='width:200px;'");
 		//jj explosion 多了一个
 		//ztp::add("text","代理推广pid",floatval($user['tg_pid']),"name=tg_pid");
-		
 		if($user['is_sqdl_time']==0)$user['is_sqdl_time']='';
 		else $user['is_sqdl_time']=date("Y-m-d H:i:s",$user['is_sqdl_time']);
-		
 		ztp::add("time","成为代理的时间",($user['is_sqdl_time']),"name=is_sqdl_time");
 		ztp::add("time","支付宝绑定次数",($user['zfb_count']),"name=zfb_count");
 		ztp::add("file","会员头像",filter_check($user['head_img']),"name=head_img");//未完善
-		
 		$path=ROOT_PATH."comm/cwdl_rule.php";
 		//这是要把累积的金额计算处理
 		if(file_exists($path)==true){
@@ -442,9 +430,8 @@ class member_manageAction extends Action{
 		ztp::add("text","累积直推下级人数",intval($user['yq_xj_count']),"name=yq_xj_count","");
 		ztp::add("text","家族累积成员人数",intval($user['yq_all_count']),"name=yq_all_count");
 		ztp::add("text","累积自购获得返利金额",floatval($user['gm_all_commission']),"name=gm_all_commission","订单总佣金");
-		
 		ztp::add("select","地区","请选择=","name=dq1 id=dq1 val=".$user['dq1'].",".$user['dq2'].",".$user['dq3'].",".$user['dq4']);
-		
+
 		//百里.冻结金额
 		ztp::add("text","冻结金额",intval($user['blocking_price']),"style='background:#eee;width:180px;'  readonly ");
 		if($user['blocking_price_endtime'] > 0)
@@ -463,53 +450,43 @@ class member_manageAction extends Action{
 		ztp::add("submit","确认");
 		ztp::play();
 	}
-	
 	//保存操作
 	public function manage_save(){
 		$id=$uid=intval($_GET['id']);
 		$set=zfun::f_getset("operator_valid_day,operator_name,fxdl_hyday");
 		$user=zfun::f_row("User","id='{$id}'");
-		
 		$str="stop_comment,stop_issue,loginname,extend_id,nickname,realname,alipay,phone,email,";
 		$str.="address,postcode,qq,money,commission,integral,zijin,tx_frozen,dlcommission,is_sqdl,tg_pid";
-		
 		//支付宝绑定次数
 		$str.=",zfb_count";
 		//运营商
 		$str.=",operator_lv,operator_id";
 		//APP推广位
 		$str.=",tb_app_pid,ios_tb_app_pid";
-
 		$data=zfun::getpost($str);
 		$data['operator_id']=intval($data['operator_id']);
 		$data['operator_lv']=0;
 		$dl_dj=$data['is_sqdl'];
 		if(!empty($_POST['hhr_gq_time']))$data['hhr_gq_time']=strtotime($_POST['hhr_gq_time']);
 		if(!empty($_POST['operator_time']))$data['operator_time']=strtotime($_POST['operator_time']);
-
 		//如果等于operator  就是运营商
 		if($data['is_sqdl']=='operator'){
-			
 			$data['operator_lv']=1;
 			$data['is_sqdl']='0';
 			if(empty($_POST['operator_time']))zfun::fecho(0,"请填写运营商过期时间",0);
 		}
 		//联合创始人
 		if($data['is_sqdl']=='operator_2'){
-			
 			$data['operator_lv']=2;
 			$data['is_sqdl']='0';
 			if(empty($_POST['operator_time']))zfun::fecho(0,"请填写运营商过期时间",0);
 		}
-		
-		
 		if($data['is_sqdl']>0){//代理的
 			if(empty($_POST['hhr_gq_time']))zfun::fecho(0,"请填写代理过期时间",0);
 			$data['operator_time']=0;
 			//$data['hhr_gq_time']=time()+$set['fxdl_hyday']*86400;
 			//if($user['hhr_gq_time']!='0')unset($data['hhr_gq_time']);
 		}
-
 		if($data['operator_lv']>0){
 			//$data['operator_time']=time()+$set['operator_valid_day']*86400;
 			$data['hhr_gq_time']=0;
@@ -517,15 +494,10 @@ class member_manageAction extends Action{
 			include_once ROOT_PATH."Action/admin/operator.action.php";
 			if(!empty($id))operatorAction::set_lower_operator_id($id);
 		}
-	
 		//判断自定义邀请码的权限
 		//self::change_tgid($data);
-		
 		$data['extend_id']=intval($data['extend_id']);
-		
-		
 		$data['vip']=intval($data['vip']);
-		
 		$data['yq_xj_count']=intval($_POST['yq_xj_count']);
 		$data['yq_all_count']=intval($_POST['yq_all_count']);
 		$data['gm_all_commission']=intval($_POST['gm_all_commission']);
@@ -540,12 +512,10 @@ class member_manageAction extends Action{
 		$data["integral"]=!empty($data['integral'])?$data['integral']:0;
 		$data["zijin"]=!empty($data['zijin'])?$data['zijin']:0;
 		$data["tx_frozen"]=!empty($data['tx_frozen'])?$data['tx_frozen']:0;
-		
 		$data['dq1']=intval($_POST['dq1']);
 		$data['dq2']=intval($_POST['dq2']);
 		$data['dq3']=intval($_POST['dq3']);
 		$data['dq4']=intval($_POST['dq4']);
-		
 		//jj explosion
 		$data['is_sqdl_time']=0;		
 		if(!empty($_POST['is_sqdl_time'])){//修改成为代理时间
@@ -555,14 +525,12 @@ class member_manageAction extends Action{
 			$data['is_sqdl_time']=time();		
 		}
 		if(!empty($_POST['alipay']))$data['zfb_au']=$_POST['alipay'];
-		
 		if(!empty($_FILES['head_img'])){
 			$img=zfun::f_simg("head_img","user");
 			if(!empty($img['head_img'])){
 				$data['head_img']=$img['head_img'];
 			}
 		}
-		
 		if(empty($id)){
 			//jj explosion
 			//$data['reg_time']=strtotime($_POST['reg_time']);
@@ -583,12 +551,9 @@ class member_manageAction extends Action{
 			if($data['extend_id']==$id)zfun::fecho(0,"不能绑定该邀请id",0);
 			$money=floatval(self::getSetting("fxdl_money" . ($data['is_sqdl']+1)));
 			if($data['is_sqdl']>0||$data['operator_lv']>0){
-					
-					
 					$arr=array("uid"=>$id,"dl_dj"=>$dl_dj,"time"=>time(),"name"=>$data['nickname'],"checks"=>1,"jnMoney"=>0,"is_pay"=>1);
 					$count=zfun::f_count("DLList","uid='$id'");
 					if(empty($count))zfun::f_insert("DLList",$arr);
-					
 					//修改可以不填推广位
 					if(!empty($_POST['tg_pid'])){
 						$tg_pid=$_POST['tg_pid'];
@@ -597,23 +562,20 @@ class member_manageAction extends Action{
 							$tg_pid=$arr[3];
 						}
 					}
-					
 					if(!empty($tg_pid)){
 						$where="tg_pid='$tg_pid' and id<>$uid";
 						$count=zfun::f_count("User",$where);
 						if(!empty($count))zfun::fecho(0,"该推广位已经被绑定",0);
 					}
-					
 					$data['tg_pid']=$tg_pid;	
 				
 			}
 			$path=ROOT_PATH."comm/cwdl_rule.php";
-
+			//编辑了关系 清空当前更新时间
+			$data['nexus_time']=0;
 			$result=zfun::f_update("User","id='$id'",$data);
 		}
-		
 		/*这是代理等级自动升级的*/
-		
 		/*$path=ROOT_PATH."comm/cwdl_rule.php";
 		if(file_exists($path)==true&&$data['operator_lv']==0){
 			$lv=$data['is_sqdl'];
@@ -625,7 +587,6 @@ class member_manageAction extends Action{
 			if($lv>$data['is_sqdl'])$data['is_sqdl']=$lv;
 			$result=zfun::f_update("User","id='$id'",$data);
 		}*/
-		
 		admin::getadd($result);
 	}
 	//获取上级
@@ -659,10 +620,8 @@ class member_manageAction extends Action{
 		$str.=",operator_name,operator_name_2,fxdl_name1,fxdl_name2";
 		$str.=",fxdl_name3,fxdl_name4,fxdl_name5,fxdl_name6";
 		$str.=",fxdl_name7,fxdl_name8,fxdl_name9,fxdl_name10";
-		
 		$set=zfun::f_getset($str);
 		if(empty($user['tg_code']))return;
-
 		if(is_numeric($user['tg_code'])==1)zfun::fecho("不能填写纯数字");
 		$user['tg_code']=str_replace(array("。","，","！","%","@","#"),".",$user['tg_code']);
 		if(strstr($user['tg_code'],"."))zfun::fecho("邀请码请勿填写非法字符");
@@ -676,7 +635,6 @@ class member_manageAction extends Action{
 		}
 		$lv=($user['is_sqdl']+1);
 		$name=$set['fxdl_name'.$lv];
-	
 		if($user['operator_lv']==1)$name=$set['operator_name'];
 		if($user['operator_lv']==2)$name=$set['operator_name_2'];
 		if(intval($user['operator_lv'])==0&&$set['fxdl_zdytgcode_onoff']!=''&&is_numeric($set['fxdl_zdytgcode_onoff'])&&$lv<$set['fxdl_zdytgcode_onoff']){
@@ -688,8 +646,6 @@ class member_manageAction extends Action{
 		if($set['fxdl_zdytgcode_onoff']=='operator_2'){
 			if($user['operator_lv']<2)zfun::fecho($name."不能自定义邀请码");
 		}
-	
-		
 		
 	}
 	//会员删除
@@ -702,6 +658,9 @@ class member_manageAction extends Action{
 			$ids=implode(",",$_POST['ch']);	
 		}
 		if(empty($ids))zfun::f_fmsg("操作失败!",0);
+		//清空分配时间记录
+		$tmp=explode(",",$ids);
+		foreach($tmp as $k=>$v){self::clean_nexus($v);}
 		$result=zfun::f_delete("User","id IN($ids)");
 		admin::getdel($result);
 	}
@@ -729,7 +688,6 @@ class member_manageAction extends Action{
 		if(!empty($_GET['show_where'])){
 			echo $where;	
 		}
-		
 		//订单好筛选
 		if(!empty($_GET['oid'])){
 			$where.=" and oid like '%".$_GET['oid']."%'";	
@@ -752,9 +710,7 @@ class member_manageAction extends Action{
 			}else{
 				if(strstr($data[$k]['interal'],"+")==false)$data[$k]['interal']="+".$data[$k]['interal'];
 			}
-			
 			$data[$k]['interal']=str_replace("+-","-",$data[$k]['interal']);
-			
 			$data[$k]['type']=self::integral_type($v['type']);
 			if(strstr($v['detail'],"邀请好友注册")){
 				if(!empty($v['data']))$data[$k]['oid']="邀请的好友id:  ".$v['data'];
@@ -923,13 +879,10 @@ class member_manageAction extends Action{
 		if(!empty($_GET['end_time'])){
 			$where.=" and time < ".intval(strtotime($_GET['end_time']));	
 		}
-		
 		if(empty($where))zfun::fecho("daochu error");
 		$where.=" and audit_status=1";
-		
 		//调用公共where
 		self::tx_comm_where($where);
-		
 		$tmp=strtotime($_GET['end_time']);
 		$data=zfun::f_select("Authentication",$where,NULL);
 		$user=zfun::f_kdata("User",$data,"uid","id","id,loginname,phone,email,nickname,alipay,zfb_au");
@@ -994,13 +947,9 @@ class member_manageAction extends Action{
 		if(!empty($_GET['end_time'])){
 			$where.=" and reg_time < ".intval(strtotime($_GET['end_time']));	
 		}
-		
 		if(empty($where))zfun::fecho("daochu error");
-		
-		
 		$tmp=strtotime($_GET['end_time']);
 		$data=zfun::f_select("User",$where,NULL);
-		
 		foreach($data as $k=>$v){
 			$data[$k]['nickname']=$v['nickname'];
 			$data[$k]['phone']=$v['phone'];
@@ -1070,10 +1019,7 @@ class member_manageAction extends Action{
 		}
 		return $data;
 	}
-	
-	
 	//jj explosion
-	
 	//支付宝转账
 	public static function alipay_auto($user=array(),$money=0){
 		$set=zfun::f_getset("alipay_auto_onoff");
@@ -1084,7 +1030,6 @@ class member_manageAction extends Action{
 		$arr=array(
 			"uid"=>$user['id'],
 			"realname"=>$user['realname'],
-
 			"alipay"=>$user['alipay'],
 			"money"=>$money,
 			"info"=>"提现".$data['money']."元",
@@ -1093,7 +1038,6 @@ class member_manageAction extends Action{
 		if(empty($result))zfun::fecho("调用转账接口出错");
 		if($result['success']!=1)zfun::fecho("转账失败 ".$result['sub_msg']);
 	}
-
 	//会员加佣金
 	function addcfb(){
 		if(empty($_POST['uid']))zfun::fecho("值为空");
@@ -1105,6 +1049,18 @@ class member_manageAction extends Action{
 		zfun::f_adddetail($_POST['info'],$uid,0,0,$commissionval);
 		zfun::addval("User","id='{$uid}'",$arr);
 		zfun::fecho("提交成功",1,1);
+	}
+	//清空上级关系 时间
+	static function clean_nexus($uid=0){
+		if(empty($uid))return;
+		actionfun("comm/order");
+			$ex_user=order::get_extend($uid);
+			$ex_user=$ex_user['user_arr'];
+			$ex_ids="'-1'";
+			foreach($ex_user as $k=>$v){$ex_ids.=",'".$v['id']."'";}
+			zfun::f_update("User","id IN({$ex_ids})",array("nexus_time"=>0));
+			//更新自动删除无效记录时间
+			zfun::f_update("Nexus","extend_uid IN({$ex_ids})",array("update_time"=>0));
 	}
 	
 }

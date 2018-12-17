@@ -85,8 +85,8 @@ class apiAction extends Action {
 		}
 
 		//百里.9.9商品
-		actionfun("appapi/baili");
-		baili::get_goods_lists("9.9");
+		// actionfun("appapi/baili");
+		// baili::get_goods_lists("9.9");
 
 		//查大淘客订单  会中断
 		if(empty($_POST['price1']))unset($_POST['price1']);
@@ -592,7 +592,6 @@ class apiAction extends Action {
 			$value['fxz'] = "分享奖：".$value['fx_commission'];
 		}
 
-
 		$arr=array("success"=>1,"data"=>$goods,"shop"=>$shop,"msg"=>"咳咳咳");
 		//jj explosion
 		$end_time=dgapp_huancun_time;
@@ -679,6 +678,7 @@ class apiAction extends Action {
 		if(!empty($_POST['end_price']))$arr['end_price']=doubleval($_POST['end_price']);
 		
 		$data=tbmaterial::getlist($_POST['keyword'],$arr,$_POST['p']);
+	
 		foreach($data as $k=>$v){
 			unset($data[$k]['small_img'],$data[$k]['dx'],$data[$k]['yx']);	
 			$data[$k]['getGoodsType']='wuliao';//物料商品
@@ -1153,35 +1153,7 @@ class apiAction extends Action {
 		
 	}
 	public function getfootmark() {
-		if (!$this -> sign()) {
-			$this -> fecho(NULL, 0, "签名错误");
-		}
-		$footmarkModel = $this -> getDatabase('FootMark');
-		$goodsModel = $this -> getDatabase('Goods');
-		$shopModel = $this -> getDatabase("Dp");
-		$page = $this -> getApp('Page');
-		$userModel = $this -> getDatabase('User');
-		if (empty($_POST['token'])) {
-			$this -> fecho(NULL, 0, "参数不完整");
-		}
-		//为第几页
-		$_GET['p'] = $_POST['p'] = !empty($_POST['p']) ? intval($_POST['p']) : 1;
-		//一页多少
-		$limit = !empty($_POST['limit']) ? $_POST['limit'] : 20;
-		$start = ($_POST['p'] - 1) * $limit;
-		$jf_return = $this -> getSetting('jf_ratio');
-		$jf_ratio = $this -> getSetting('jf_buy');
-		$jf_ratio = explode(',', $jf_ratio);
-		$userid = $userModel -> selectRow('token="' . $_POST['token'] . '"');
-		if (empty($userid)) {
-			$this -> fecho(null, 0, '您的账号在其他终端登陆，请重新登陆！');
-		}
-		/*
-			returnfb
-			returnbl
-		*/
-		$uid = $userid['id'];
-		$this -> setSessionUser($uid, 123);
+		$user=appcomm::signcheck(1);$uid=$user['id'];
 		//jj explosion
 		//删除一百后的记录
 		$del_data=zfun::f_select("FootMark","uid=".$uid,"id",100,100,"starttime desc");
@@ -1190,105 +1162,92 @@ class apiAction extends Action {
 			foreach($del_data as $k=>$v){$ids.=",".$v['id'];}
 			zfun::f_delete("FootMark","id IN($ids)");
 		}
-		if (!empty($userid['id'])) {
-			$zhe = $jf_ratio[3];
-			if ($uid) {
-				$userModel = $this -> getDatabase("User");
-				$user = $userModel -> selectRow("id=" . $uid);
-				
-			}
-			$count = $footmarkModel -> selectRow('uid=' . $uid, 'count(*)');
-			$footmark = $footmarkModel -> select('uid=' . $uid, null, $limit, $start, 'starttime desc');
-			$pages = $page -> paging($count['count(*)'], $p, $limit, ACTION, CONTROL);
-			$goods=zfun::f_kdata("Goods",$footmark,"goodsid","fnuo_id","shop_id=4");
-			foreach($goods as $k=>$v){
-				if($v['shop_id']==4)$goods[$k]['shop_id']=3;	
-			}
-			if(!empty($_POST['off'])){
-				fpre($footmark);
-				fpre($goods);
-			}
-			$set=zfun::f_getset("fan_all_str");
-			foreach ($footmark as $k => $v) {
-				if(!empty($v['data'])){
-					$goods_=json_decode($v['data'],true);
-				}
-				else {
-					zfun::f_delete("FootMark","id=".$v['id']);
-					unset($footmark[$k]);
-					continue;
-					$goods_=$goods[$v['goodsid']];
-				}
-				unset($footmark[$k]['data']);
-				$shop = $shopModel -> selectRow('dp_id="' . $goods_['dp_id'] . '"');
-				if ($shop) {
-					$footmark[$k]['goods_shop'] = $shop['name'];
-				}
-				$footmark[$k]['jd_url']='';
-				if ($goods_['shop_id']==3) {
-					$footmark[$k]['jd_url'] =INDEX_WEB_URL."?act=jdapi&ctrl=gotobuy&gid=".$goods_['fnuo_id'];
-				}
-				$footmark[$k]['commission'] = $goods_['commission'];
-				$footmark[$k]['shop_id'] = $goods_['shop_id'];
-				$footmark[$k]['returnfb'] = $goods_['fcommission'];
-				$footmark[$k]['returnbl'] = $goods_['fbili'];
-				$footmark[$k]['goods_title'] = $goods_['goods_title'];
-				$footmark[$k]['goods_img'] = $goods_['goods_img'];
-				$footmark[$k]['goods_price'] = $goods_['goods_price'];
-				$footmark[$k]['fnuo_id'] = $goods_['fnuo_id'];
-				$footmark[$k]['id'] = $goods_['fnuo_id'];
-				$footmark[$k]['starttime'] = date("H:i:s", $v['starttime']);
-				$footmark[$k]['endtime'] = date("H:i:s", $v['endtime']);
-				$footmark[$k]['highcommission_wap_url'] = $goods_['highcommission_wap_url'];
-				$footmark[$k]['goods_cost_price'] = $goods_['goods_cost_price'];
-				$footmark[$k]['yhq'] = $goods_['yhq'];
-				$footmark[$k]['yhq_price'] = $goods_['yhq_price'];
-				$footmark[$k]['fan_all_str'] = $set['fan_all_str'];
-				//zheli boom
-				$footmark[$k]['fnuo_url']=$goods_['fnuo_url'];
-				if(empty($footmark[$k]['pdd'])&&empty($footmark[$k]['jd'])){
-					actionfun("comm/tbmaterial");
-					$goods_commission=tbmaterial::id($footmark[$k]['fnuo_id']);
-					//zfun::isoff($goods_commission,1);
-					
-					if(!empty($goods_commission)){
-						if(empty($goods_['commission']))$footmark[$k]['commission']=$goods_commission['commission'];
-						$footmark[$k]['goods_sales']=$goods_commission['goods_sales'];
-						if(!empty($goods_commission['yhq_price']))$footmark[$k]['yhq_price']=$goods_commission['yhq_price'];
-						if(!empty($goods_commission['yhq_span']))$footmark[$k]['yhq_span']=$goods_commission['yhq_span'];
-						$footmark[$k]['goods_img']=$goods_commission['goods_img'];
-						if(!empty($goods_['yhq_price'])){
-							$footmark[$k]['wl_yhq_url']=$goods_commission['yhq_url'];
-							$footmark[$k]['yhq_use_time']="使用期限：".date("Y-m-d",$goods_commission['start_time'])."-".date("Y-m-d",$goods_commission['end_time']);	
-						}
-						$footmark[$k]['shop_dsr']=$goods_commission['shop_dsr'];
-						$footmark[$k]['shop_title']=$goods_commission['shop_title'];
-						$footmark[$k]['seller_id']=$goods_commission['seller_id'];
-					}
-					actionfun("default/gototaobao");
-					$tmp_yhq_url=gototaobaoAction::check_yhq_url(array("goods_title"=>$goods_['goods_title'],"fnuo_id"=>$goods_['fnuo_id']),1);
-			
-					if(!empty($GLOBALS['yhq_price']))$footmark[$k]['yhq_price']=$GLOBALS['yhq_price'];
-					if(!empty($GLOBALS['yhq_span']))$footmark[$k]['yhq_span']=$GLOBALS['yhq_span'];
-					if(!empty($GLOBALS['goods_cost_price']))$footmark[$k]['goods_cost_price']=$GLOBALS['goods_cost_price'];
-					if(!empty($GLOBALS['goods_price']))$footmark[$k]['goods_price']=$GLOBALS['goods_price'];
-					if(!empty($GLOBALS['dtk_commission'])&&$GLOBALS['dtk_commission']>$footmark[$k]['commission'])$footmark[$k]['commission']=$GLOBALS['dtk_commission'];
-				}
-			}
+		$footmark=appcomm::f_goods("FootMark","uid='{$uid}'","","starttime desc",NULL,20);
 		
-			$footmark=zfun::f_fgoodscommission($footmark);
-			
-			foreach($footmark as $k=>$v){
-				$footmark[$k]['returnfb'] = $v['fcommission'];
-				$footmark[$k]['returnbl'] = $v['fbili'];
-			}
-			appcomm::goodsfanlioff($footmark);
-			$footmark=array_values($footmark);
-			$this -> fecho($footmark, 1, "ok");
-		} else {
-			$this -> fecho(null, 0, "没有该用户");
+		$goods=zfun::f_kdata("Goods",$footmark,"goodsid","fnuo_id"," shop_id=4");
+		foreach($goods as $k=>$v){
+			if($v['shop_id']==4)$goods[$k]['shop_id']=3;	
 		}
-		$this -> fecho(null, 1, "ok");
+		$set=zfun::f_getset("fan_all_str");
+		foreach ($footmark as $k => $v) {
+			if(!empty($v['data'])){
+				$goods_=json_decode($v['data'],true);
+			}
+			else {
+				zfun::f_delete("FootMark","id=".$v['id']);
+				unset($footmark[$k]);
+				continue;
+				$goods_=$goods[$v['goodsid']];
+			}
+			unset($footmark[$k]['data']);
+			$shop = zfun::f_row("Dp",'dp_id="' . $goods_['dp_id'] . '"');
+			if ($shop) {
+				$footmark[$k]['goods_shop'] = $shop['name'];
+			}
+			$footmark[$k]['jd_url']='';
+			if ($goods_['shop_id']==3) {
+				$footmark[$k]['jd_url'] =INDEX_WEB_URL."?act=jdapi&ctrl=gotobuy&gid=".$goods_['fnuo_id'];
+			}
+			$footmark[$k]['commission'] = $goods_['commission'];
+			$footmark[$k]['shop_id'] = $goods_['shop_id'];
+			$footmark[$k]['returnfb'] = $goods_['fcommission'];
+			$footmark[$k]['returnbl'] = $goods_['fbili'];
+			$footmark[$k]['goods_title'] = $goods_['goods_title'];
+			$footmark[$k]['goods_img'] = $goods_['goods_img'];
+			$footmark[$k]['goods_price'] = $goods_['goods_price'];
+			$footmark[$k]['fnuo_id'] = $goods_['fnuo_id'];
+			$footmark[$k]['id'] = $goods_['fnuo_id'];
+			$footmark[$k]['starttime'] = date("H:i:s", $v['starttime']);
+			$footmark[$k]['endtime'] = date("H:i:s", $v['endtime']);
+			$footmark[$k]['highcommission_wap_url'] = $goods_['highcommission_wap_url'];
+			$footmark[$k]['goods_cost_price'] = $goods_['goods_cost_price'];
+			$footmark[$k]['yhq'] = $goods_['yhq'];
+			$footmark[$k]['yhq_price'] = $goods_['yhq_price'];
+			$footmark[$k]['fan_all_str'] = $set['fan_all_str'];
+			//zheli boom
+			$footmark[$k]['fnuo_url']=$goods_['fnuo_url'];
+			if(empty($footmark[$k]['pdd'])&&empty($footmark[$k]['jd'])){
+				actionfun("comm/tbmaterial");
+				$goods_commission=tbmaterial::id($footmark[$k]['fnuo_id']);
+				//zfun::isoff($goods_commission,1);
+				
+				if(!empty($goods_commission)){
+					$footmark[$k]['commission']=$goods_commission['commission'];
+					$footmark[$k]['goods_sales']=$goods_commission['goods_sales'];
+					$footmark[$k]['goods_price']=$goods_commission['goods_price'];
+					$footmark[$k]['goods_cost_price']=$goods_commission['goods_cost_price'];
+					$footmark[$k]['yhq_price']=$goods_commission['yhq_price'];
+					$footmark[$k]['yhq_span']=$goods_commission['yhq_span'];
+					$footmark[$k]['goods_img']=$goods_commission['goods_img'];
+					if(!empty($goods_['yhq_price'])){
+						$footmark[$k]['wl_yhq_url']=$goods_commission['yhq_url'];
+						$footmark[$k]['yhq_use_time']="使用期限：".date("Y-m-d",$goods_commission['start_time'])."-".date("Y-m-d",$goods_commission['end_time']);	
+					}
+					$footmark[$k]['shop_dsr']=$goods_commission['shop_dsr'];
+					$footmark[$k]['shop_title']=$goods_commission['shop_title'];
+					$footmark[$k]['seller_id']=$goods_commission['seller_id'];
+				}
+				/*actionfun("default/gototaobao");
+				$tmp_yhq_url=gototaobaoAction::check_yhq_url(array("goods_title"=>$goods_['goods_title'],"fnuo_id"=>$goods_['fnuo_id']),1);
+		
+				if(!empty($GLOBALS['yhq_price']))$footmark[$k]['yhq_price']=$GLOBALS['yhq_price'];
+				if(!empty($GLOBALS['yhq_span']))$footmark[$k]['yhq_span']=$GLOBALS['yhq_span'];
+				if(!empty($GLOBALS['goods_cost_price']))$footmark[$k]['goods_cost_price']=$GLOBALS['goods_cost_price'];
+				if(!empty($GLOBALS['goods_price']))$footmark[$k]['goods_price']=$GLOBALS['goods_price'];
+				if(!empty($GLOBALS['dtk_commission'])&&$GLOBALS['dtk_commission']>$footmark[$k]['commission'])$footmark[$k]['commission']=$GLOBALS['dtk_commission'];*/
+			}
+		}
+	
+		$footmark=zfun::f_fgoodscommission($footmark);
+		
+		foreach($footmark as $k=>$v){
+			$footmark[$k]['returnfb'] = $v['fcommission'];
+			$footmark[$k]['returnbl'] = $v['fbili'];
+		}
+		appcomm::goodsfanlioff($footmark);
+		$footmark=array_values($footmark);
+	
+		zfun::fecho("足迹",$footmark,1);
 	}
 	public function addmylike() {
 		if (!$this -> sign()) {
@@ -1309,14 +1268,7 @@ class apiAction extends Action {
 		$tmp=zfun::f_count("MyLike",$where);
 		if(!empty($tmp))$this -> fecho(null, 1, '已收藏');
 		
-		if($set['ggapitype']!=2){//不是物料模式 走联盟
-			actionfun("appapi/alimama");
-			$tmp=alimamaAction::getcommission($_POST['goodsid']);
-			if(!empty($tmp)){
-				$tmp['pictUrl']=$tmp['pictUrl']."_400x400.jpg";
-			}
-		}
-		else{//物料模式
+		
 			actionfun("comm/tbmaterial");
 			$tmp=tbmaterial::id($_POST['goodsid']);
 			if(!empty($tmp)){
@@ -1325,10 +1277,10 @@ class apiAction extends Action {
 				$tmp['biz30day']=$tmp['goods_sales'];$tmp['tkRate']=$tmp['commission'];
 				$tmp['userType']=$tmp['shop_id'];$tmp['auctionId']=$tmp['fnuo_id'];
 			}
-		}
+		
 		if(!empty($tmp['fnuo_id'])){
 			actionfun("default/gototaobao");
-			$tmp_yhq_url=gototaobaoAction::check_yhq_url(array("goods_title"=>$tmp['goods_title'],"fnuo_id"=>$tmp['fnuo_id']),1);
+			//$tmp_yhq_url=gototaobaoAction::check_yhq_url(array("goods_title"=>$tmp['goods_title'],"fnuo_id"=>$tmp['fnuo_id']),1);
 			if(!empty($tmp_yhq_url)&&empty($tmp['yhq_url'])&&empty($getgoodstype)){
 				$tmp['yhq_url']=$tmp_yhq_url;
 				$tmp['yhq']=1;
@@ -1419,122 +1371,82 @@ class apiAction extends Action {
 		$this -> fecho(null, 1, "ok");
 	}
 	public function getmylike() {
-		if (!$this -> sign()) {
-			$this -> fecho(NULL, 0, "签名错误");
-		}
-		$goodsModel = $this -> getDatabase('Goods');
-		$mylikeModel = $this -> getDatabase('MyLike');
-		$jf_return = $this -> getSetting('jf_ratio');
-		$jf_ratio = $this -> getSetting('jf_buy');
-		$jf_ratio = explode(',', $jf_ratio);
-		//为第几页
-		$_GET['p'] = $_POST['p'] = !empty($_POST['p']) ? intval($_POST['p']) : 1;
-		//一页多少
-		$limit = !empty($_POST['limit']) ? $_POST['limit'] : 20;
-		$page = $this -> getApp('Page');
-		$start = ($_POST['p'] - 1) * $limit;
-		if (empty($_POST['token'])) {
-			$this -> fecho(NULL, 0, "参数不完整");
-		}
-		$userModel = $this -> getDatabase('User');
-		$userid = $userModel -> selectRow('token="' . $_POST['token'] . '"');
-		if (empty($userid)) {
-			$this -> fecho(null, 0, '您的账号在其他终端登陆，请重新登陆！');
-		}
-		if ($userid['id']) {
-			$this -> setSessionUser($userid['id'], $userid['nickname']);
-			$count = $mylikeModel -> selectRow('uid=' . $userid['id'], 'count(*)');
-			$mylike = $mylikeModel -> select('uid=' . $userid['id']." and type=0", null, $limit, $start, 'time desc');
-			$pages = $page -> paging($count['count(*)'], $p, $limit, ACTION, CONTROL);
-            
-			$zhe = $jf_ratio[0];
-			if ($userid['vip'] == 0) {
-				$zhe = $jf_ratio[0];
-			} elseif ($userid['vip'] == 1) {
-				$zhe = $jf_ratio[1];
-			} elseif ($userid['vip'] == 2) {
-				$zhe = $jf_ratio[2];
-			} elseif ($userid['vip'] == 3) {
-				$zhe = $jf_ratio[3];
-			}
-			$set=zfun::f_getset("fan_all_str,mylike_all_msg");
-			$str=$set['fan_all_str'];
-		
-			foreach ($mylike as $k => $v) {
-				if(empty($v['data']))$goods = $goodsModel -> selectRow("fnuo_id='".$v['goodsid']."'");
-				else $goods=json_decode($v['data'],true);
-			
-				unset($mylike[$k]['data']);
-				if(!empty($goods)&&$goods['shop_id']==4)$goods['shop_id']=3;
-				$mylike[$k]['jd_url']='';
-				$mylike[$k]['shop_id']=$goods['shop_id'];
-				
-				$mylike[$k]['pdd'] = intval($goods['pdd']);
-				$mylike[$k]['jd'] = intval($goods['jd']);
-				$mylike[$k]['fnuo_id'] = $goods['fnuo_id'];
-				$mylike[$k]['shop_id'] = $goods['shop_id'];
-				$mylike[$k]['goods_title'] = $goods['goods_title'];
-				$mylike[$k]['goods_img'] = $goods['goods_img'];
-				$mylike[$k]['goods_price'] = $goods['goods_price'];
-				$mylike[$k]['goods_cost_price'] = $goods['goods_cost_price'];
-				$mylike[$k]['highcommission_wap_url'] = $goods['highcommission_wap_url'];
-				$mylike[$k]['commission']=$goods['commission'];
-				$mylike[$k]['goods_cost_price'] = $goods['goods_cost_price'];
-				$mylike[$k]['yhq'] = $goods['yhq'];
-				$mylike[$k]['yhq_price'] = $goods['yhq_price'];
-				$mylike[$k]['fan_all_str'] = $set['fan_all_str'];
-				$mylike[$k]['mylike_all_msg'] = $set['mylike_all_msg'];
-				if(empty($mylike[$k]['pdd'])&&empty($mylike[$k]['jd'])){
-					actionfun("comm/tbmaterial");
-					if(!empty($mylike[$k]['fnuo_id']))$goods_commission=tbmaterial::id($mylike[$k]['fnuo_id']);
-					//zfun::isoff($goods_commission,1);
-					
-					if(!empty($goods_commission)){
-						if(empty($goods['commission']))$mylike[$k]['commission']=$goods_commission['commission'];
-						$mylike[$k]['goods_sales']=$goods_commission['goods_sales'];
-						if(!empty($goods_commission['yhq_price']))$mylike[$k]['yhq_price']=$goods_commission['yhq_price'];
-						if(!empty($goods_commission['yhq_span']))$mylike[$k]['yhq_span']=$goods_commission['yhq_span'];
-						$mylike[$k]['goods_img']=$goods_commission['goods_img'];
-						if(!empty($goods['yhq_price'])){
-							$mylike[$k]['wl_yhq_url']=$goods_commission['yhq_url'];
-							$mylike[$k]['yhq_use_time']="使用期限：".date("Y-m-d",$goods_commission['start_time'])."-".date("Y-m-d",$goods_commission['end_time']);	
-						}
-						$mylike[$k]['shop_dsr']=$goods_commission['shop_dsr'];
-						$mylike[$k]['shop_title']=$goods_commission['shop_title'];
-						$mylike[$k]['seller_id']=$goods_commission['seller_id'];
+		$user=appcomm::signcheck(1);$uid=$user['id'];
+		$mylike=appcomm::f_goods("MyLike","uid='{$uid}' and type=0","","time desc",NULL,20);
+		$set=zfun::f_getset("fan_all_str,mylike_all_msg");
+		$str=$set['fan_all_str'];
+		$goodsdata=zfun::f_kdata("Goods",$mylike,"goodsid","fnuo_id");
+		foreach ($mylike as $k => $v) {
+			if(empty($v['data']))$goods = $goodsdata[$v['goodsid']];
+			else $goods=json_decode($v['data'],true);
+			unset($mylike[$k]['data']);
+			if(!empty($goods)&&$goods['shop_id']==4)$goods['shop_id']=3;
+			$mylike[$k]['jd_url']='';
+			$mylike[$k]['shop_id']=$goods['shop_id'];
+			$mylike[$k]['pdd'] = intval($goods['pdd']);
+			$mylike[$k]['jd'] = intval($goods['jd']);
+			$mylike[$k]['fnuo_id'] = $goods['fnuo_id'];
+			$mylike[$k]['shop_id'] = $goods['shop_id'];
+			$mylike[$k]['goods_title'] = $goods['goods_title'];
+			$mylike[$k]['goods_img'] = $goods['goods_img'];
+			$mylike[$k]['goods_price'] = $goods['goods_price'];
+			$mylike[$k]['goods_cost_price'] = $goods['goods_cost_price'];
+			$mylike[$k]['highcommission_wap_url'] = $goods['highcommission_wap_url'];
+			$mylike[$k]['commission']=$goods['commission'];
+			$mylike[$k]['goods_cost_price'] = $goods['goods_cost_price'];
+			$mylike[$k]['yhq'] = $goods['yhq'];
+			$mylike[$k]['yhq_price'] = $goods['yhq_price'];
+			$mylike[$k]['fan_all_str'] = $set['fan_all_str'];
+			$mylike[$k]['mylike_all_msg'] = $set['mylike_all_msg'];
+			if(empty($mylike[$k]['pdd'])&&empty($mylike[$k]['jd'])){
+				actionfun("comm/tbmaterial");
+				if(!empty($mylike[$k]['fnuo_id']))$goods_commission=tbmaterial::id($mylike[$k]['fnuo_id']);
+				if(!empty($goods_commission)){
+					$mylike[$k]['commission']=$goods_commission['commission'];
+					$mylike[$k]['goods_sales']=$goods_commission['goods_sales'];
+					$mylike[$k]['goods_price']=$goods_commission['goods_price'];
+					$mylike[$k]['goods_cost_price']=$goods_commission['goods_cost_price'];
+					$mylike[$k]['yhq_price']=$goods_commission['yhq_price'];
+					$mylike[$k]['yhq_span']=$goods_commission['yhq_span'];
+					$mylike[$k]['goods_img']=$goods_commission['goods_img'];
+					if(!empty($goods['yhq_price'])){
+						$mylike[$k]['wl_yhq_url']=$goods_commission['yhq_url'];
+						$mylike[$k]['yhq_use_time']="使用期限：".date("Y-m-d",$goods_commission['start_time'])."-".date("Y-m-d",$goods_commission['end_time']);	
 					}
-					actionfun("default/gototaobao");
-					$tmp_yhq_url=gototaobaoAction::check_yhq_url(array("goods_title"=>$goods['goods_title'],"fnuo_id"=>$goods['fnuo_id']),1);
+					$mylike[$k]['shop_dsr']=$goods_commission['shop_dsr'];
+					$mylike[$k]['shop_title']=$goods_commission['shop_title'];
+					$mylike[$k]['seller_id']=$goods_commission['seller_id'];
+				}
+				actionfun("default/gototaobao");
+				/*$tmp_yhq_url=gototaobaoAction::check_yhq_url(array("goods_title"=>$goods['goods_title'],"fnuo_id"=>$goods['fnuo_id']),1);
 
-					if(!empty($GLOBALS['yhq_price']))$mylike[$k]['yhq_price']=$GLOBALS['yhq_price'];
-					if(!empty($GLOBALS['yhq_span']))$mylike[$k]['yhq_span']=$GLOBALS['yhq_span'];
-					if(!empty($GLOBALS['goods_cost_price']))$mylike[$k]['goods_cost_price']=$GLOBALS['goods_cost_price'];
-					if(!empty($GLOBALS['goods_price']))$mylike[$k]['goods_price']=$GLOBALS['goods_price'];
-					if(!empty($GLOBALS['dtk_commission'])&&$GLOBALS['dtk_commission']>$mylike[$k]['commission'])$mylike[$k]['commission']=$GLOBALS['dtk_commission'];
-				}
+				if(!empty($GLOBALS['yhq_price']))$mylike[$k]['yhq_price']=$GLOBALS['yhq_price'];
+				if(!empty($GLOBALS['yhq_span']))$mylike[$k]['yhq_span']=$GLOBALS['yhq_span'];
+				if(!empty($GLOBALS['goods_cost_price']))$mylike[$k]['goods_cost_price']=$GLOBALS['goods_cost_price'];
+				if(!empty($GLOBALS['goods_price']))$mylike[$k]['goods_price']=$GLOBALS['goods_price'];
+				if(!empty($GLOBALS['dtk_commission'])&&$GLOBALS['dtk_commission']>$mylike[$k]['commission'])$mylike[$k]['commission']=$GLOBALS['dtk_commission'];*/
 			}
-				
-			//zheli boom
-			$set=zfun::f_getset("goodscol_fanli_str1");
-			
-			if($set['goodscol_fanli_str1'])$str=$set['goodscol_fanli_str1'];
-			$mylike=zfun::f_fgoodscommission($mylike);
-			appcomm::goodsfanlioff($mylike);
-			$mylike=appcomm::goodsfeixiang($mylike);
-			foreach($mylike as $k=>$v){
-				
-				if ($v['fcommission']>0) {
-					$mylike[$k]['return_title'] =$str."".$v['fcommission'];
-				} else {
-					$mylike[$k]['return_title'] = '无存款';
-				}
-				unset($mylike[$k]['tdj_data'],$mylike[$k]['detailurl']);	
-			}
-			
-			$this -> fecho($mylike, 1, "ok");
-		} else {
-			$this -> fecho(null, 0, "没有该用户");
 		}
+			
+		//zheli boom
+		$set=zfun::f_getset("goodscol_fanli_str1");
+		
+		if($set['goodscol_fanli_str1'])$str=$set['goodscol_fanli_str1'];
+		$mylike=zfun::f_fgoodscommission($mylike);
+		appcomm::goodsfanlioff($mylike);
+		$mylike=appcomm::goodsfeixiang($mylike);
+		foreach($mylike as $k=>$v){
+			
+			if ($v['fcommission']>0) {
+				$mylike[$k]['return_title'] =$str."".$v['fcommission'];
+			} else {
+				$mylike[$k]['return_title'] = '无存款';
+			}
+			unset($mylike[$k]['tdj_data'],$mylike[$k]['detailurl']);	
+		}
+		
+		zfun::fecho("我的收藏",$mylike,1);
+	
 	}
 	public function gethelper() {
 		if (!$this -> sign()) {
@@ -1568,6 +1480,7 @@ class apiAction extends Action {
 			"content"=>filter_check($_POST['content']),
 			"contact"=>filter_check($_POST['contact']),
 			"type"=>intval($_POST['type']),
+			"time"=>time(),
 		);
 		zfun::f_insert("IdeasBox",$arr);
 		zfun::fecho("反馈成功",1,1);
@@ -1806,12 +1719,12 @@ class apiAction extends Action {
 			$data['is_showcate']=1;
 			return $data;
 		}
-		if($type_onoff==1&&$type_dtktype=='tqg'){
+		if(($type_onoff==1||$type_onoff==3)&&$type_dtktype=='tqg'){
 			$data['view_type']=2;
 			$data['is_showcate']=0;
 			return $data;
 		}
-		if($type_onoff==1&&$type_dtktype=='jhs'){
+		if(($type_onoff==1||$type_onoff==3)&&$type_dtktype=='jhs'){
 			$data['view_type']=1;
 			$data['is_showcate']=0;
 			return $data;
@@ -2004,7 +1917,6 @@ class apiAction extends Action {
 			"9"=>"app_20_dtk_type",
 		);
 		
-		
 		//fpre($tmp[$type]);
 		
 		$str=",shouye,cgf,yhq,1,9,";
@@ -2078,7 +1990,7 @@ class apiAction extends Action {
 			unset($category[$k]['img']);
 			$category[$k]['keyword']=$v['category_name'];
 		}
-		if(in_array($_POST['type'],array(1,3,9,10,29,28,27,"pub_jingdongshangpin"))){
+		if(in_array($_POST['type'],array(1,3,9,10,29,28,27,36,"pub_jingdongshangpin"))){
 			$arr=array();
 			$arr[]=array(
 				"id"=>0,
@@ -2626,13 +2538,25 @@ class apiAction extends Action {
 		$orderModel = $this -> getDatabase('Order');
 		$authenticationModel = $this -> getDatabase('Authentication');
 		$user = $userModel -> selectRow('token="' . $_POST['token'] . '"', "tb_app_pid,ios_tb_app_pid,fanTotal_time,tg_code,hhr_gq_time,id,is_sqdl,tg_pid,loginname,is_agent,vip,phone,email,nickname,realname,sex,qq,integral,head_img,checkNum,checkTime,taobao_au,qq_au,sina_au,zfb_au,weixin_au,vip,money,growth,three_nickname,address,extend_id,order_num,sordernum,lovenum,flower,xflower,hflower,fans,people,commission,zztx,lhbtx,hbtx,operator_lv,platform");
+		
+		$setstr="mem_qiaodao_onoff,jf_name,user_top_img,fxdl_zdssdl_onoff,jf_ratio,vip_name".$user['vip'].",is_vip_extend_onoff";
+		$setstr.=",operator_wuxian_bili,operator_name,operator_name_2";//运营商
+		$setstr.=",fxdl_hhrshare_onoff";//普通会员是否可分享
+		$set=zfun::f_getset($setstr);
+		$set['fxdl_hhrshare_onoff']=intval($set['fxdl_hhrshare_onoff']);
+		
 		$uid=$user['id'];
+
+		//判断注册返还佣金
+		actionfun("timer/register_commission");
+		register_commissionAction::one($uid);
+
 		$user['platform']=self::check_platform();
 		//分配会员推广位
 		if(!empty($_POST['token'])){
 			$user['is_sqdl']=intval($user['is_sqdl']);
 			$user['operator_lv']=intval($user['operator_lv']);
-			if(empty($user['tg_pid'])&&($user['is_sqdl']||$user['operator_lv'])){//代理推广位
+			if(empty($user['tg_pid'])&&($user['is_sqdl']||$user['operator_lv']||$set['fxdl_hhrshare_onoff'])){//代理推广位
 				$tmp=zfun::f_row("Tbpid","uid='0' and type='agent'");
 				if(!empty($tmp)){
 					zfun::f_update("User","id='".$user['id']."'",array("tg_pid"=>$tmp['adzone_id']));
@@ -2684,12 +2608,7 @@ class apiAction extends Action {
 		$jf_return = $this -> getSetting('jf_ratio');
 		$jf_ratio = $this -> getSetting('jf_ratio');
 		$user['vip']=self::getSetting("vip_name".$user['vip']);*/
-		$setstr="mem_qiaodao_onoff,jf_name,user_top_img,fxdl_zdssdl_onoff,jf_ratio,vip_name".$user['vip'].",is_vip_extend_onoff";
 		
-		//运营商
-		$setstr.=",operator_wuxian_bili,operator_name,operator_name_2";
-		
-		$set=zfun::f_getset($setstr);
 		
 		$jfname=$set['jf_name'];
 		$jf_return=$jf_ratio=$set['jf_ratio'];
@@ -2859,14 +2778,14 @@ class apiAction extends Action {
 			$user['is_sqdl']=0;
 			$user['is_hhr']=0;
 			$user['hhr_checks']=3;
-			$user['vip_name']='普通会员';
+			$user['vip_name']=self::getSetting("fxdl_name".($user['is_sqdl']+1));
 		}
 		if($user['is_sqdl']==0&&$user['operator_lv']==0){//jj explosion
 			$user['dl_checks']=3;
 			$user['is_sqdl']=0;
 			$user['is_hhr']=0;
 			$user['hhr_checks']=3;
-			$user['vip_name']='普通会员';
+			$user['vip_name']=self::getSetting("fxdl_name".($user['is_sqdl']+1));
 		}
 		zfun::isoff($user);
 		if($user['operator_lv']==1)$user['vip_name']=$set['operator_name'];
@@ -2934,6 +2853,7 @@ class apiAction extends Action {
 		}
 		if (!empty($_POST['phone'])) {
 			$phoneuser = zfun::f_row("User",'phone='.$_POST['phone']);
+			$data['nexus_time']=0;
 			if(!empty($_POST['tid'])){
 				$tg_code_low=strtolower($_POST['tgid']);
 				$count=zfun::f_row("User","tg_code_low='".$tg_code_low."' and tg_code_low<>''");
@@ -3182,18 +3102,15 @@ class apiAction extends Action {
 	//jj explosion
 	public function reg_shijian($uid=0){
 		if(empty($uid))$this -> fecho(0, 1, "注册失败!");
-		$set=zfun::f_getset("jf_reg,commission_reg,xinren_hongbao");
+		$set=zfun::f_getset("jf_reg,xinren_hongbao");
 		$jf_reg = floatval($set['jf_reg']);
-		$commission_reg=floatval($set['commission_reg']);
 		if($jf_reg>0){
 			zfun::f_adddetail("注册送 ".$jf_reg ." 积分",$uid,6,0,$jf_reg);
 		}
 		$webname=self::getSetting("webset_webnick");
 		$sysMsgModel = $this -> getDatabase('sysMsg');
 		$sysMsgModel -> insert(array('time' => time(), 'uid' => $uid, 'msg' => '尊敬的用户，欢迎来到'.$webname, 'title' => '温馨提示'));		
-		if($commission_reg>0){
-			zfun::f_adddetail("注册送 ".$commission_reg ." 佣金",$uid,0,0,$commission_reg);
-		}
+		
 		$invite_hongbao=floatval($set['xinren_hongbao']);	
 		//注册送积分事件
 		if($invite_hongbao>0&&(!empty($_POST['tid'])||!empty($_POST['tgid']))){
@@ -3239,10 +3156,9 @@ class apiAction extends Action {
 		 $tgid = 0;
 		 }*/
 		$webname=self::getSetting("webset_webnick");
-		$set=zfun::f_getset("jf_reg,commission_reg,xinren_hongbao,blocking_price_endday");	//百里，追加blocking_price_endday
+		$set=zfun::f_getset("jf_reg,xinren_hongbao,blocking_price_endday");	//百里，追加blocking_price_endday
 		$jf_reg = floatval($set['jf_reg']);
 		$xinren_hongbao=floatval($set['xinren_hongbao']);
-		$commission_reg=floatval($set['commission_reg']);
 		if (!empty($_POST['type'])) {
 			$extendreg=intval(self::getSetting("extendreg"));
 			if(empty($_POST['tid'])&&!empty($extendreg)){
@@ -3259,13 +3175,13 @@ class apiAction extends Action {
 				}
 				$_POST['tid']=$tgids;
 				if(empty($tmp))$this->fecho(null,0,"推荐人不存在");
-				$commission_reg+=$xinren_hongbao;
+				$commission+=$xinren_hongbao;
 			}
 			switch($_POST['type']) {
 				case 1 :
 					//$arr = explode("@", $_POST['username']);
 					$token = md5(base64_encode($_POST['username'] . time() . uniqid(rand())));
-					$userdata = array('phone' => $_POST['username'], 'nickname' => $_POST['username'], 'password' => $_POST['pwd'], 'integral' => $jf_reg, 'reg_time' => time(),'login_time'=>time(),"commission"=>$commission_reg, 'token' => $token);
+					$userdata = array('phone' => $_POST['username'], 'nickname' => $_POST['username'], 'password' => $_POST['pwd'], 'integral' => $jf_reg, 'reg_time' => time(),'login_time'=>time(),"commission"=>$commission, 'token' => $token);
 
 					//百里
 					$blocking_price_endtime = $set['blocking_price_endday'] > 0 ? $set['blocking_price_endday'] : 3;
@@ -3274,7 +3190,6 @@ class apiAction extends Action {
 					$userdata["blocking_price"] = $commission_reg;	//*****需要注释掉commission字段
 					$userdata["blocking_price_endtime"] = $blocking_price_endtime;	//首单结束期限
 					$userdata["commission"] = 0;	//重置
-
 
 					if (!empty($_POST['tid'])) {
 						$userdata['extend_id'] = $_POST['tid'];
@@ -3292,10 +3207,9 @@ class apiAction extends Action {
 					break;
 				case 2 :
 					$jf_reg = $this -> getSetting('jf_reg');
-					$commission_reg=floatval(self::getSetting("commission_reg"));
 					$arr = explode("@", $_POST['username']);
 					$token = md5(base64_encode($_POST['username'] . time() . uniqid(rand())));
-					$userdata = array('email' => $_POST['username'], 'nickname' => $arr[0], 'password' => $_POST['pwd'], 'integral' => $jf_reg, 'reg_time' => time(),"login_time"=>time(),"commission"=>$commission_reg, 'token' => $token);
+					$userdata = array('email' => $_POST['username'], 'nickname' => $arr[0], 'password' => $_POST['pwd'], 'integral' => $jf_reg, 'reg_time' => time(),"login_time"=>time(), 'token' => $token);
 
 					//百里
 					$blocking_price_endtime = $set['blocking_price_endday'] > 0 ? $set['blocking_price_endday'] : 3;
@@ -3305,6 +3219,7 @@ class apiAction extends Action {
 					$userdata["blocking_price_endtime"] = $blocking_price_endtime;	//首单结束期限
 					$userdata["commission"] = 0;	//重置
 					
+
 					if (!empty($_POST['tid'])) {
 						$userdata['extend_id'] = $_POST['tid'];
 					}
@@ -3409,11 +3324,9 @@ class apiAction extends Action {
 		if (empty($_POST['type'])) {
 			$this -> fecho(null, 0, "缺少参数");
 		}
-		$commission_reg=floatval(self::getSetting("commission_reg"));
-		$set=zfun::f_getset("jf_reg,commission_reg,xinren_hongbao,blocking_price_endday");	//百里，追加blocking_price_endday
+		$set=zfun::f_getset("jf_reg,xinren_hongbao,blocking_price_endday");	//百里，追加blocking_price_endday
 		$jf_reg = floatval($set['jf_reg']);
 		$xinren_hongbao=floatval($set['xinren_hongbao']);
-		$commission_reg=floatval($set['commission_reg']);
 		switch($_POST['type']) {
 			case 1 :
 				$openid = $_POST["openid"];
@@ -3507,7 +3420,6 @@ class apiAction extends Action {
 				$userdata['token'] = $token = md5(base64_encode($weixin . time() . uniqid(rand())));
 				break;
 		}
-		// $userdata['commission']=$commission_reg;
 
 		//百里
 		//首单结束期限
@@ -3548,16 +3460,20 @@ class apiAction extends Action {
 			case 1 :
 				//我的消息
 				$where = "display=0 AND uid=" . $userid['id'];
+				$title='我的消息';
 				break;
 			case 2 :
 				//系统消息
 				$where = "display=1";
+				$title='系统消息';
 				break;
 		}
 		$msg = $sysMsgModel -> select($where, 'id,msg,time,title,type',NULL,NULL,"time DESC");
 		foreach ($msg as $k => $v) {
 			$msg[$k]['time'] = date("Y-m-d", $v['time']);
+			if(empty($v['title']))$msg[$k]['title']=$title;
 		}
+		
 		$this -> fecho($msg, 1, '成功');
 	}
 	public function getMsgDetail() {
@@ -3621,7 +3537,7 @@ class apiAction extends Action {
 		$this -> setCookieUser($user['id'], $user['nickname'], 14 * 24 * 3600);
 		$data=appcomm::parametercheck("o_type,token");
 		$shop_id=0;
-		$where = "id>0";
+		$where = "uid='{$uid}'";
 		switch($_POST['o_type']) {
 			case 1 :
 				$where .= ' AND orderType=1 ';
@@ -3641,7 +3557,7 @@ class apiAction extends Action {
 				$shop_id=1;
 				break;
 		}
-		switch($_POST['statu']) {
+		switch(intval($_POST['statu'])) {
 			case 1 :
 				$where .= ' AND (status="订单结算" or status="订单付款") AND returnstatus=0 ';
 				break;
@@ -3651,18 +3567,23 @@ class apiAction extends Action {
 			case 3 :
 				$where .= ' AND status="订单失效"';
 				break;
+			case 4:
+				$where.=" and status IN('订单成功','订单结算')";
+				break;
 		}
-		$where .= ' AND uid=' . $uid." ";
 		$arr = array();
 		$fi="now_user,id,orderId,postage,uid,share_uid,goodsNum,goodsId,status,createDate,payDate,status,orderType,goodsInfo,commission,goods_img,return_commision,estimate,payment,returnstatus,choujiang_n,choujiang_sum,choujiang_data,choujiang_money";
+		if(!empty($_GET['show_where']))fpre($where);
 		$order = appcomm::f_goods("Order", $where, $fi, 'createDate desc', NULL, 20);
 		include_once ROOT_PATH."Action/index/appapi/commGetMore.action.php";
 		$arr=commGetMoreAction::firstOrder($order,$user);
-
+		$shop_types=array("0"=>"淘宝","1"=>"淘宝","jd"=>'京东',"pdd"=>'拼多多');
+		
 		//图片缺失处理
 		actionfun("comm/tbmaterial");
 		foreach($arr as $k=>$v){
-			if(empty($v['goods_img'])){
+			$arr[$k]['shop_type']=$shop_types[$v['orderType']];
+			if(empty($v['goods_img'])&&$v['orderType']=='1'){
 				$tmp=tbmaterial::id($v['goodsId']);
 				if(!empty($tmp)){
 					$arr[$k]['goods_img']=$tmp['goods_img'];

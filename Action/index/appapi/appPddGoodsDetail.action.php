@@ -7,6 +7,51 @@ actionfun("appapi/goods_fenxiang");
 actionfun("appapi/gotopinduoduo");
 actionfun("appapi/appJdGoodsDetail");
 class appPddGoodsDetailAction extends Action{
+	public static function pass_goods(){
+		$fnuo_id=filter_check($_POST['fnuo_id']);
+		$data=json_decode($_POST['data'],true);
+		$data=self::comm_goods($data);
+		
+		zfun::fecho("传输处理",$data,1);
+	}
+	public static function comm_goods($data=array()){
+		$uid=$GLOBALS['usermsg']['id'];
+		$user=$GLOBALS['usermsg'];
+		$data['is_store']=0;
+		$data['shop_id']=5;
+		$data['shop_type']='拼多多';
+		$data['pdd']=1;
+		$data['shop_img']=INDEX_WEB_URL."View/index/img/appapi/comm/pdd.png";
+		$data['yhq_url']=$data['fnuo_url']=self::getUrl("gotopinduoduo","index",array("gid"=>$data['fnuo_id']),"appapi");
+		if(!empty($data['yhq_start_time'])&&!empty($data['yhq_start_time'])){
+			$data['yhq_use_time']=date("Y.m.d",$data['yhq_start_time'])."-".date("Y.m.d",$data['yhq_end_time']);
+		}
+		if(!empty($data['yhq_price']))$data['yhq_span']=$data['yhq_price']."元优惠券";
+		newgoods_detailAction::footmark($uid,$data);//足迹
+		//轮播图
+		$data['imgArr']=array($data['goods_img']);
+		if(!empty($data['goods_img_list']))$data['imgArr']=$data['goods_img_list'];//商品图片集
+		$data['dpArr']=array();
+		$data['xggoodsArr']=array();
+		$data['goods_ico_one']=INDEX_WEB_URL."View/index/img/appapi/comm/list_discount_quan.png";
+		if(!empty($data['yhq_price']))$data['goods_ico_one']=INDEX_WEB_URL."View/index/img/appapi/comm/list_after_quan.png";
+		
+		//这里是收藏
+		$mywhere="goodsid='".$data['fnuo_id']."' AND uid='".intval($uid)."'";
+		$my=zfun::f_count("MyLike",$mywhere);
+		$data['is_collect']=0;$data['is_mylike']=0;
+		if($my>0){$data['is_collect']=1;$data['is_mylike']=1;}
+		unset($data['goods_img_list']);
+		$data['cate_id']=$data['cid'];	
+		$data['quan_bjimg']=INDEX_WEB_URL."View/index/img/appapi/comm/quan_bjimg.png";
+		$data['goods_ico_one']=INDEX_WEB_URL."View/index/img/appapi/comm/list_discount_quan.png";
+		if(!empty($data['yhq_price']))$data['goods_ico_one']=INDEX_WEB_URL."View/index/img/appapi/comm/list_after_quan.png";
+		$data['detail_goods_sjimg']=INDEX_WEB_URL."View/index/img/appapi/comm/detail_goods_sjimg.png";
+		$data['detail_goods_fxzimg']=INDEX_WEB_URL."View/index/img/appapi/comm/detail_goods_fxzimg.png";
+		actionfun("appapi/goods_detail_fanli");
+		$data=goods_detail_fanliAction::index($user,$data);
+		return $data;
+	}
 	//详情
 	public function pddIndex(){
 		appcomm::signcheck();
@@ -18,23 +63,16 @@ class appPddGoodsDetailAction extends Action{
 			$tgidkey = $this -> getApp('Tgidkey');
 			$uid1 = $tgidkey -> addkey($uid);
 			if(!empty($user['tg_code']))$uid1=$user['tg_code'];
+			$user['tguid']=$uid1;
+			$GLOBALS['usermsg']=$user;
 		}
+		if(!empty($_POST['data']))self::pass_goods();
 		$lv=(intval($user['is_sqdl'])+1);
 		//调用拼多多获取商品信息
 		$data=pinduoduo::id($fnuo_id);
 		if(empty($data))zfun::fecho("拼多多详情",$data,1);
 		$data=zfun::f_fgoodscommission(array($data));$data=reset($data);
-		$data['is_store']=0;
-		$data['shop_id']=5;
-		$data['shop_type']='拼多多';
-		$data['pdd']=1;
-		$data['shop_img']=INDEX_WEB_URL."View/index/img/appapi/comm/pdd.png";
-		$data['yhq_url']=$data['fnuo_url']=self::getUrl("gotopinduoduo","index",array("gid"=>$data['fnuo_id']),"appapi");
-		if(!empty($data['yhq_start_time'])&&!empty($data['yhq_start_time'])){
-			$data['yhq_use_time']=date("Y.m.d",$data['yhq_start_time'])."-".date("Y.m.d",$data['yhq_end_time']);
-		}
-		if(!empty($data['yhq_price']))$data['yhq_span']=$data['yhq_price']."元优惠券";
-		newgoods_detailAction::footmark($uid,$goods);//足迹
+		
 		$data['share_url'] = ($this -> getUrl('invite_friend', 'goods_detail', array('tgid' => $uid1,"id"=>$data['fnuo_id']),'new_share'));
 		$data['str']='';
 		$set=zfun::f_getset("hhrshare_noflstr,goods_detail_str1,goods_detail_str2,app_fanli_onoff,fx_goods_fl,CustomUnit,hhrapitype,fxdl_fxyjbili".$lv.",fxdl_show_fl".$lv);// jj explosion
@@ -62,28 +100,11 @@ class appPddGoodsDetailAction extends Action{
 			}
 		}
 		if($set['app_fanli_onoff']==0)$data['str']="";
-		$data['goods_ico_one']=INDEX_WEB_URL."View/index/img/appapi/comm/list_discount_quan.png";
-		if(!empty($data['yhq_price']))$data['goods_ico_one']=INDEX_WEB_URL."View/index/img/appapi/comm/list_after_quan.png";
-		//轮播图
-		$data['imgArr']=array($data['goods_img']);
-		if(!empty($data['goods_img_list']))$data['imgArr']=$data['goods_img_list'];//商品图片集
-		$data['dpArr']=array();
-		
-		
-		$data['xggoodsArr']=array();
-		
+	
 		//拼多多商品详情图片
 		$data['detailArr']=self::getpddgoodsinfoimg($fnuo_id);
-		//这里是收藏
-		$mywhere="goodsid='".$data['fnuo_id']."' AND uid='".intval($uid)."'";
-		$my=zfun::f_count("MyLike",$mywhere);
-		$data['is_collect']=0;$data['is_mylike']=0;
-		if($my>0){$data['is_collect']=1;$data['is_mylike']=1;}
-		unset($data['goods_img_list']);
-		$data['cate_id']=$data['cid'];	
-		$data['quan_bjimg']=INDEX_WEB_URL."View/index/img/appapi/comm/quan_bjimg.png";
-
-		$data=newgoods_detailAction::getfanli($data,$user);
+		
+		$data=self::comm_goods($data);
 
 		//百里
 		//获取当前会员等级比例
@@ -255,9 +276,11 @@ class appPddGoodsDetailAction extends Action{
 		$con=str_replace("{邀请码}",$tid,$con);
 		$commission=goods_fenxiangAction::get_user_bili($garr);
 		$con=str_replace("{自购佣金}",$commission,$con);
+		$con=str_replace("{分享人自购佣金}",$garr['fcommission'],$con);
 		$data['goods_img']=array($garr['goods_img']);
 		if(!empty($garr['goods_img_list']))$data['goods_img']=$garr['goods_img_list'];
 		foreach($data['goods_img'] as $k=>$v){
+			if($k!=0)continue;
 			$data['goods_img'][$k]=INDEX_WEB_URL."?mod=appapi&act=appJdGoodsDetail&img=".urlencode($v)."&ctrl=getcode&pdd=1&fnuo_id=".$fnuo_id."&getGoodsType=".$_POST['getGoodsType']."&token=".$_POST['token'];
 		}
 
@@ -292,6 +315,7 @@ class appPddGoodsDetailAction extends Action{
 		$data['fx_commission'] = sprintf("%.2f", $data['goods_price'] * ($data['commission']/100) * $hs_bili);
 		$data['fcommission'] = $data['fx_commission'];
 		$data['fxz'] =  str_replace($data['old_fx_commission'], $data['fx_commission'], $data['fxz']);
+		
 		
 		zfun::fecho("多图分享",$data,1,1);
 	}
@@ -330,6 +354,7 @@ class appPddGoodsDetailAction extends Action{
 		$data['str2']=str_replace("{邀请码}",$tid,$data['str2']);
 		$commission=goods_fenxiangAction::get_user_bili($garr);
 		$data['str2']=str_replace("{自购佣金}",$commission,$data['str2']);
+		$data['str2']=str_replace("{分享人自购佣金}",$garr['fcommission'],$data['str2']);
 		$data['title1']=$garr['goods_title'];
 		$data['goods_img']=$garr['goods_img'];
 		$data['title2']=$set['webset_webnick'];

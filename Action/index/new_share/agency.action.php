@@ -17,13 +17,13 @@ class agencyAction extends Action{
           $money = self::getSetting("fxdl_money" . $i);
 		  if(empty($money))$money="免费";
 		  else $money.="元";
-		  $fxdldata[$i]['title']=$money."升级".$fxdldata[$i]['title'];
+		   $fxdldata[$i]['title']=$money."升级".$fxdldata[$i]['title'];
 		 }
 		$fxdldata=array_values($fxdldata);
 		$set['dl_list']=array();
 		$set['dl_hy_xz']=filter_check($set['dl_hy_xz']);
-		$qian=array(" ","　","\t","\n","\r");
-  		$set['dl_hy_xz']=str_replace($qian, '', $set['dl_hy_xz']);
+		$qian=array(" ","　","\t","\n","\r");  
+  		$set['dl_hy_xz']=str_replace($qian, '', $set['dl_hy_xz']);    
 		if(!empty($fxdldata))$set['dl_list']=$fxdldata;
 		if(empty($set['dl_hy_title']))$set['dl_hy_title']="会员需知 MEMBERS NEED";
 		if(empty($set['dl_hy_xz']))$set['dl_hy_xz']="凡是入驻".$set['AppDisplayName']."平台，代理技术服务费概不退，还请认真考虑后加入！";
@@ -31,10 +31,9 @@ class agencyAction extends Action{
 		if(!empty($set['dl_bjt']))$set['dl_zdjs']=UPLOAD_URL."slide/".$set['dl_zdjs'];
 		$set['zhushi']="注：若升级到更高等级需缴纳相应的费用";
 		unset($set['AppDisplayName']);
-
 		zfun::fecho("申请页面",$set,1);
 	}
-
+	
 	/*海报*/
 	public function ssAnnual(){
 		appcomm::signcheck();
@@ -51,7 +50,7 @@ class agencyAction extends Action{
 			$url=INDEX_WEB_URL."?mod=new_share&act=agency&ctrl=getcode&token=".$_POST['token']."&id=".$v['id']."&time=".time();
 			$model[$k]['image']=$url;
 			unset($model[$k]['content_first']);unset($model[$k]['img_max']);
-
+			
 		}
 		zfun::fecho("海报",$model,1);
 	}
@@ -64,7 +63,7 @@ class agencyAction extends Action{
 		if(empty($model['content_first']))$model['content_first']='扫一扫注册下载'.$set['AppDisplayName'];
 		self::qrcode2($model,$user,1);
 	}
-
+	
 	public function dl_list(){
 		appcomm::signcheck();
 		if(empty($_POST['token']))zfun::fecho("请登录");
@@ -100,13 +99,13 @@ class agencyAction extends Action{
 	}
 	public function dl_order(){
 		$user=appcomm::signcheck(1);$uid=$user['id'];
-		$where="(status='订单付款' or status='订单结算') and uid='{$uid}'";
-
+		$where="(status IN('订单付款','订单结算','订单成功')) and uid='{$uid}'";
+		
 		//$fi="id,orderId,now_user,fenxiang_returnstatus,share_uid,uid,postage,goodsNum,info,shop_title,goodsId,status,createDate,payDate,status,orderType,goodsInfo,commission,goods_img,return_commision,estimate,payment,returnstatus,choujiang_n,choujiang_sum,choujiang_data,choujiang_money";
 		$num=20;
 		$order = appcomm::f_goods("Rebate", $where, $fi, 'order_create_time desc', NULL, $num);
 		$arr=commGetMoreAction::secondOrder($order,$user);
-
+		
 		$sarr=array("创建订单"=>"待付款","订单付款"=>"已付款","订单结算"=>"未到账","订单失效"=>"已失效");
 		$buy_user=zfun::f_kdata("User",$arr,"uid","id","id,extend_id,is_sqdl");
 		$invite_user=zfun::f_kdata("User",$buy_user,"extend_id","id","id,nickname,tg_pid,is_sqdl");
@@ -164,6 +163,7 @@ class agencyAction extends Action{
 		return self::rsaSign($str,app_alipay_rsa);
 	}
 	public static function tbsend($method,$arr){
+		$set=zfun::f_getset("app_alipay_payment_type,app_alipay_payment_http_type");
 		ksort($arr);
 		$biz_content=zfun::f_json_encode($arr);
 		$arr=array("biz_content"=>$biz_content);
@@ -175,6 +175,9 @@ class agencyAction extends Action{
 		$arr['timestamp']=date("Y-m-d H:i:s",time());
 		$arr['charset']="utf-8";
 		$arr['notify_url']="http://".$_SERVER['HTTP_HOST']."/payapi.php";
+		if($set['app_alipay_payment_http_type'].''=='1'){
+			$arr['notify_url']=str_replace("http://","https://",$arr['notify_url']);
+		}
 		$arr['sign']=self::apisign($arr);
 		//$url="https://openapi.alipay.com/gateway.do?";
 		$url='?';
@@ -249,7 +252,89 @@ class agencyAction extends Action{
 			}
 		}
 		return array("darr"=>$darr,"uids"=>$uids,"count"=>$cou);
+		
+	}
+	public static function qrcode2($arr,$user,$new=0){//生成二维码
+		$tgidkey = self::getApp('Tgidkey');
+		$tid = $tgidkey -> addkey($user['id']);
+		$user['tid'] = $tid;
+		if(!empty($user['tg_code']))$user['tid']=$user['tg_code'];
+		
+		$set=zfun::f_getset("share_host,haibao_share_onoff,android_url");
+		$url=self::getUrl('invite_friend', 'new_packet', array('tgid' => $user['tid']),'new_share');
+		if($set['haibao_share_onoff']==1)$url = (self::getUrl('down', 'supdownload', array('tgid' => $user['tid']),'appapi'));
+		if(!empty($set['share_host'])){
+			$url=str_replace(HTTP_HOST,$set['share_host'],$url);
+		}
+		$url4=$set['android_url'];
+		if(empty($url4))$url4=INDEX_WEB_URL."?act=api&ctrl=downloadfile";
+		if($set['haibao_share_onoff']==2)$url=$url4;
+		$data = array();
+		$data['width']=790;
+		$data['height']=1280;
+        $data['list'][0] = array(//背景图
+            "url" => UPLOAD_URL."model/".$arr['img_max'],
+            "x" => 0,
+            "y" => 0,
+            "width" => 790,
+            "height" => 1280,
+			"type"=>"png"
+        );
 
+         //百里.获取小程序二维码
+        // $hs_qrcode = self::get_hs_qrcode($tid);
+        // $hs_qrcode = json_decode($hs_qrcode);
+        // $hs_qrcode = $hs_qrcode->url;
+
+        //百里.替换域名生成二维码
+        $url = "http://".$set['share_host']."/?mod=appapi&act=down&ctrl=get_unionid&tgid=".$tid;
+
+        //百里.邀请码位置调整（不同位数）
+        $leftpx = 285 - ( strlen($user['tid']) - 5 ) * 8;
+
+        //百里.修改样式
+		$data['list'][1] = array(//二维码
+           // "url" => INDEX_WEB_URL."comm/qrcode/?url=".$arr."&size=10&codeKB=2",
+		   "url" => INDEX_WEB_URL."comm/qrcode/?url=".urlencode($url)."&size=10&codeKB=2",
+		   	// "url" => $hs_qrcode,	//开启此项需要开启获取小程序二维码
+            "x" => 291,
+            "y" => 1000,
+            "width" => 200,
+            "height" => 200,
+			"type"=>"png"
+        );
+       	$data['text'][0]=array(
+			"size"=>26,
+			"x"=>$leftpx,	//285,	//百里
+			"y"=>970,
+			"width" => 214,
+            "height" => 20,
+			"val"=>"邀请码".$user['tid'],
+			"color"=>0,
+		);
+		$data['text'][1]=array(
+			"size"=>16,
+			"x"=>230,
+			"y"=>1260,
+			"width" => 214,
+            "height" => 20,
+			"val"=>$arr['content_first'],
+			"color"=>0,
+		);
+		if($new==1){
+			fun("pic");
+			return pic::getpic($data);
+		}
+		$data=zfun::arr64_encode($data);
+		//zfun::head("jpg");
+		$url=INDEX_WEB_URL."comm/pic.php?pic_ctrl=getpic&data=".urlencode($data);
+		
+	//	echo "<img src='".$url."'>";;
+		//exit;
+		return $url;
+		//fpre($url);exit;
+		//echo zfun::get(INDEX_WEB_URL."comm/pic.php?type=getpic&data=".$data);
+		
 	}
 
 	//百里.获取二维码
@@ -276,89 +361,6 @@ class agencyAction extends Action{
         curl_close($ch);
 
         return $data;
-	}
-
-	public static function qrcode2($arr,$user,$new=0){//生成二维码
-		$tgidkey = self::getApp('Tgidkey');
-		$tid = $tgidkey -> addkey($user['id']);
-		$user['tid'] = $tid;
-		if(!empty($user['tg_code']))$user['tid']=$user['tg_code'];
-
-		$set=zfun::f_getset("share_host,haibao_share_onoff,android_url");
-		$url=self::getUrl('invite_friend', 'new_packet', array('tgid' => $user['tid']),'new_share');
-		if($set['haibao_share_onoff']==1)$url = (self::getUrl('down', 'supdownload', array('tgid' => $user['tid']),'appapi'));
-		if(!empty($set['share_host'])){
-			$url=str_replace(HTTP_HOST,$set['share_host'],$url);
-		}
-		$url4=$set['android_url'];
-		if(empty($url4))$url4=INDEX_WEB_URL."?act=api&ctrl=downloadfile";
-		if($set['haibao_share_onoff']==2)$url=$url4;
-		$data = array();
-		$data['width']=790;
-		$data['height']=1280;
-        $data['list'][0] = array(//背景图
-            "url" => UPLOAD_URL."model/".$arr['img_max'],
-            "x" => 0,
-            "y" => 0,
-            "width" => 790,
-            "height" => 1280,
-			"type"=>"png"
-        );
-
-        //百里.获取小程序二维码
-        // $hs_qrcode = self::get_hs_qrcode($tid);
-        // $hs_qrcode = json_decode($hs_qrcode);
-        // $hs_qrcode = $hs_qrcode->url;
-
-        //百里.替换域名生成二维码
-        $url = "http://".$set['share_host']."/?mod=appapi&act=down&ctrl=get_unionid&tgid=".$tid;
-
-        //百里.邀请码位置调整（不同位数）
-        $leftpx = 285 - ( strlen($user['tid']) - 5 ) * 8;
-
-        //百里.修改样式
-		$data['list'][1] = array(//二维码
-           // "url" => INDEX_WEB_URL."comm/qrcode/?url=".$arr."&size=10&codeKB=2",
-		   "url" => INDEX_WEB_URL."comm/qrcode/?url=".urlencode($url)."&size=10&codeKB=2",
-		   	// "url" => $hs_qrcode,	//开启此项需要开启获取小程序二维码
-            "x" => 291,
-            "y" => 1000,
-            "width" => 200,
-            "height" => 200,
-			"type"=>"png"
-        );
-       	$data['text'][0]=array(
-			"size"=>26,
-			"x"=>$leftpx,	//285,
-			"y"=>970,
-			"width" => 214,
-            "height" => 20,
-			"val"=>"邀请码".$user['tid'],
-			"color"=>0,
-		);
-		$data['text'][1]=array(
-			"size"=>16,
-			"x"=>230,
-			"y"=>1260,
-			"width" => 214,
-            "height" => 20,
-			"val"=>$arr['content_first'],
-			"color"=>0,
-		);
-		if($new==1){
-			fun("pic");
-			return pic::getpic($data);
-		}
-		$data=zfun::arr64_encode($data);
-		//zfun::head("jpg");
-		$url=INDEX_WEB_URL."comm/pic.php?pic_ctrl=getpic&data=".urlencode($data);
-
-	//	echo "<img src='".$url."'>";;
-		//exit;
-		return $url;
-		//fpre($url);exit;
-		//echo zfun::get(INDEX_WEB_URL."comm/pic.php?type=getpic&data=".$data);
-
 	}
 }
 ?>

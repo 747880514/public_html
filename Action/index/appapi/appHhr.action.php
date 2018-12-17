@@ -29,7 +29,6 @@ class appHhrAction extends Action{
 		$data['is_pay']=2;
 		if(!empty($user['is_sqdl']))zfun::fecho("你已经是合伙人");
 		$count=zfun::f_count("DLList","uid='$uid' AND checks<>2");
-
 		if(!empty($count))zfun::fecho("你已经申请过，请勿再次申请");
 		if(intval($set['hhr_openCheck'])==0){
 			$arr=array("is_sqdl" => $data['dl_dj']);
@@ -57,19 +56,17 @@ class appHhrAction extends Action{
 		$str=array("普通会员","合伙人");
 		$data['Vname']=self::getSetting("fxdl_name".($user['is_sqdl']+1));
 		$djtg_lv=intval(self::getSetting("fxdl_tjhydj_".($user['is_sqdl']+1)));
-
 		$operator_set=zfun::f_getset("operator_name,operator_name_2");
 		//如果是运营商
 		if($user['operator_lv'].''!='0')$data['Vname']=$operator_set['operator_name'];
 		if($user['operator_lv'].''=='2')$data['Vname']=$operator_set['operator_name_2'];
-
 		$att=self::getcarr($uid,"extend_id",$djtg_lv,"1");
 		$data['count']=$att['count'];
-
-		$result=order::get_lower($uid);
-		$data['allcount']=$result['count'];
+		//$result=order::get_lower($uid);
+		$count=zfun::f_count("Nexus","extend_uid='{$uid}' and bili<>0");
+		$data['allcount']=$count;
 		if($user['operator_lv'].''!='0'){//如果是运营商
-			$data['allcount']=zfun::f_count("User","operator_id='{$uid}'");
+			//$data['allcount']=zfun::f_count("User","operator_id='{$uid}'");
 		}
 		$data['xxjc']=INDEX_WEB_URL."?mod=wap&act=super_new&ctrl=appjc";
 		$data['question']=INDEX_WEB_URL."?mod=wap&act=super_new&ctrl=appquestion";
@@ -109,11 +106,7 @@ class appHhrAction extends Action{
 			include_once ROOT_PATH."Action/index/default/gototaobao.action.php";
 			if(empty($_POST['p']))$_POST['p']=1;
 			$data=array();
-
 			$data['page']=ceil($_POST['p']*5/100);
-
-
-
 			$p=$_POST['p'];
 			$pp=$_POST['p']-1;
 			$data['cid']=$_POST['cid'];
@@ -121,51 +114,36 @@ class appHhrAction extends Action{
 			$data['sort']=$_POST['sort'];
 			$data['start_price']=$_POST['start_price'];
 			$data['end_price']=$_POST['end_price'];
-
 			$goods=appdtkAction::index($data);
-
 			$j=0;
-
 			$i=1;
 			$goods=array_values($goods);
 			$arr=array();
 			foreach($goods as $k=>$v){
 				if(empty($v['goods_price']))continue;
 				if(empty($arr[$i]))$arr[$i]=array();
-
 				$arr[$i][]=$v;
-
 				if(count($arr[$i])==5)$i++;
-
 				//if(($k+1)==($i+1)*5){$i++;}
 			}
-
 			foreach($arr as $k=>$v){
 				if(empty($v))$arr[$k]=array();
 			}
-
 			$pa=($p-20*($data['page']-1));
 			if($pa<=0)$pa=1;
 			$p=$pa;
-
 			if(empty($arr[$p]))$arr[$p]=array();
-
-
 			foreach($arr[$p] as $k=>$v){
-
 				if(empty($v['shop_id']))$arr[$p][$k]['shop_id']=1;
-
 					$arr[$p][$k]['fnuo_id1']=$v['fnuo_id'];
 					$idd=explode("_",$v['fnuo_id']);
 					$itt=$idd[0];
 					$goodss=self::get_dtk_hyq($itt);
-
 					$arr[$p][$k]['commission']=$goodss['Commission'];
 					$arr[$p][$k]['fnuo_id']=$goodss['GoodsID'];
 					$arr[$p][$k]['yhq']=0;
 					//$arr[$p][$k]['yhq_url']=$att['yhq_url'];
 					$arr[$p][$k]['yhq_span']='';
-
 					if(!empty($v['yhq_price'])){
 						$arr[$p][$k]['yhq']=1;
 						$arr[$p][$k]['yhq_span']=$v['yhq_price']."元";
@@ -182,24 +160,19 @@ class appHhrAction extends Action{
 					if(!empty($uid)){
 						$count=zfun::f_count("MyLike","uid='$uid' AND goodsid='".($arr[$p][$k]['fnuo_id'])."'");
 						if($count>0)$arr[$p][$k]['is_mylike']=1;
-					}
-
+					}	
+				
 			}
-
-
-
+				
 			//$arr[$p]=array_values($arr[$p]);
-
 			$arr[$p]=zfun::f_fgoodscommission($arr[$p]);
 			/*foreach($arr[$p] as $k=>$v){
 				//$arr[$p][$k]['commission1']=$v['commission'];
 				//$arr[$p][$k]['fcommission']=zfun::dian($v['goods_price']*($v['commission']/100)*($bili/100));
 				//$arr[$p][$k]['commission']=zfun::dian($arr[$p][$k]['fcommission']/$v['goods_price']*100);
-
 			}*/
 			zfun::isoff($arr[$p]);
 			appcomm::goodsfeixiang($arr[$p]);
-
 			//jj explosion 因为接错字段先这样写着先
 			appcomm::goodsfanlioff($arr[$p]);
 			foreach($arr[$p] as $k=>$v){
@@ -213,16 +186,14 @@ class appHhrAction extends Action{
 		}
 		$fi="id,fnuo_id,goods_img,goods_title,stock,end_time,goods_price,highcommission,highcommission_start_time,highcommission_end_time,goods_type,commission,goods_cost_price,shop_id,goods_sales,yhq,yhq_url,yhq_span,yhq_price";
 		$goods=appcomm::f_goods("Goods",$where,$fi,$sort,$arr,$num);
-
 		$goods=zfun::f_fgoodscommission($goods);
-
 		foreach($goods as $k=>$v){
 			if(empty($v['shop_id']))$goods[$k]['shop_id']=1;
 			$goods[$k]['is_mylike']=0;
 			if(!empty($uid)){
 				$count=zfun::f_count("MyLike","uid='$uid' AND goodsid=".intval($v['id']));
 				if($count>0)$goods[$k]['is_mylike']=1;
-			}
+			}	
 			$goods[$k]['is_support']=0;
 			if(floatval($v['commission'])>0)$goods[$k]['is_support']=1;
 			if($v['shop_id']==4)$goods[$k]['shop_id']=3;
@@ -231,13 +202,11 @@ class appHhrAction extends Action{
 			if($v['stock']==0){$goods[$k]['is_qg']=1;$goods[$k]['qgStr']='已抢光';}
 			else $goods[$k]['is_qg']=0;
 			$jindu=$v['goods_sales']/($v['stock']+$v['goods_sales']);
-			$goods[$k]['jindu']=sprintf("%.2f",$jindu)*100;
-
+			$goods[$k]['jindu']=sprintf("%.2f",$jindu)*100; 
 			/*
 			$goods[$k]['fcommission']=zfun::dian($v['goods_price']*($v['commission']/100)*($bili/100));
 			$goods[$k]['commission']=zfun::dian($goods[$k]['fcommission']/$v['goods_price']*100);
 			*/
-
 			unset($goods[$k]['goods_type']);unset($goods[$k]['fbili']);unset($goods[$k]['zhe']);
 			unset($goods[$k]['fcommissionshow']);unset($goods[$k]['detailurl']);
 			unset($goods[$k]['highcommission']);unset($goods[$k]['highcommission_start_time']);unset($goods[$k]['highcommission_end_time']);
@@ -245,60 +214,35 @@ class appHhrAction extends Action{
 		//处理分享赚佣金
 		appcomm::goodsfeixiang($goods);
 		appcomm::goodsfanlioff($goods);
-
 		appcomm::set_app_cookie($goods);
 		zfun::fecho("商品列表",$goods,1);
 	}
 	public static function getin($str='',$str1='',$str2=''){
-
 		$str=explode($str1,$str);
-
 		if(empty($str[1]))$str[1]='';
-
 		$str=explode($str2,$str[1]);
-
-		return $str[0];
-
+		return $str[0];	
 	}
 	//大淘客数据
-
 	public static function get_dtk_hyq($fnuo_id=''){
-
 		if(empty($fnuo_id))return;
-
 		if(empty($GLOBALS['get_dtk_hyq_set']))$set=$GLOBALS['get_dtk_hyq_set']=zfun::f_getset("almm_yhq_moshi,almm_yhq_pid,almm_yhq_host,dtk_key");
-
 		$set=$GLOBALS['get_dtk_hyq_set'];
-
 		//if(empty($set['almm_yhq_pid'])||$set['almm_yhq_moshi']=='0')return;
-
 		$pid=$set['almm_yhq_pid'];
-
 		// 如果 推广的 pid存在 使用 推广的
-
 		//if(!empty($GLOBALS['taobaopid']))$pid=$GLOBALS['taobaopid'];
-
 		//if(empty($pid))return;
-
-
-
-		$url="http://api.dataoke.com/index.php?r=port/index&appkey=".$set['dtk_key']."&v=2&id=".$fnuo_id;
+		$url="http://api.dataoke.com/index.php?r=port/index&appkey=".$set['dtk_key']."&v=2&id=".$fnuo_id;	
 		$data1=self::read_app_cookie($url);
 		if(!empty($data1))return $data1;
 		$tmp=curl_get($url);
-
 		$data=json_decode($tmp,true);
-
 		if(empty($data))return;
-
 		$data=$data['result'];
-
 		$activityId=self::getin(str_replace("?","&",$data['Quan_link']),"&activity_id=","&");
-
 		if(!empty($activityId)){
-
 		$yhq_price=$GLOBALS['yhq_price']=floatval($data['Quan_price']);
-
 		$yhq_span=$GLOBALS['yhq_span']="领券".$yhq_price."元";
 		$data['yhq_url']="https://uland.taobao.com/coupon/edetail?activityId=$activityId&pid=$pid&itemId=$fnuo_id&src=tkzs_1&dx=1";
 		self::set_app_cookie($data,86400,$url);
@@ -309,67 +253,42 @@ class appHhrAction extends Action{
 		return $data;
 	}
 	//设置缓存
-
 	public static function set_app_cookie($data=array(),$end_time=86400,$url='',$app=0,$t=0){
 		//$t是因为有个地方要用到token了
 		if(!empty($_GET['cookie'])&&$_GET['cookie']=="off")return;//测试用
-
 		$c=$url;
 		if($app==1){
 			if(!isset($_GET['ctrl']))$_GET['ctrl']='';
-
 			foreach($_POST as $k=>$v){
-
 				if($k=='time'||$k=='sign')continue;
-
 				if(strstr($_GET['ctrl'],"goods")==false&&$k=='token'&&$t==0)continue;
-
 				$c.=$k.$v;
-
 			}
 		}
 		$c=md5($c);
-
 		$url=ROOT_PATH."Temp/dgapp/".$c.".cache";
-
 		zfun::wfile($url,json_encode(array("data"=>$data,"end_time"=>time()+$end_time)));
-
 	}
 	//读取缓存
-
 	public static function read_app_cookie($url,$app=0,$t=0){
 		//$t是因为有个地方要用到token了
 		if(!empty($_GET['cookie'])&&$_GET['cookie']=="off")return;//测试用
-
 		$c=$url;
 		if($app==1){
 			if(!isset($_GET['ctrl']))$_GET['ctrl']='';
-
 			foreach($_POST as $k=>$v){
-
 				if($k=='time'||$k=='sign')continue;
-
 				if(strstr($_GET['ctrl'],"goods")==false&&$k=='token'&&$t==0)continue;
-
 				$c.=$k.$v;
-
 			}
 		}
-
 		$c=md5($c);
-
 		$url=ROOT_PATH."Temp/dgapp/".$c.".cache";
-
 		if(file_exists($url)==false)return;
-
 		$data=json_decode(zfun::get($url),true);
-
 		if($data['end_time']<time())return;
-
 		if(!empty($data['data']['success'])){return ($data['data']);}
-
 		return $data['data'];
-
 	}
 	/*商品一级分类*/
 	public function getCate(){
@@ -399,14 +318,12 @@ class appHhrAction extends Action{
 	/*英雄榜*/
 	public function yqFriend(){
 		appcomm::signcheck();
-
 		//排行榜
 		$p=intval($_POST['p']);
 		if(empty($p))$p=1;
 		$num=20;
 		$phuser=appcomm::f_goods("User","dlfl_sum>0","head_img,nickname,dlfl_sum","dlfl_sum DESC",NULL,$num);
 		foreach($phuser as $k=>$v){
-
 			$phuser[$k]['nickname']=self::xphone($v['nickname']);
 			$head_img=$v['head_img'];
 			if(empty($head_img))$head_img="default.png";
@@ -419,40 +336,34 @@ class appHhrAction extends Action{
 			else if($k==2&&intval($_POST['p'])<2)$phuser[$k]['logo']=INDEX_WEB_URL."View/index/img/wap/comm/invite_list_tong.png";
 			$phuser[$k]['commission_sum']=zfun::dian($v['dlfl_sum']);
 		}
-
 		zfun::fecho("英雄榜",$phuser,1);
 	}
 	/*我的粉丝*/
 	public function myFan(){
 		$user=appcomm::signcheck(1);$uid=$user['id'];
-		$result=order::get_lower($uid);
-		$uids=$result['uids'];
-		/*全部的佣金*/
-		$where_hhr="uid IN(".$uids.") and extend_id='$uid'";
-		if(!empty($_GET['show_where']))fpre($where_hhr);
-		$sum=zfun::f_sum("HhrNextJl",$where_hhr,"sum");
-		$data['sum']=$sum;
-		$data['count']=$result['lower_count'];
-		$where="id IN(".$uids.") and id<>$uid";
+		$data['sum']=zfun::f_sum("Rebate","uid='{$uid}' and buy_share_uid<>'{$uid}' and returnstatus=1","fcommission");
+		$data['count']=zfun::f_count("Nexus","extend_uid='{$uid}' and bili > 0");
 		$data['fan']=array();
-		/*佣金排序方法*/
-		if(intval($_POST['sort'])>2){
-			$url=zfun::thisurl();
-			$data['fan']=self::next_fl_px($where,$uid,$url);
-			zfun::fecho("我的粉丝",$data,1);
-		}
-		$sort=self::getSort1($_POST['sort']);
-		$user1=appcomm::f_goods("User",$where,"id,head_img,is_sqdl,nickname,reg_time,phone,tg_pid,tb_app_pid,ios_tb_app_pid",$sort,NULL,20);	//百里追加
-		$hhr_next_fl=zfun::f_kdata("HhrNextJl",$user1,"id","uid","uid,sum","  extend_id='$uid'");
-
-		foreach($user1  as $k=>$v){
-			$head_img=$v['head_img'];
+		$sort_arr=array(
+			"0"=>"lower_offer desc",//默认
+			"1"=>"lower_reg_time desc",
+			"2"=>"lower_reg_time asc",
+			"3"=>"lower_offer desc",
+			"4"=>"lower_offer asc",
+		);
+		$sort=$sort_arr[intval($_POST['sort']).''];
+		$where="extend_uid='{$uid}' and bili > 0";
+		$nexus=appcomm::f_goods("Nexus",$where,NULL,$sort,NULL,20);
+		//fpre(count($user1));
+		$nexus_user=zfun::f_kdata("User",$nexus,"lower_uid","id","id,head_img,is_sqdl,nickname,reg_time,phone,tg_pid,tb_app_pid,ios_tb_app_pid");	//百里追加
+		foreach($nexus as $k=>$v){
+			$one_user=$nexus_user[$v['lower_uid'].''];
+			$head_img=$one_user['head_img'];
 			if(empty($head_img))$head_img='default.png';
 			if(strstr($head_img,"http")==false)$head_img=UPLOAD_URL."user/".$head_img;
-			$user1[$k]['head_img']=$head_img;
-
-			$user1[$k]['nickname'] = str_replace("****", "***", self::xphone($v['nickname']));
-			$user1[$k]['Vname']=self::getSetting("fxdl_name".($v['is_sqdl']+1));
+			$nexus[$k]['head_img']=$head_img;
+			$nexus[$k]['nickname']=self::xphone($one_user['nickname']);
+			$nexus[$k]['Vname']=self::getSetting("fxdl_name".($one_user['is_sqdl']+1));
 
 			//百里.展示状态
 			//仅锁粉待激活（未填写手机号）
@@ -494,32 +405,29 @@ class appHhrAction extends Action{
 				$nexus[$k]['Vname'] .= '/'.$one_user['phone'];
 			}
 
-			$user1[$k]['commission']=zfun::dian($hhr_next_fl[$v['id']]['sum']);
-
+			$nexus[$k]['commission']=zfun::dian($v['lower_offer']);
+			$nexus[$k]['reg_time']=$v['lower_reg_time'];
 		}
 		$set=zfun::f_getset("CustomUnit,YJCustomUnit");
 		$data['str1']=$set['CustomUnit'];
 		$data['str2']=$set['YJCustomUnit'];
-		if(!empty($user1))$data['fan']=$user1;
-		zfun::fecho("我的粉丝2",$data,1);
+		if(!empty($nexus))$data['fan']=$nexus;
+		zfun::fecho("我的粉丝",$data,1);
 	}
 	/*下级返利排序*/
 	public function next_fl_px($where,$uid,$url){
 		$data1=self::read_app_cookie($url,1,1);
 		if(!empty($data1))return $data1;
-
-
+			
 		$p=intval($_POST['p']);
 		if(empty($p))$p=1;
 		$user1=appcomm::f_goods("User",$where,"id,head_img,is_sqdl,nickname,reg_time",$sort,NULL,0);
 		$hhr_next_fl=zfun::f_kdata("HhrNextJl",$user1,"id","uid","uid,sum","  extend_id='$uid'");
-
 		foreach($user1  as $k=>$v){
 			$head_img=$v['head_img'];
 			if(empty($head_img))$head_img='default.png';
 			if(strstr($head_img,"http")==false)$head_img=UPLOAD_URL."user/".$head_img;
 			$user1[$k]['head_img']=$head_img;
-
 			$user1[$k]['nickname']=self::xphone($v['nickname']);
 			$user1[$k]['Vname']=self::getSetting("fxdl_name".($v['is_sqdl']+1));
 			$user1[$k]['commission']=zfun::dian($hhr_next_fl[$v['id']]['sum']);
@@ -530,13 +438,12 @@ class appHhrAction extends Action{
 		$user1=self::sortarr($user1,"commission",$sort);
 		$i=1;
 		$user1=array_values($user1);
-
 		$arr=array();
 		foreach($user1 as $k=>$v){
 			if(empty($arr[$i]))$arr[$i]=array();
 			$arr[$i][]=$v;
 			if(count($arr[$i])==20)$i++;
-
+			
 		}
 		foreach($arr as $k=>$v){
 			if(empty($v))$arr[$k]=array();
@@ -546,7 +453,6 @@ class appHhrAction extends Action{
 		return $arr[$p];
 	}
 	/*我邀请的合伙人*/
-
 	public function myHhr(){
 		$user=appcomm::signcheck(1);$uid=$user['id'];
 		$djtg_lv=intval(self::getSetting("fxdl_tjhydj_".($user['is_sqdl']+1)));
@@ -562,9 +468,7 @@ class appHhrAction extends Action{
 		$where="id IN(".$att['uids'].") and is_sqdl>0";
 		if(intval($_POST['is_hhr'])==1)$where="id IN(".$att1['uids'].") and is_sqdl>0";
 		/*全部的佣金*/
-		//$order_all=zfun::f_select("Order","(status='订单付款' or status='订单结算') and uid IN(".$att2['uids'].")","commission,uid,tg_pid");
-
-
+		//$order_all=zfun::f_select("Order","(status IN('订单付款','订单结算','订单成功')) and uid IN(".$att2['uids'].")","commission,uid,tg_pid");
 		$lvv=$att2['darr'];
 		$lv_dl=intval($user['is_sqdl']+1);
 		$data['fan']=array();
@@ -577,18 +481,15 @@ class appHhrAction extends Action{
 		$sort=self::getSort1($_POST['sort']);
 		$user1=appcomm::f_goods("User",$where,"id,head_img,is_sqdl,nickname,reg_time",$sort,NULL,20);
 		$hhr_next_fl=zfun::f_kdata("HhrNextJl",$user1,"id","uid","uid,sum","  extend_id='$uid'");
-
-
 		foreach($user1  as $k=>$v){
 			$head_img=$v['head_img'];
 			if(empty($head_img))$head_img='default.png';
 			if(strstr($head_img,"http")==false)$head_img=UPLOAD_URL."user/".$head_img;
 			$user1[$k]['head_img']=$head_img;
-
 			$user1[$k]['nickname']=self::xphone($v['nickname']);
 			$user1[$k]['Vname']=self::getSetting("fxdl_name".($v['is_sqdl']+1));
 			$user1[$k]['commission']=zfun::dian($hhr_next_fl[$v['id']]['sum']);
-
+			
 		}
 		if(!empty($user1))$data['fan']=$user1;
 		zfun::fecho("我邀请的合伙人",$data,1);
@@ -600,22 +501,22 @@ class appHhrAction extends Action{
 		foreach ($arr as $k=>$v)$tmp[$k] = $v[$key];
 		if($type=="desc")$type=SORT_DESC;else $type=SORT_ASC;
 		array_multisort($arr,SORT_NUMERIC,$tmp,$type);
-		return $arr;
+		return $arr;	
 	}
 	/*分享订单*/
 	public function myOrder(){
 		$user=appcomm::signcheck(1);$uid=$user['id'];
 		if(empty($_POST['token']))zfun::fecho("请登录");
 		$where="share_uid='$uid' and orderType='1'   AND uid<>".intval($user['id']);
-		$data['fsxl']=zfun::f_count("Order",$where." and ( status='订单付款' or status='订单结算')");
-		$data['jjdz']=zfun::f_count("Order",$where." and ( status='订单付款' or status='订单结算') and fenxiang_returnstatus=0");
+		$data['fsxl']=zfun::f_count("Order",$where." and status IN ('订单付款','订单结算','订单成功')");
+		$data['jjdz']=zfun::f_count("Order",$where." and status IN ('订单付款','订单结算','订单成功') and fenxiang_returnstatus=0");
 		$data['ljjl']=zfun::f_count("Order",$where." and fenxiang_returnstatus=1");
 		switch($_POST['type']){
 			case 0:
-				$where.=" and ( status='订单付款' or status='订单结算')";
+				$where.=" and status IN ('订单付款','订单结算','订单成功')";
 				break;
 			case 1:
-				$where.=" and ( status='订单付款' or status='订单结算') and fenxiang_returnstatus=0";
+				$where.=" and status IN ('订单付款','订单结算','订单成功') and fenxiang_returnstatus=0";
 				break;
 			case 2:
 				$where.=" and fenxiang_returnstatus=1";
@@ -639,18 +540,20 @@ class appHhrAction extends Action{
 		$data['order']=$arr;
 		zfun::fecho("分享订单",$data,1);
 	}
-
 	/*我的团队订单*/
 	public function myteamOrder(){
 		$user=appcomm::signcheck(1);zfun::$set['uid']=$uid=$user['id'];
 		$where=" platform='tb' and uid='$uid' and bili<>0 and comment<>'自购'";
 		$data['all']=zfun::f_count("Rebate",$where);
-		$data['yfk']=zfun::f_count("Rebate",$where." and (status='订单结算' or status='订单付款') and returnstatus=0");
+		$data['yfk']=zfun::f_count("Rebate",$where." and status IN('订单付款') and returnstatus=0");
 		$data['ysx']=zfun::f_count("Rebate",$where." and status='订单失效'");
 		$data['yjs']=zfun::f_count("Rebate",$where." and returnstatus=1");
+		if(!empty($_POST['show_ysh'])){
+			$data['ysh']=zfun::f_count("Rebate",$where." and status IN('订单成功','订单结算') and returnstatus=0");
+		}
 		switch($_POST['type']){
 			case 1:
-				$where.=" and (status='订单结算' or status='订单付款') and returnstatus=0";
+				$where.=" and status IN('订单付款') and returnstatus=0";
 				break;
 			case 2:
 				$where.=" and status='订单失效'";
@@ -658,14 +561,15 @@ class appHhrAction extends Action{
 			case 3:
 				$where.=" and returnstatus=1 ";
 				break;
+			case 4:
+				$where.=" and status IN('订单成功','订单结算') and returnstatus=0";
+				break;
 		}
 		//$fi="id,orderId,now_user,share_uid,fenxiang_returnstatus,uid,postage,goodsNum,info,shop_title,goodsId,status,createDate,payDate,status,orderType,goodsInfo,commission,goods_img,return_commision,estimate,payment,returnstatus,choujiang_n,choujiang_sum,choujiang_data,choujiang_money";
 		$num=20;
 		$order = appcomm::f_goods("Rebate", $where, $fi, 'order_create_time desc', NULL, $num);
-
 		actionfun("appapi/commGetMore");
 		$arr=commGetMoreAction::secondOrder($order,$user);
-
 		//appcomm::goodsfanlioff($arr);
 		$sarr=array("创建订单"=>"待付款","订单付款"=>"已付款","订单结算"=>"未到账","订单失效"=>"已失效");
 		$buy_user=zfun::f_kdata("User",$arr,"uid","id","id,extend_id,is_sqdl");
@@ -677,10 +581,8 @@ class appHhrAction extends Action{
 			if($v['returnstatus']==1)$arr[$k]['status']="已到账";
 			$arr[$k]['tgNickname']=$invite_user[$buy_user[$v['uid']]['extend_id']]['nickname'];
 		}
-
 		//图片缺失处理
 		actionfun("comm/tbmaterial");
-
 		foreach($arr as $k=>$v){
 			if(empty($v['goods_img'])){
 				$tmp=tbmaterial::id($v['goodsId']);
@@ -690,7 +592,6 @@ class appHhrAction extends Action{
 				}
 			}
 		}
-
 		if(empty($arr))$arr=array();
 		$data['order']=$arr;
 		zfun::fecho("我的团队订单",$data,1);
@@ -708,32 +609,52 @@ class appHhrAction extends Action{
 			$eids=self::getc($user['id'],"extend_id",$lv);
 			$time=$v['succ_time'];
 			if(empty($v['succ_time']))$time=$v['time'];
-
+			
 		}
 	}
 	/*点击生成二维码*/
 	public function ercode(){
 		$user=appcomm::signcheck(1);
-
 		$fnuo_id1=filter_check($_POST['fnuo_id']);
-
 		$fnuo_id=explode("_",$fnuo_id1);
-
 		$fnuo_id=$fnuo_id[0];
 		$data=array();
 		$data['img']=INDEX_WEB_URL."?mod=appapi&act=appHhr&ctrl=getcode&fnuo_id=".$fnuo_id."&getGoodsType=".$_POST['getGoodsType']."&token=".$_POST['token'];
 		zfun::fecho("点击生成二维码",$data,1);
 	}
 	public function getcode(){
+		ob_end_clean();
+		$cookie_key="img getcode";
+		
+		foreach($_GET as $k=>$v){
+			$cookie_key.=$k."_".$v;
+		}
+		$cookie_key=md5($cookie_key);
+		$cookie_path=ROOT_PATH."Temp/dgapp/{$cookie_key}.log";
+		if(file_exists($cookie_path)){
+			$tmp=zfun::get($cookie_path);
+			zfun::head("png");
+			echo $tmp;
+			return;
+		}
+
+		if(empty($_GET['create'])){
+			$url=INDEX_WEB_URL."?".$_SERVER['QUERY_STRING']."&create=on";
+			$data=curl_get($url);
+			@file_put_contents($cookie_path,$data);
+			zfun::head("png");
+			echo $data;
+			return;
+		}
+
 		$fnuo_id=$_GET['fnuo_id'];
 		$token=filter_check($_GET['token']);
 		$user=zfun::f_row("User","token='$token'");
-
 		$getgoodstype=filter_check($_GET['getGoodsType']);//类型 物料 大淘客
 		$set=zfun::f_getset("ggapitype");
-
 			actionfun("comm/tbmaterial");
 			$v=tbmaterial::id($fnuo_id);
+		
 			if(!empty($_GET['img']))$v['goods_img']=$_GET['img'];
 			$arr=array(
 				"goods_title"=>$v['goods_title'],
@@ -748,20 +669,12 @@ class appHhrAction extends Action{
 				"start_time"=>$v['start_time'],
 				"end_time"=>$v['end_time'],
 			);
-
 			if($v['shop_id']==1)$arr['shop_type']="淘宝";
 			elseif($v['shop_id']==2)$arr['shop_type']="天猫";
-
-
-
 		actionfun("default/gototaobao");
 		$arr['yhq_url']='';
-
-		$tmp_yhq_url=gototaobaoAction::check_yhq_url(array("goods_title"=>$v['goods_title'],"fnuo_id"=>$fnuo_id),1);
+		//$tmp_yhq_url=gototaobaoAction::check_yhq_url(array("goods_title"=>$v['goods_title'],"fnuo_id"=>$fnuo_id),1);
 		if(!empty($tmp_yhq_url))$arr['yhq_url']=$tmp_yhq_url;
-
-
-
 		if(empty($getgoodstype)){
 			if(!empty($GLOBALS['yhq_span']))$arr['yhq_span']=$GLOBALS['yhq_span'];
 			if(!empty($GLOBALS['yhq_price']))$arr['yhq_price']=$GLOBALS['yhq_price'];
@@ -771,29 +684,21 @@ class appHhrAction extends Action{
 			//if(!empty($GLOBALS['dtk_commission'])&&$GLOBALS['dtk_commission']>$arr['commission'])$arr['commission']=$GLOBALS['dtk_commission'];
 		}
 		if(!empty($arr['yhq_price'])){
-
 			$arr['yhq']=1;
-
 		}
-
 		$goods=zfun::f_fgoodscommission(array($arr));$goods=reset($goods);
-
 		self::new_qrcode($goods,$user,'',1);
-
+		
 	}
-
 	public static function bdurl($bd,$bd2,$bd3,$bd4){
 		//$bdurl='http://cj.fnuo123.com/rebate_rebateShareDetail_wap-545269808157-931.html';
-
 		$set=zfun::f_getset("xinlang_key");
 		$source=$set['xinlang_key'];
-
+		if(empty($source))return array($bd,$bd2,$bd3,$bd4);
 		$bd=urlencode($bd);
 		$bd2=urlencode($bd2);
 		$bd3=urlencode($bd3);
 		$bd4=urlencode($bd4);
-
-
 		$url="https://api.weibo.com/2/short_url/shorten.json?source=$source";
 		if(!empty($bd))$url.="&url_long=$bd";
 		if(!empty($bd2))$url.="&url_long=$bd2";
@@ -801,14 +706,12 @@ class appHhrAction extends Action{
 		if(!empty($bd4))$url.="&url_long=$bd4";
 		$data=zfun::curl_get($url);
 		$data=json_decode($data,true);
-
 		$arr=array();
 		foreach($data['urls']  as $k=>$v){
 			$arr[]=$v['url_short'];
 		}
 		return $arr;
 	}
-
 	public static function qrcode2($arr=array(),$user=array(),$urls='',$getnew=0){//生成二维码
 		$img=str_replace("https:","http:",$arr['goods_img']);
 		$tgidkey = self::getApp('Tgidkey');
@@ -816,7 +719,6 @@ class appHhrAction extends Action{
 		if(!empty($user['tg_code']))$tgid=$user['tg_code'];
 		$getgoodstype=filter_check($_POST['getGoodsType']);//类型 物料 大淘客
 		$tg_url=self::getUrl('rebate_DG', 'rebate_detail', array("getgoodstype"=>$getgoodstype,"fnuo_id"=>$arr['fnuo_id'],'tgid' => $tgid),'wap');
-
 		$set=zfun::f_getset("android_url,tg_durl,is_openbd,app_goods_tw_url");
 		$url3=self::getUrl('invite_friend', 'new_packet', array("is_goods_share"=>1,"fnuo_id"=>$pset['fnuo_id'],'tgid' => $tgid),'new_share');
 		$url2=self::getUrl("down","supdownload",array('tgid' => $tgid),"appapi");/*更换*/
@@ -825,11 +727,9 @@ class appHhrAction extends Action{
 		if(intval($set['tg_durl'])==1){
 			//$url1=INDEX_WEB_URL."rebate_rebateShareDetail_wap-".$arr['fnuo_id']."-".$tgid.".html";
 			$url1=INDEX_WEB_URL."?mod=wap&act=rebate_DG&ctrl=rebateShareDetail&getgoodstype=$getgoodstype&tgid=".($tgid)."&fnuo_id=".filter_check($arr['fnuo_id']);
-
 			if(!empty($set['is_openbd']))$bd="http://fanyi.baidu.com/transpage?query=".urlencode($url1)."&source=url&ie=utf8&from=en&to=zh&render=1";
 			else{
 				$url1=$tg_url;
-
 				$bd=$url1;
 			}
 			if(!empty($set['is_openbd']))$bd2="http://fanyi.baidu.com/transpage?query=".urlencode($url2)."&source=url&ie=utf8&from=en&to=zh&render=1";
@@ -837,18 +737,15 @@ class appHhrAction extends Action{
 				$bd2=$url2;
 			}
 			//$url3=INDEX_WEB_URL."new_share-".$tgid."-".$arr['fnuo_id']."-1.html";
-
 			if(!empty($set['is_openbd']))$bd3="http://fanyi.baidu.com/transpage?query=".urlencode($url3)."&source=url&ie=utf8&from=en&to=zh&render=1";
 			else{
 				$bd3=$url3;
 			}
 			$arrulr=self::bdurl($bd,$bd2,$bd3);
-
 			if(!empty($arrulr[0]))$tg_url=$arrulr[0];
 			if(!empty($arrulr[1]))$url2=$arrulr[1];
 			if(!empty($arrulr[2]))$url3=$arrulr[2];
-		}
-
+		} 
 		if(intval($set['app_goods_tw_url'])==1){
 			$tg_url=$url2;
 		}
@@ -861,7 +758,7 @@ class appHhrAction extends Action{
 		$data = array();
 		$data['width']=600;
 		$data['height']=880;
-
+		
        $data['list'][0] = array(
             "url" => INDEX_WEB_URL."View/index/img/wap/takeOutt/sup_download/bj1.png",
             "x" => 0,
@@ -887,7 +784,6 @@ class appHhrAction extends Action{
 			"type"=>"png"
         );
 		//
-
 		$data['list'][3] = array(
             "url" => $img,
             "x" =>0,
@@ -935,7 +831,6 @@ class appHhrAction extends Action{
 				"val"=>"券后价：￥".(floatval($arr['goods_price'])),
 			);
 		}
-
 		foreach($data['text'] as $k=>$v){
 			if(empty($v['val']))unset($data['text'][$k]);
 		}
@@ -946,10 +841,9 @@ class appHhrAction extends Action{
 			return pic::getpic($data);
 		}
 		$data=zfun::arr64_encode($data);
-
 		$url=INDEX_WEB_URL."comm/pic.php?pic_ctrl=getpic&data=".urlencode($data);
 		return $url;
-
+		
 	}
 
 	//百里。修改分享图
@@ -962,36 +856,29 @@ class appHhrAction extends Action{
 		$tgidkey = self::getApp('Tgidkey');
 		$tgid = $tgidkey->addkey($user['id']);
 		if(!empty($user['tg_code']))$tgid=$user['tg_code'];
-
 		$getgoodstype=filter_check($_POST['getGoodsType']);//类型 物料 大淘客
 		$tg_url=self::getUrl('rebate_DG', 'rebate_detail', array("getgoodstype"=>$getgoodstype,"fnuo_id"=>$arr['fnuo_id'],'tgid' => $tgid),'wap');
-
 		$set=zfun::f_getset("share_host,android_url,tg_durl,is_openbd,app_goods_tw_url,app_goods_tljtw_url");
 		$url3=self::getUrl('invite_friend', 'new_packet', array("is_goods_share"=>1,"fnuo_id"=>$arr['fnuo_id'],'tgid' => $tgid),'new_share');
 		$url2=self::getUrl("down","supdownload",array('tgid' => $tgid),"appapi");/*更换*/
 		//新商品详情
 		$goods_down_url=self::getUrl("rebate_DG","rebate_detail",array("type"=>'down',"is_goods_share"=>1,"fnuo_id"=>$arr['fnuo_id'],'tgid' => $tgid),"wap");
-
 		if(!empty($set['share_host'])){
 			$tg_url=str_replace(HTTP_HOST,$set['share_host'],$tg_url);
 			$url2=str_replace(HTTP_HOST,$set['share_host'],$url2);
 			$url3=str_replace(HTTP_HOST,$set['share_host'],$url3);
 			$goods_down_url=str_replace(HTTP_HOST,$set['share_host'],$goods_down_url);
 		}
-
-
 		$url4=$set['android_url'];
 		if(empty($url4))$url4=INDEX_WEB_URL."?act=api&ctrl=downloadfile";
+		
 		if(intval($set['tg_durl'])==1){
 			//$url1=INDEX_WEB_URL."rebate_rebateShareDetail_wap-".$arr['fnuo_id']."-".$tgid.".html";
 			$url1=INDEX_WEB_URL."?mod=wap&act=rebate_DG&ctrl=rebateShareDetail&getgoodstype=$getgoodstype&tgid=".($tgid)."&fnuo_id=".filter_check($arr['fnuo_id']);
-
-
 			if(!empty($set['is_openbd']))$bd="http://fanyi.baidu.com/transpage?query=".urlencode($url1)."&source=url&ie=utf8&from=en&to=zh&render=1";
 			else{
 			//	$url1=INDEX_WEB_URL."rebate-".$arr['fnuo_id']."-".$tgid.".html";
 				$url1=$tg_url;
-
 				$bd=$url1;
 			}
 			if(!empty($set['is_openbd']))$bd2="http://fanyi.baidu.com/transpage?query=".urlencode($url2)."&source=url&ie=utf8&from=en&to=zh&render=1";
@@ -999,19 +886,17 @@ class appHhrAction extends Action{
 				$bd2=$url2;
 			}
 			//$url3=INDEX_WEB_URL."new_share-".$tgid."-".$arr['fnuo_id']."-1.html";
-
 			if(!empty($set['is_openbd']))$bd3="http://fanyi.baidu.com/transpage?query=".urlencode($url3)."&source=url&ie=utf8&from=en&to=zh&render=1";
 			else{
 				$bd3=$url3;
 			}
-
 			$arrulr=self::bdurl($bd,$bd2,$bd3,$goods_down_url);
-
 			if(!empty($arrulr[0]))$tg_url=$arrulr[0];
 			if(!empty($arrulr[1]))$url2=$arrulr[1];
 			if(!empty($arrulr[2]))$url3=$arrulr[2];
 			if(!empty($arrulr[3]))$goods_down_url=$arrulr[3];
-		}
+		} 
+		
 		//淘礼金
 		if($_GET['tlj']==1)$set['app_goods_tw_url']=intval($set['app_goods_tljtw_url']);
 		if(intval($set['app_goods_tw_url'])==1){
@@ -1029,7 +914,7 @@ class appHhrAction extends Action{
 		$data = array();
 		$data['width']=750;
 		$data['height']=1334;
-
+	
        $data['list'][0] = array(//底部的框
             "url" => INDEX_WEB_URL."View/index/img/appapi/comm/code_bg_0.png?time=".time(),
             "x" => 0,
@@ -1144,20 +1029,17 @@ class appHhrAction extends Action{
 				"type"=>"png"
 			);
 		}
-
-
+		
 		if($getnew==1){
 			fun("pic");
 				//fpre($data);
 			return pic::getpic($data);
 		}
 		$data=zfun::arr64_encode($data);
-
 		$url=INDEX_WEB_URL."comm/pic.php?pic_ctrl=getpic&data=".urlencode($data);
 		return $url;
-
+		
 	}
-
 	/*合伙人收益中心*/
 	public function dl_list(){
 		appcomm::signcheck();
@@ -1198,15 +1080,11 @@ class appHhrAction extends Action{
 		$user['team_sum']=zfun::dian($data['all_team']);
 		$sett=zfun::f_getset("CustomUnit,rmb_ico");
 		$user['str1']='立即提币';
-
 		$user['str2']=$sett['CustomUnit'];
-
 		$user['icon']=UPLOAD_URL."geticos/".$sett['rmb_ico'];
-
 		unset($user['is_sqdl']);unset($user['is_sqdl_time']);
 		zfun::fecho("合伙人收益中心",$user,1);
 	}
-
 	/*排序*/
 	public static function getSort($getsort){
 		switch(filter_check($getsort)) {
@@ -1214,7 +1092,6 @@ class appHhrAction extends Action{
 				// 人气
 				$sort = "tg_sort desc,tg_sort desc";
 				break;
-
 			case 2:
 				// 价格低到高
 				$sort = "tg_sort desc,goods_price asc";
@@ -1227,10 +1104,9 @@ class appHhrAction extends Action{
 				// 销量
 				$sort = "tg_sort desc,goods_sales desc";
 				break;
-
+			
 		}
 		if(empty($sort))$sort='tg_sort desc';
-
 		return $sort;
 	}
 	/*排序*/
@@ -1240,24 +1116,19 @@ class appHhrAction extends Action{
 				// 入驻时间高到低
 				$sort = "reg_time desc";
 				break;
-
 			case 2:
 				// 入驻时间低到高
 				$sort = "reg_time asc";
 				break;
-
 			/*case 3 :
 				// 佣金高到低
 				$sort = "sum desc";
 				break;
-
 			case 4:
 				//  佣金低到高
 				$sort = "sum asc";
 				break;*/
 		}
-
-
 		return $sort;
 	}
 	/*筛选条件*/
@@ -1282,7 +1153,6 @@ class appHhrAction extends Action{
 				$where.=" AND shop_id=4";//京东
 				break;
 		}
-
 		return $where;
 	}
 	public static function getcarr($uid, $tidname = "extend_id", $maxlv = 9,$is_sqdl=0,$is_cy=0) {//获取下级
@@ -1297,8 +1167,6 @@ class appHhrAction extends Action{
 			$lv++;
 			$where="$tidname IN($tid) and $tidname<>0 and $tidname<>'' ";
 			if($is_sqdl==1)$where.= "and is_sqdl>0";
-
-
 			$user = zfun::f_select("User",$where,"id");
 			if (!empty($user)) {
 				$tid = "";
@@ -1308,7 +1176,6 @@ class appHhrAction extends Action{
 				$arr[$lv] = $tid;
 				if($is_cy==1&&$lv==1)unset($arr[$lv]);
 			}
-
 		} while(!empty($user)&&$lv<$maxlv-1);
 		unset($arr[0]);
 		if(empty($arr))$arr=array();
@@ -1325,20 +1192,20 @@ class appHhrAction extends Action{
 			}
 		}
 		return array("darr"=>$darr,"uids"=>$uids,"count"=>$cou);
-
+		
 	}
 	public static function xphone($phone=''){
 		// 百里.修改前
 		// $phone.="";
 		// $len=strlen($phone);
 		// if($len>=11){
-		// 	return mb_substr($phone,0,3,"utf-8")."****".mb_substr($phone,-2,2,"utf-8");
+		// 	return mb_substr($phone,0,3,"utf-8")."******".mb_substr($phone,-2,2,"utf-8");	
 		// }
 		// if($len>=5){
-		// 	return mb_substr($phone,0,1,"utf-8")."**".mb_substr($phone,-1,1,"utf-8");
+		// 	return mb_substr($phone,0,2,"utf-8")."***".mb_substr($phone,-1,1,"utf-8");	
 		// }
-		// return mb_substr($phone,0,1,"utf-8")."*";
-
+		// return mb_substr($phone,0,1,"utf-8")."*";	
+		
 		//百里.修改后
 		return mb_substr($phone,0,1,"utf-8")."**".mb_substr($phone,-1,1,"utf-8");
 	}
@@ -1356,7 +1223,6 @@ class appHhrAction extends Action{
 			$where="$tidname IN($tid) and $tidname<>0 and $tidname<>'' ";
 			if($is_sqdl==1)$where.= "and is_sqdl>0";
 			$user = zfun::f_select("User",$where,"id,is_sqdl");
-
 			if (!empty($user)) {
 				$tid = "";
 				foreach ($user as $k => $v){
@@ -1364,19 +1230,15 @@ class appHhrAction extends Action{
 					if($lv==$maxlv&&$v['is_sqdl']>0&&$set['operator_onoff']==1)continue;
 					if(!empty($v['id']))$tid .= "," . $v['id'];
 				}
-
 				$tid = substr($tid, 1);
 				if(!empty($tid))$arr[$lv] = $tid;
-
 				if($is_cy==1&&$lv==1)unset($arr[$lv]);
 			}
-
+			
 		} while(!empty($user)&&$lv<$maxlv);
-
 		$ids = implode(",", $arr);
 		if (empty($ids))
 			$ids = -1;
-
 		return $ids;
 		/*
 		$user = zfun::f_select("User", "$tidname IN($ids) and id<>0");
@@ -1411,7 +1273,7 @@ class appHhrAction extends Action{
 		$ids = implode(",", $arr);
 		if (empty($ids))
 			$ids = -1;
-
+			
 		return $ids;
 		/*
 		$user = zfun::f_select("User", "$tidname IN($ids) and id<>0");

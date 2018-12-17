@@ -22,7 +22,7 @@ class goods_cateAction extends Action{
 	public function getCates() {
 		appcomm::signcheck();appcomm::read_app_cookie();
 		$field = "id,category_name,catename";
-		
+
 		$att=array("6","1","3","7","31","32","33","34","35","36","37","38","double11two","double11twenty4","double11ys");
 		$key=array("app_high_zhanwai_onoff","app_yhq_zhanwai_onoff","app_9_zhanwai_onoff","app_20_zhanwai_onoff","app_tgphb_zhanwai_onoff","app_ssxlb_zhanwai_onoff","app_qtxlb_zhanwai_onoff","app_ddq_zhanwai_onoff","app_tqg_zhanwai_onoff","app_jhs_zhanwai_onoff","app_jpmj_zhanwai_onoff","app_ht_zhanwai_onoff","app_double11two_zhanwai_onoff","app_double11twenty4_zhanwai_onoff","app_double11ys_zhanwai_onoff");
 		$bom=array();$bom1=array();$bom2=array();
@@ -34,7 +34,7 @@ class goods_cateAction extends Action{
 			$bom2[$v]=$dtktype[$k];
 		}
 		$type_onoff=intval($setArr[$bom[$type]]);
-			
+
 		if($type_onoff==2){
 			$category=self::cate();
 		}else{
@@ -48,10 +48,10 @@ class goods_cateAction extends Action{
 		$arr[]=array(
 			"id"=>0,
 			"category_name"=>"全部",
-			
+
 		);
 		foreach($category as $k=>$v){
-			$arr[]=$v;	
+			$arr[]=$v;
 		}
 		$category=$arr;
 		zfun::fecho("分类",$category,1);
@@ -61,7 +61,9 @@ class goods_cateAction extends Action{
 		appcomm::signcheck();
 		actionfun("comm/dtk");
 		$type=filter_check($_POST['type']);
-		if(empty($type)||$type=='34'||strstr(",大淘客双十一2小时定金榜,大淘客双十一24小时定金榜,双11预售精品库,",','.$_POST['type'].','))$data=dtk::dongdongqiang_date();
+		if(empty($type)||$type=='34'||strstr(",大淘客双十一2小时定金榜,大淘客双十一24小时定金榜,双11预售精品库,",','.$_POST['type'].',')){
+			$data=dtk::dongdongqiang_date();
+		}
 		else if($type=='35'||$type=='pub_taoqianggou'){
 			actionfun("appapi/appCate");
 			$data=appCateAction::tqg_time();
@@ -114,7 +116,7 @@ class goods_cateAction extends Action{
 				"check"=>1,
 				"status"=>1,
 			),
-			
+
 			array(
 				"date"=>"08:00",
 				"time"=>1,
@@ -122,7 +124,7 @@ class goods_cateAction extends Action{
 				"check"=>0,
 				"status"=>1,
 			),
-			
+
 			array(
 				"date"=>"12:00",
 				"time"=>2,
@@ -130,7 +132,7 @@ class goods_cateAction extends Action{
 				"check"=>0,
 				"status"=>1,
 			),
-		
+
 			array(
 				"date"=>"15:00",
 				"time"=>3,
@@ -152,15 +154,15 @@ class goods_cateAction extends Action{
 			if($k<=$count)$next=strtotime($date." ".$data[$k+1]['date']);
 			//如果小于当前时间 且当前时间小于下一个时间
 			if($date_time<$time&&!empty($next)&&$time<$next){
-			
+
 				$data[$k]['check']=1;
 			}
 			//如果是最后一个 且小于当前时间
 			if($k>=$count&&$date_time<$time){
-				
+
 				$data[$k]['check']=1;
 			}
-			
+
 			$data[$k]['date']="今日 ".$v['date'];
 		}
 		return $data;
@@ -214,6 +216,6 @@ class goods_cateAction extends Action{
 		);
 		return $arr;
 	}
-	
+
 }
 ?>

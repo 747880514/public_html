@@ -283,7 +283,7 @@ class invite_friendAction extends Action{
 		}
 		if(empty($_POST['code']))return false;
 		zfun::add_f("wapyzm1");
-		$phone=intval($_POST['code']);
+		$phone=($_POST['code']);
 		$user = zfun::f_count("User", "phone='$phone'");
 		if($user>0)zfun::fecho("您已经是老用户",2,0);
 		
@@ -331,18 +331,17 @@ class invite_friendAction extends Action{
 				zfun::f_adddetail($str,$tgid,66,2,$sett['lhb_num_tg']);
 			}
 		}
-		$set=zfun::f_getset("jf_reg,commission_reg,jf_name,extendreg,xinren_hongbao,blocking_price_endday");
+		$set=zfun::f_getset("jf_reg,jf_name,extendreg,xinren_hongbao,blocking_price_endday");	//百里。追加blocking_price_endday
 		$set['xrhb']=$set['xinren_hongbao'];
 		//$extendreg=intval($set["extendreg"]);
 		//if($extendreg&&empty($tgid))zfun::alert("推荐人ID必填");
 		$jf_reg=floatval($set['jf_reg']);
 		$invite_hongbao=floatval($set['xrhb']);	
-		$commission_reg=floatval($set['commission_reg']);
 		$data['loginname']=$phone;
 		$data['phone']=$phone;
 		$data['password']=$password;
 		$data['integral']=$jf_reg;
-		// $data['commission']=$commission_reg+$invite_hongbao;
+		// $data['commission']=$invite_hongbao;
 		$data['nickname']=$phone;
 		$data['head_img']='default.png';
 		$data['extend_id']=intval($tgid);
@@ -355,7 +354,8 @@ class invite_friendAction extends Action{
 
 		$data["blocking_price"] = $commission_reg+$invite_hongbao;
 		$data["blocking_price_endtime"] = $blocking_price_endtime;
-		
+
+
 		//省市县网点
 		$data['dq1']=intval($_POST['dq1']);
 		$data['dq2']=intval($_POST['dq2']);
@@ -385,9 +385,6 @@ class invite_friendAction extends Action{
 		}
 		if($jf_reg>0){
 			zfun::f_adddetail('注册送' . $jf_reg . $set['jf_name'],$new_user_id,6,0,$jf_reg);	
-		}
-		if($commission_reg>0){
-			zfun::f_adddetail('注册送' . $commission_reg . '佣金',$new_user_id,6,0,$commission_reg);		
 		}
 		zfun::fecho("正确",array("news"=>1),1);
 	}
