@@ -311,7 +311,7 @@ class appJdGoodsDetailAction extends Action{
 				$hs_bili = 0.88;
 				break;
 			default:
-				$hs_bili = 0.51;
+				$hs_bili = 0.88;
 				break;
 		}
 		// $data['hs_bili'] = explode("￥", $data['btn_fxz']['bili'])[1];
@@ -336,6 +336,9 @@ class appJdGoodsDetailAction extends Action{
 				$up_hs_bili = 0.76;
 				break;
 			case '3':
+				$up_hs_bili = 0.88;
+				break;
+			default:
 				$up_hs_bili = 0.88;
 				break;
 		}
@@ -785,7 +788,7 @@ class appJdGoodsDetailAction extends Action{
 				$hs_bili = 0.88;
 				break;
 			default:
-				$hs_bili = 0.51;
+				$hs_bili = 0.88;
 				break;
 		}
 		$data['old_fx_commission'] = $data['fx_commission'];

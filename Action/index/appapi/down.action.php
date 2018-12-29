@@ -160,6 +160,13 @@ class downAction extends Action{
 
 	 }
 
+	 /**
+	  * [get_unionid 百里]
+	  * @Author   Baili
+	  * @Email    baili@juhuivip.com
+	  * @DateTime 2018-12-22T18:18:14+0800
+	  * @return   [type]                   [description]
+	  */
 	public function get_unionid()
 	{
 		$tgid = $_REQUEST['tgid'];
@@ -172,6 +179,13 @@ class downAction extends Action{
 		header('Location: '.$url);
 	}
 
+	/**
+	 * [callback 百里]
+	 * @Author   Baili
+	 * @Email    baili@juhuivip.com
+	 * @DateTime 2018-12-22T18:18:20+0800
+	 * @return   function                 [description]
+	 */
 	public function callback()
 	{
 		$code = $_REQUEST['code'];
@@ -292,7 +306,7 @@ class downAction extends Action{
 
 
 	/**
-	 * [bind_mobile 绑定手机号]
+	 * [bind_mobile 百里绑定手机号]
 	 * @Author   Baili
 	 * @Email    baili@juhuivip.com
 	 * @DateTime 2018-10-27T11:50:13+0800

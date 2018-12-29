@@ -551,7 +551,7 @@ class newgoods_detailAction extends Action{
 				$hs_bili = 0.88;
 				break;
 			default:
-				$hs_bili = 0.51;
+				$hs_bili = 0.88;
 				break;
 		}
 		// $goods['hs_bili'] = explode("￥", $goods['btn_fxz']['bili'])[1];
@@ -576,6 +576,9 @@ class newgoods_detailAction extends Action{
 				$up_hs_bili = 0.76;
 				break;
 			case '3':
+				$up_hs_bili = 0.88;
+				break;
+			default:
 				$up_hs_bili = 0.88;
 				break;
 		}

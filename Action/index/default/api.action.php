@@ -2547,6 +2547,10 @@ class apiAction extends Action {
 		
 		$uid=$user['id'];
 
+		//百里.会员返款操作
+		actionfun("appapi/baili_zhaoshang");
+		baili_zhaoshangAction::presell_return($uid);
+
 		//判断注册返还佣金
 		actionfun("timer/register_commission");
 		register_commissionAction::one($uid);

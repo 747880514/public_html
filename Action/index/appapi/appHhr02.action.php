@@ -115,6 +115,7 @@ class appHhr02Action extends Action{
 			// if(empty($money)||$new_money<=0)$new_money="免费";
 			// if(empty($money)||$new_money<=0)$new_money=$set['fxdl_ljzt'.$i]."人付费 ";
 			// else $new_money.=$set['CustomUnit'];
+			// 百里
 			if(empty($money)||$new_money<=0)
 			{
 				if($fxdldata[$i]['title'] == '蒜头')

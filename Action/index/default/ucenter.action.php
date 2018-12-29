@@ -1559,6 +1559,12 @@ class ucenterAction extends Action {
 		$data=zfun::f_getset("UcenterShareTitle,UcenterShareText");
 		$tgurl = $this -> getUrl('login', 'register', array('tgid' => $uid));
 		$data['UcenterShareText']=str_replace("{tgurl}",$tgurl,$data['UcenterShareText']);
+
+		//百里.重写
+		$data['UcenterShareText']="http://app.fashanginvest.com/?mod=appapi&act=down&ctrl=get_unionid&tgid=".$uid;
+		$tgurl = $data['UcenterShareText'];
+
+		
 		self::assign("data",$data);
 		self::assign("tgurl", $tgurl);
 		$this -> display();

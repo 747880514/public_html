@@ -325,6 +325,7 @@ class circleFunctionAction extends Action{
 		}
 		return $tg_url;
 	}
+	//百里
 	//生成二维码
 	public static function qrcode2($arr=array(),$user=array(),$tg_url='',$tgid=0){//生成二维码
 		$img=str_replace(array("https:","ttps:"),"http:",$arr['goods_img']);

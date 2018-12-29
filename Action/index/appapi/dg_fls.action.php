@@ -351,9 +351,11 @@ class dg_flsAction extends Action{
 		{
 			$zgcommission2 = zfun::f_sum("User","extend_id='{$user['id']}' and huasuan_jsmoney > 0 and clear_huasuan_jsmoney = 0 and (ISNULL(huasuan_jstime) OR huasuan_jstime = 0)","huasuan_jsmoney");	//待解锁
 
-			//待解锁奖励=邀请待解锁奖励+注册赠送冻结余额
+			//待解锁奖励=邀请待解锁奖励+注册赠送冻结余额+剩余返利金额(fanliosjingbgouyytbo_fnuoossimple_zhaoshang_presell表)
 			$blocking = zfun::f_row("User", "id = '{$user['id']}'", 'commission,blocking_price,blocking_price_endtime');
 			$zgcommission2 += $blocking['blocking_price'];
+			$zhaoshang_presell = zfun::f_row("Zhaoshangpresell", "uid = {$user['id']}");
+			$zgcommission2 += $zhaoshang_presell['balance'];
 
 			$zgcommission2 = max( sprintf("%.2f", $zgcommission2), '0.00');	//格式化金额
 		}

@@ -271,7 +271,7 @@ class goods_fenxiangAction extends Action{
 				$hs_bili = 0.88;
 				break;
 			default:
-				$hs_bili = 0.51;
+				$hs_bili = 0.88;
 				break;
 		}
 		$garr["hs_bili"] =  sprintf("%.2f", $garr['goods_price'] * ($garr['commission']/100) * $hs_bili);
