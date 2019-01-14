@@ -30,11 +30,11 @@ class appJdGoodsDetailAction extends Action{
 
 		if(!empty($jd_data[0]))$data['fnuo_id']=$jd_data[0];
 
-		
-
 		$data=self::comm_goods($data);
 
-		
+		//百里
+		actionfun("appapi/baili");
+		$data = baili::hs_detail_commission($data);
 
 		zfun::fecho("传输处理",$data,1);
 

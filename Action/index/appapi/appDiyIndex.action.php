@@ -12,6 +12,23 @@ class appDiyIndexAction extends Action{
 		$index_style_id=$set[$type.'_style_id'];
 		$arr=self::getCSS($type);
 		$arr=array_values($arr);
+
+		//百里
+		//外链带token，实现H5页面获取会员信息
+		foreach ($arr as $key => &$value)
+		{
+			if($value['type'] == 'index_huandengpian_01')
+			{
+				foreach ($value['list'] as $k => &$v)
+				{
+					if($v['SkipUIIdentifier'] == 'pub_wailian')
+					{
+						$v['url'] .= "&token=".filter_check($_POST['token']);
+					}
+				}
+			}
+		}
+
 		echo str_replace('"success":1','"success":"1"',json_encode(array("msg"=>"首页数据","style_id"=>$index_style_id,"data"=>$arr,"success"=>1))); exit;
 	}
 	//跑马灯

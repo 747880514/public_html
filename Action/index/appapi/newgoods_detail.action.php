@@ -250,6 +250,10 @@ class newgoods_detailAction extends Action{
 
 		//$goods=self::getfanli($goods);
 
+		//百里
+		actionfun("appapi/baili");
+		$goods = baili::hs_detail_commission($goods);
+
 		zfun::fecho("传输数据处理接口",$goods,1,1);
 
 

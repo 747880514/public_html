@@ -459,14 +459,16 @@ class dg_flsAction extends Action{
 				),
 				
 				array(
-					"name"=>'分享订单'.$fxzcount.'个',
+					// "name"=>'分享订单'.$fxzcount.'个',
+					"name"=>'分享订单'.$fxzcount,	//百里
 					"img"=>$img_arr['fxdd_ico1'],
 					"SkipUIIdentifier"=>"pub_fenxiangdingdan",
 					"val"=>$fxzcount,
 					"is_need_login"=>1,	
 				),
 				array(
-					"name"=>'家族订单'.$teamcount.'个',
+					// "name"=>'家族订单'.$teamcount.'个',
+					"name"=>'家族订单'.$teamcount,	//百里
 					"img"=>$img_arr['fxdd_ico'],
 					"SkipUIIdentifier"=>"pub_jiazudingdan",
 					"val"=>$teamcount,

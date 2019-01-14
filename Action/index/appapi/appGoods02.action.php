@@ -18,7 +18,7 @@ class appGoods02Action extends Action{
 		$data=zfun::arr64_decode($set['dtk_sxtj_data']);
 		unset($set['dtk_sxtj_data']);
 		foreach($data as $k=>$v)$set[$k]=$v;
-		
+
 		return $set;
 	}
 	public function getGoods(){
@@ -26,7 +26,7 @@ class appGoods02Action extends Action{
 		$set=self::getset();
 		if(!empty($_POST['token'])){
 			$user=zfun::f_row("User","token='".$_POST['token']."'");
-			
+
 		}
 		$guanggaoset=zfun::f_row("GuanggaoSet","var<>'' and var='".$_POST['show_type_str']."'");
 		$json=array();
@@ -38,7 +38,7 @@ class appGoods02Action extends Action{
 		if($SkipUIIdentifier=='pub_gettaobao')$SkipUIIdentifier='buy_taobao';
 
 		if(empty($SkipUIIdentifier))$SkipUIIdentifier='buy_taobao';
-		
+
 		$goods=array();
 		$_POST['keyword']=preg_replace('/^( |\s)*|( |\s)*$/', '', $_POST['keyword']);
 		$_POST['keyword']=str_replace(array("【冬季必备】","冬季必备"),"",$_POST['keyword']);
@@ -59,7 +59,7 @@ class appGoods02Action extends Action{
 			if(!empty($_POST['keyword'])&&empty($_POST['is_index'])){
 				if(!empty($set['gg_goods_s_price']))$_POST['start_price']=$set['gg_goods_s_price'];
 				if(!empty($set['gg_goods_s_bili']))$_POST['commission']=$set['gg_goods_s_bili'];
-				
+
 				self::getSearchPddgoods();
 			}
 		}
@@ -68,7 +68,7 @@ class appGoods02Action extends Action{
 			if($_POST['is_index']==1)self::getIndexTaobao($set);
 			if(!empty($_POST['is_ksrk'])){
 				$_POST['is_index']=1;
-				
+
 				if(empty($json))self::getSearchTaobao();
 				else{
 					self::getKsrkTaobao();
@@ -120,12 +120,12 @@ class appGoods02Action extends Action{
 		if($_POST['is_tm']==1)$_POST['mall_item']='true';
 		atbapiAction::getgoods(0,1);
 	}
-	
+
 	//首页淘宝商品
 	public static function getIndexTaobao(){
 		$set=self::getset();
 		$_POST['page_no']=$_POST['p'];
-		
+
 		if($set['app_shouye_zhanwai_onoff']==3){
 			$sort_arr=array(
 				"zonghe"=>0,
@@ -141,14 +141,14 @@ class appGoods02Action extends Action{
 			);
 			$_POST["sort"]=$sort_arr[($_POST['sort'])];
 		}
-		
+
 		apiAction::goods_sx_new();//包含物料模式
 		$data_str=apiAction::goods_sx_str();//筛选条件
 		$arr=$data_str['arr'];
 		$str2=$data_str['str'];
 		//淘宝联盟路线
 		if($set['app_shouye_zhanwai_onoff']==1)self::tblm($arr);
-		
+
 		$where = "id>0 and shop_id IN(1,2) AND start_time<" . time() . " AND end_time>" . time();
 		if (!empty($_POST['cid'])) {
 			$categoryModel = $GLOBALS['action']->getDatabase("Category");
@@ -177,16 +177,16 @@ class appGoods02Action extends Action{
 		if(empty($sort))$sort='tg_sort desc,goods_sales desc';
 		else $sort="tg_sort desc,".$sort;
 		$num=20;
-		$goods = appcomm::f_goods("Goods", $where, 'id,fnuo_id,goods_sales,goods_type,goods_price,goods_cost_price,goods_img,goods_title,start_time,end_time,cate_id,dp_id,commission,shop_id,highcommission_url,highcommission_wap_url,yhq_price,yhq_url,stock,yhq,yhq_span', $sort, NULL, $num);	
+		$goods = appcomm::f_goods("Goods", $where, 'id,fnuo_id,goods_sales,goods_type,goods_price,goods_cost_price,goods_img,goods_title,start_time,end_time,cate_id,dp_id,commission,shop_id,highcommission_url,highcommission_wap_url,yhq_price,yhq_url,stock,yhq,yhq_span', $sort, NULL, $num);
 		$goods=self::comm_update_goods($goods);
 		zfun::fecho("首页淘宝商品",$goods,1);
 	}
 	//快速入口淘宝商品
 	public static function getKsrkTaobao(){
-		
+
 		$set=self::getset();
 		$_POST['page_no']=$_POST['p'];
-		
+
 		if($GLOBALS['json']['goods_pd_onoff']==3){
 			$sort_arr=array(
 				"zonghe"=>0,
@@ -202,13 +202,13 @@ class appGoods02Action extends Action{
 			);
 			$_POST["sort"]=$sort_arr[($_POST['sort'])];
 		}
-		
+
 		apiAction::goods_sx_new();//包含物料模式
 		$data_str=apiAction::goods_sx_str();//筛选条件
 		//$arr=$data_str['arr'];
 		//$str2=$data_str['str'];
-		
-		
+
+
 		$where = "id>0 and shop_id IN(1,2) AND start_time<" . time() . " AND end_time>" . time();
 		if(!empty($GLOBALS['json']['start_price']))$where.=" and goods_price>".$GLOBALS['json']['start_price'];
 		if(!empty($GLOBALS['json']['end_price']))$where.=" and goods_price<".$GLOBALS['json']['end_price'];
@@ -243,11 +243,15 @@ class appGoods02Action extends Action{
 		if(empty($sort))$sort='tg_sort desc,goods_sales desc';
 		else $sort="tg_sort desc,".$sort;
 		$num=20;
-		$goods = appcomm::f_goods("Goods", $where, 'id,fnuo_id,goods_sales,goods_type,goods_price,goods_cost_price,goods_img,goods_title,start_time,end_time,cate_id,dp_id,commission,shop_id,highcommission_url,highcommission_wap_url,yhq_price,yhq_url,stock,yhq,yhq_span', $sort, NULL, $num);	
+		$goods = appcomm::f_goods("Goods", $where, 'id,fnuo_id,goods_sales,goods_type,goods_price,goods_cost_price,goods_img,goods_title,start_time,end_time,cate_id,dp_id,commission,shop_id,highcommission_url,highcommission_wap_url,yhq_price,yhq_url,stock,yhq,yhq_span', $sort, NULL, $num);
 		$goods=self::comm_update_goods($goods);
+
+		//百里
+		$goods = baili::hs_commission($goods);
+
 		zfun::fecho("首页淘宝商品",$goods,1);
 	}
-	
+
 	//首页拼多多
 	public static function getIndexPddgoods($set,$t=0){
 		if(empty($_POST['cid'])){
@@ -255,7 +259,7 @@ class appGoods02Action extends Action{
 			if(empty($_POST['keyword']))$_POST['keyword']='女装';
 		}
 		if(intval($set['pdd_indexgoods_type'])==1)$_POST['yhq']=1;
-		
+
 		$GLOBALS['start_price']=$set['app_pddshouye_minprice_sx'];
 		$GLOBALS['end_price']=$set['app_pddshouye_maxprice_sx'];
 		$GLOBALS['start_commission_rate']=$set['app_pddshouye_yj_sx'];
@@ -301,7 +305,7 @@ class appGoods02Action extends Action{
 	}
 	//拼多多商品
 	static function pddgoods($is_index=0){
-		
+
 		$sort_arr=array(
 			"zonghe"=>"",//默认
 			"goods_price_asc"=>"goods_price asc",//价格从低到高
@@ -324,14 +328,14 @@ class appGoods02Action extends Action{
 		$arr['end_sales']=$GLOBALS['end_sales'];
 		if(empty($_POST['keyword'])&&!empty($_POST['is_ksrk']))$_POST['keyword']='女装';
 		if(!empty($arr['cid'])&&!empty($_POST['is_ksrk']))$_POST['keyword']='';
-		
-	
+
+
 		$data=pinduoduo::getlist($_POST['keyword'],$arr,$_POST['p']);
 		foreach($data as $k=>$v){
-		
+
 			$data[$k]['getGoodsType']='buy_pinduoduo';//
 		}
-		return $data;		
+		return $data;
 	}
 	//首页京东
 	public static function getIndexJdgoods($set,$t=0){
@@ -345,7 +349,7 @@ class appGoods02Action extends Action{
 		elseif($set['app_jdshouye_zhanwai_onoff']==6)$data=self::getJttGoods();//京推推
 		else if(intval($set['jd_indexgoods_type'])==1)$data=self::jdCouponGoods();
 		else$data=self::jdgoods();
-	
+
 		if($t==1)return $data;
 		$goods=self::comm_update_goods($data);
 
@@ -356,9 +360,9 @@ class appGoods02Action extends Action{
 	}
 	//搜索页的京东
 	public static function getSearchJdgoods($t=0){
-		
+
 		if($_POST['is_ksrk']==1&&$GLOBALS['json']){
-			
+
 			if($GLOBALS['json']['jdgoods_pd_onoff']==6)$data=self::getJttGoods();//京推推
 			else if(intval($GLOBALS['json']['yhq_onoff'])==1)$data=self::jdCouponGoods();
 			else $data=self::jdgoods();
@@ -400,9 +404,9 @@ class appGoods02Action extends Action{
 			$data[$k]['goods_type']=0;
 			$data[$k]['goods_img']=str_replace(array("_500x500.jpg"),"",$v['goods_img']);
 		}
-		
-		
-		return $data;		
+
+
+		return $data;
 	}
 	//京东商品
 	static function jdgoods(){
@@ -426,7 +430,7 @@ class appGoods02Action extends Action{
 		foreach($data as $k=>$v){
 			$data[$k]['getGoodsType']='buy_jingdong';//
 		}
-		return $data;		
+		return $data;
 	}
 	//京东标签商品
 	static function lablejdgoods(){
@@ -454,18 +458,18 @@ class appGoods02Action extends Action{
 			$data[$k]['getGoodsType']='buy_jingdong';//
 			$data[$k]['fnuo_id'].="_".$GLOBALS['app_jd_lable'];//
 		}
-		return $data;		
+		return $data;
 	}
 	//搜索页的优惠券京东
 	public static function getSearchJdCouponGoods($t=0){
-	
+
 		$data=self::jdCouponGoods();
 		if($t==1)return $data;
 		$goods=self::comm_update_goods($data);
 
 		//百里
 		$goods = baili::hs_commission($goods);
-		
+
 		zfun::fecho("首页京东商品",$goods,1);
 	}
 	//搜索页的优惠券京东
@@ -492,7 +496,7 @@ class appGoods02Action extends Action{
 		foreach($data as $k=>$v){
 			$data[$k]['getGoodsType']='buy_jingdong';//
 		}
-		return $data;		
+		return $data;
 	}
 	//淘宝联盟
 	public static function tblm($arr=array()){
@@ -519,7 +523,7 @@ class appGoods02Action extends Action{
 		if(!empty($_POST['price1']))$_POST['start_price']=$_POST['price1'];
 		if(!empty($_POST['price2']))$_POST['end_price']=$_POST['price2'];
 		if(!empty($_POST['sort'])&&$_POST['sort']==5)$_POST['sortType']=9;
-		  
+
 		/*这是淘宝联盟的*/
 		if(intval($set['app_ggyhqtype'])==1){
 			actionfun("appapi/new_Alimama");
@@ -545,30 +549,30 @@ class appGoods02Action extends Action{
 	}
 	static function comm_update_goods($arr_gg=array()){
 		$set=self::getset();
-	
+
 		if(empty($arr_gg))return array();
 		if(!empty($_GET['fuck']))fpre(reset($arr_gg));
-		
+
 		$arr_gg=zfun::f_fgoodscommission($arr_gg);
-		
+
 		if(!empty($_GET['fuck']))fpre(reset($arr_gg));
 		$shop_type=array("淘宝","淘宝","天猫","京东","京东");
 		foreach($arr_gg as $k=>$v){
 			$arr_gg[$k]['shop_type']=$shop_type[$v['shop_id']];
 			if($v['shop_id']==4){
 				$arr_gg[$k]['shop_id']=3;
-				
+
 				$arr_gg[$k]['fnuo_url']=self::getUrl("gotojingdong","index",array("gid"=>$v['fnuo_id']),"appapi");
 				if(!empty($GLOBALS['is_jtt']))$arr_gg[$k]['fnuo_url']=INDEX_WEB_URL."?mod=appapi&act=gotojingdong&gid=".$v['fnuo_id']."&yhq_url=".urlencode($v['yhq_url']);
 			}
-			
+
 			if($v['pdd']==1){
 				$arr_gg[$k]['shop_id']=5;
 				$arr_gg[$k]['shop_type']='拼多多';
-				
+
 				$arr_gg[$k]['fnuo_url']=self::getUrl("gotopinduoduo","index",array("gid"=>$v['fnuo_id']),"appapi");
 			}
-			
+
 			$arr_gg[$k]['zhe']=$v['zhe']."折";
 			$arr_gg[$k]['goods_ico_one']=INDEX_WEB_URL."View/index/img/appapi/comm/list_discount_quan.png";
 			if(!empty($v['yhq_price']))$arr_gg[$k]['goods_ico_one']=INDEX_WEB_URL."View/index/img/appapi/comm/list_after_quan.png";
@@ -582,15 +586,15 @@ class appGoods02Action extends Action{
 			unset($arr_gg[$k]['detailurl']);
 			$arr_gg[$k]['is_qiangguang']=0;
 			if(!empty($v['shop_name']))$arr_gg[$k]['shop_title']=$v['shop_name'];
-	
+
 			$arr_gg[$k]['yhq_span']=intval($v['yhq_price'])."元券";
 		}
 		appcomm::goodsfeixiang($arr_gg);
 		appcomm::goodsfanlioff($arr_gg);
 		return $arr_gg;
 	}
-	
-	
+
+
 }
 ?>
 

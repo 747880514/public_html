@@ -51,12 +51,13 @@ class apiAction extends Action {
 		$oid = filter_check($_POST['oid']);
 		if (!($oid > 0))$this -> fecho(NULL, 0, "非法操作");
 		if (!($_POST['t'] == 1 || $_POST['t'] == 2))$this -> fecho(NULL, 0, "非法操作");
-		$tmp = zfun::f_row("Order", "orderId='$oid' and orderType='" . $_POST['t'] . "'","uid");
+		$order=$tmp = zfun::f_row("Order", "orderId='$oid' and orderType='" . $_POST['t'] . "'","uid");
 		if(empty($tmp))$this -> fecho(NULL, 0, "订单不存在 请稍后再尝试找回订单");
 		if($tmp['uid']==$uid)$this -> fecho(NULL, 0, "你已绑定该订单");
 		if($tmp['uid'].''!='0')$this -> fecho(NULL, 0, "订单已被他人绑定，如果是您的订单请联系客服处理");
 		
 		//判断是否是分享订单 分享订单不能找回
+		if($order['share_uid'].''!='0')$this->fecho(NULL,0,"分享订单不能找回");
 		$tg_pid=$tmp['tg_pid'];
 		if(!empty($tg_pid)){
 			$check=zfun::f_count("User","tg_pid='{$tg_pid}'");
@@ -83,11 +84,6 @@ class apiAction extends Action {
 		} else {
 			$uid = 0;
 		}
-
-		//百里.9.9商品
-		// actionfun("appapi/baili");
-		// baili::get_goods_lists("9.9");
-
 		//查大淘客订单  会中断
 		if(empty($_POST['price1']))unset($_POST['price1']);
 		if(empty($_POST['keyword']))unset($_POST['keyword']);
@@ -1784,6 +1780,9 @@ class apiAction extends Action {
 		}else if($type_dtktype=='大淘客双十一24小时定金榜'){//大淘客双十一24小时定金榜
 			$data['view_type']=1;
 			$data['is_showcate']=0;
+		}else if($type_dtktype=='大淘客双十二精选'){//大淘客双十二精选
+			$data['view_type']=1;
+			$data['is_showcate']=0;
 		}
 		
 		return $data;
@@ -1883,10 +1882,39 @@ class apiAction extends Action {
 			$json=json_decode($v['data_json'],true);unset($slides[$k]['data_json']);
 			$slides[$k]['fnuo_id']=($json['fnuo_id']);
 			$slides[$k]['shop_type']=($json['shop_type']);
+			
+			$slides[$k]['goods_msg']=self::getgoodsmsg($slides[$k]);
 		}
 		//success
 		//if(empty($set['checkVersion']))appcomm::set_app_cookie($slides);
 		$this -> fecho($slides, 1, "好吧，被你发现了");
+	}
+	//匹配商品详情接口
+	public static function getgoodsmsg($data=array()){
+		if($data['SkipUIIdentifier']!='pub_xuanzheshangpin')return array();
+		$fnuo_id=$data['fnuo_id'];
+		$tmp=array();
+		if(empty($fnuo_id))return array();
+		switch($data['shop_type'].''){
+			case "buy_jingdong":
+				actionfun("comm/jingdong");
+				$tmp=jingdong::id($fnuo_id);
+				break;
+			case "buy_pinduoduo":
+				actionfun("comm/pinduoduo");
+				$tmp=pinduoduo::id($fnuo_id);
+				break;
+			default:
+				actionfun("comm/tbmaterial");
+				$tmp=tbmaterial::id($fnuo_id);
+			
+				break;
+		}
+		if(empty($tmp))return $tmp;
+		
+		$tmp=self::comm_update_goods(array($tmp));
+		return $tmp;
+
 	}
 	public function getCates() {
 		if (!$this -> sign()) {
@@ -2470,7 +2498,7 @@ class apiAction extends Action {
 		if (empty($oneR)) {
 			if (!empty($user['extend_id'])) {
 				$extend = $userModel -> selectRow('id=' . $user['extend_id']);
-				$set=zfun::f_getset("yq_fh_onoff,operator_yqzcjl1,operator_yqzcjl2,fxdl_yqzcjl".($extend['is_sqdl']+1));
+				$set=zfun::f_getset("set_yqfh_time,yq_fh_onoff,operator_yqzcjl1,operator_yqzcjl2,fxdl_yqzcjl".($extend['is_sqdl']+1));
 				$commission_spread=floatval($set["fxdl_yqzcjl".($extend['is_sqdl']+1)]);
 				if($extend['operator_lv']=='1'){
 					$commission_spread=floatval($set['operator_yqzcjl1']);
@@ -2478,7 +2506,11 @@ class apiAction extends Action {
 				if($extend['operator_lv']=='2'){
 					$commission_spread=floatval($set['operator_yqzcjl2']);
 				}
-				if (!empty($user['phone']) && !empty($user['zfb_au'])) {
+				$not_fanli=0;
+				$times=$set['set_yqfh_time']; $reg_time=$user['reg_time'];
+				if(!empty($times)&&!empty($reg_time)&&$reg_time<$times)$not_fanli=1;
+			
+				if (!empty($user['phone']) && !empty($user['zfb_au'])&&$not_fanli==0) {
 					$jf_spread = floatval($this -> getSetting("jf_spread"));
 					//$commission_spread=floatval(self::getSetting("commission_spread"));
 					$carr=array();
@@ -2526,30 +2558,32 @@ class apiAction extends Action {
 		return $type;
 	}
 	public function getUserInfo() {
+		//zfun::fecho(ip);
 		if (!$this -> sign()) {
 			$this -> fecho(null, 0, "签名错误");
 		}
 		if (empty($_POST['token'])) {
 			$this -> fecho(null, 0, '缺少参数token');
 		}
+
 		$userModel = $this -> getDatabase('User');
 		$mylikeModel = $this -> getDatabase('MyLike');
 		$eventlog = $this -> getDatabase('Interal');
 		$orderModel = $this -> getDatabase('Order');
 		$authenticationModel = $this -> getDatabase('Authentication');
-		$user = $userModel -> selectRow('token="' . $_POST['token'] . '"', "tb_app_pid,ios_tb_app_pid,fanTotal_time,tg_code,hhr_gq_time,id,is_sqdl,tg_pid,loginname,is_agent,vip,phone,email,nickname,realname,sex,qq,integral,head_img,checkNum,checkTime,taobao_au,qq_au,sina_au,zfb_au,weixin_au,vip,money,growth,three_nickname,address,extend_id,order_num,sordernum,lovenum,flower,xflower,hflower,fans,people,commission,zztx,lhbtx,hbtx,operator_lv,platform");
-		
+		$user = $userModel -> selectRow('token="' . $_POST['token'] . '"', "reg_time,tb_app_pid,ios_tb_app_pid,fanTotal_time,tg_code,hhr_gq_time,id,is_sqdl,tg_pid,loginname,is_agent,vip,phone,email,nickname,realname,sex,qq,integral,head_img,checkNum,checkTime,taobao_au,qq_au,sina_au,zfb_au,weixin_au,vip,money,growth,three_nickname,address,extend_id,order_num,sordernum,lovenum,flower,xflower,hflower,fans,people,commission,zztx,lhbtx,hbtx,operator_lv,platform");
+
 		$setstr="mem_qiaodao_onoff,jf_name,user_top_img,fxdl_zdssdl_onoff,jf_ratio,vip_name".$user['vip'].",is_vip_extend_onoff";
 		$setstr.=",operator_wuxian_bili,operator_name,operator_name_2";//运营商
 		$setstr.=",fxdl_hhrshare_onoff";//普通会员是否可分享
 		$set=zfun::f_getset($setstr);
 		$set['fxdl_hhrshare_onoff']=intval($set['fxdl_hhrshare_onoff']);
-		
+
 		$uid=$user['id'];
 
 		//百里.会员返款操作
-		actionfun("appapi/baili_zhaoshang");
-		baili_zhaoshangAction::presell_return($uid);
+		// actionfun("appapi/baili_zhaoshang");
+		// baili_zhaoshangAction::presell_return($uid);
 
 		//判断注册返还佣金
 		actionfun("timer/register_commission");
@@ -2893,14 +2927,13 @@ class apiAction extends Action {
 		}
 		if (!empty($_POST['dq2'])) {
 			$data['dq2'] = intval($_POST['dq2']);
-			
 		}
 		if (!empty($_POST['dq3'])) {
 			$data['dq3'] = intval($_POST['dq3']);
-			
 		}
 		if(empty($data))zfun::fecho("操作失败");
 		$user = $userModel -> update('id=' . $userid['id'], $data);
+		actionfun("timer/user_nexus");$tmpaction=new user_nexusAction();$tmpaction->index();
 		$this -> fecho($user, 1, "修改数据成功");
 	}
 	public function updateIntegral() {
@@ -3081,7 +3114,17 @@ class apiAction extends Action {
 			$dizhi = str_replace("&t=", "&euid=" . $uid . "&t=", $dizhi);
 			$str1 = explode("&shops=", $dizhi);
 			$str2 = explode("&euid=", $dizhi);
-			$dizhi = $str1[0] . "&euid=" . $str2[1];
+
+			//百里
+			if(strstr($dizhi, 's.click.taobao.com'))
+			{
+				$dizhi = $str1[0];
+			}
+			else
+			{
+				$dizhi = $str1[0] . "&euid=" . $str2[1];
+			}
+
 			$scdg[$k]['scdg_dizhi'] = $dizhi;
 			$scdg[$k]['str1'] ="最高返".$v['scdg_bili']."%";
 			/*$tmp = str_replace("&e=", "&abc=", $v['scdg_dizhi']);
@@ -3144,21 +3187,7 @@ class apiAction extends Action {
 		}
 		if (!empty($_POST['token'])) {
 			$userid = $userModel -> selectRow('token="' . $_POST['token'] . '"');
-			/*$person_id = $userid['id'];
-			 $Decodekey = $this -> getApp('Tgidkey');
-			 if (!empty($person_id)) {
-			 $person_tgid = $Decodekey -> Decodekey($person_id);
-			 } else {
-			 $person_tgid = 0;
-			 }*/
 		}
-		/*if (!empty($_POST['tid'])) {
-		 $tgid = intval($_POST['tid']);
-		 $Decodekey = $this -> getApp('Tgidkey');
-		 $tgid = $Decodekey -> Decodekey($tgid);
-		 } else {
-		 $tgid = 0;
-		 }*/
 		$webname=self::getSetting("webset_webnick");
 		$set=zfun::f_getset("jf_reg,xinren_hongbao,blocking_price_endday");	//百里，追加blocking_price_endday
 		$jf_reg = floatval($set['jf_reg']);
@@ -3198,6 +3227,8 @@ class apiAction extends Action {
 					if (!empty($_POST['tid'])) {
 						$userdata['extend_id'] = $_POST['tid'];
 					}
+					actionfun("appapi/dg_login");
+					dg_loginAction::getlhb_num($userdata['extend_id']);
 					$insertid=$uid = $userModel -> insertId($userdata);
 					$this -> setSessionUser($insertid, $_POST['username']);
 					//注册送积分事件
@@ -3206,8 +3237,7 @@ class apiAction extends Action {
 					//绑定运营商id
 					actionfun("comm/register");
 					register::set_operator_id($uid);
-					
-					$this -> fecho(null, 1, "注册成功");
+
 					break;
 				case 2 :
 					$jf_reg = $this -> getSetting('jf_reg');
@@ -3235,10 +3265,11 @@ class apiAction extends Action {
 					//绑定运营商id
 					actionfun("comm/register");
 					register::set_operator_id($uid);
-					
-					$this -> fecho(null, 1, "注册成功");
+
 					break;
 			}
+			actionfun("timer/user_nexus");$tmpaction=new user_nexusAction();$tmpaction->index();
+			$this -> fecho(null, 1, "注册成功");
 		}
 	}
 	public function updatePwd() {

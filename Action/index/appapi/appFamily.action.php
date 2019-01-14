@@ -120,7 +120,7 @@ class appFamilyAction extends Action{
 						$validorderend = zfun::f_row("Order", "status = '订单结算' AND returnstatus = 1 AND uid = '{$one_user['id']}'");
 						if(!$validorderend)
 						{
-							$nexus[$k]['Vname'] = '解锁中';//"待激活";
+							$nexus[$k]['Vname'] = '已下单';//"待激活";
 						}
 					}
 					else

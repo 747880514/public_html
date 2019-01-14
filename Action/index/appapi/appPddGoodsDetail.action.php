@@ -11,7 +11,11 @@ class appPddGoodsDetailAction extends Action{
 		$fnuo_id=filter_check($_POST['fnuo_id']);
 		$data=json_decode($_POST['data'],true);
 		$data=self::comm_goods($data);
-		
+
+		//百里
+		actionfun("appapi/baili");
+		$data = baili::hs_detail_commission($data);
+
 		zfun::fecho("传输处理",$data,1);
 	}
 	public static function comm_goods($data=array()){

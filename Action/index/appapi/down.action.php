@@ -239,13 +239,13 @@ class downAction extends Action{
 		//检测用户，注册
 		$user = zfun::f_row("User", "weixin_au = '".$unionid."' OR weixin_au = '".$openid."'");
 
+		$tgidkey = $this->getApp('Tgidkey');
+		$tgid = $tgidkey->Decodekey($tgid);
+
 		if(!$user)
 		{
 			$commission_reg = floatval(self::getSetting("commission_reg"));
 			$jf_reg=floatval(self::getSetting("jf_reg"));
-
-			$tgidkey = $this->getApp('Tgidkey');
-			$tgid = $tgidkey->Decodekey($tgid);
 
 			//百里
 			$blocking_price_endtime = self::getSetting('blocking_price_endday') > 0 ? self::getSetting('blocking_price_endday') : 3;
@@ -297,6 +297,27 @@ class downAction extends Action{
 		{
 			$uid = $user['id'];
 			$mobile = $user['phone'];
+
+			//未下单的用户，可以随意修改上下级关系
+			if($user['is_create_order'] != 1 && $user['extend_id'] != $tgid)
+			{
+				$is_create_order = zfun::f_row("Order", "uid='{$uid}' AND `status` IN ('订单付款','订单结算')");
+				if($is_create_order)
+				{
+					$updatedata['is_create_order'] = 1;	//已下单，不能更改上下级，固定标识
+				}
+				else
+				{
+					$updatedata['extend_id'] = $tgid;	//未下单，可以更改上下级
+				}
+
+				if($user['extend_id'] == '2094')
+				{
+					$updatedata['is_sqdl'] = 1;	//如果上级在公司名下，降级处理
+				}
+
+				zfun::f_update("User", "id = '{$uid}'", $updatedata);
+			}
 		}
 
 

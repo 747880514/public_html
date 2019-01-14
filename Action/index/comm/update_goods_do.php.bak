@@ -1,6 +1,7 @@
 <?php
 actionfun("comm/actfun");
 class update_goods_do{
+
 	static function update($order=array(),$user=array()){
 		$set=zfun::f_getset("update_goods_lvup_onoff,update_goods_onoff,operator_name,fxdl_name" . ($order['update_type']+1));
 		if($set['update_goods_onoff']==0)return 0;
@@ -172,6 +173,7 @@ class update_goods_do{
 	 * @return   [type]                          [description]
 	 */
 	public static function fanli_6($uid=0,$level=0,$money=0){
+
 		$money=floatval($money);
 		if(empty($uid))return;
 		if(empty($level))return;//等级
@@ -192,16 +194,171 @@ class update_goods_do{
 		$set=zfun::f_getset($str);
 		$fxdl_name=$set["fxdl_name".($level+1)];
 		if($level=='operator')$fxdl_name=$set["operator_name"];
+		$djdata=self::hs_getp($uid);
 
+		if(empty($djdata))return;
 		$user=zfun::f_row("User","id='$uid'");
 
-		//百里.重新计算比例
-		$djdata = self::hs_commission($uid);
-		if(empty($djdata))return;
-		$bili_str = array('直接奖励','间推奖励','管理奖励','蒜花分红','蒜花分红');
+		//百里.统计蒜苗蒜花个数
+		$lv_total = array('2'=>0, '3'=>0);
+		foreach ($djdata as $key => $value) {
+			// $lv_total[$value['is_sqdl']] += 1;
+			// 【招商会】
+			if($value['is_sqdl'] > 3)
+			{
+				$lv_total[3] += 1;
+			}
+			else
+			{
+				$lv_total[$value['is_sqdl']] += 1;
+			}
+		}
 
+		//百里.重新计算比例
+		$bili_mod = self::hs_bili_mod($lv_total);
+		$bili_str = array('直接奖励','间推奖励','管理奖励','蒜花分红','蒜花分红');
+		$other1 = array('v3'=>2,'v4'=>2,'v5'=>2,'v6'=>2);
+		$k = 0;
+		$max_x = 36;	//【招商会】最高不超过36%
+		foreach ($djdata as $key => &$value) {
+			//【非招商会】
+			// $value['bili'] = $bili_mod[$k];
+			//【招商会】
+			// if($lv_total[2] == 0 && ($k == 0 || $k == 1))
+			// {
+			// 	switch ($value['is_sqdl']) {
+			// 		case '3':
+			// 			$x = 6;		//蒜花+6
+			// 			break;
+			// 		case '4':
+			// 			$x = 14;	//蒜苔+14
+			// 			break;
+			// 		case '5':
+			// 			$x = 24;	//主管+24
+			// 			break;
+			// 		case '6':
+			// 			$x = 36;	//经理+36
+			// 			break;
+			// 	}
+
+			// 	$x = $max_x > $x ? $x : $max_x;
+
+			// 	$value['bili'] = $bili_mod[$k] + $x;
+
+			// 	$max_x -= $x;
+			// }
+			// if($lv_total[2] == 1 && $k == 0)
+			// {
+			// 	switch ($value['is_sqdl']) {
+			// 		case '3':
+			// 			$x = 6;		//蒜花+6
+			// 			break;
+			// 		case '4':
+			// 			$x = 14;	//蒜苔+14
+			// 			break;
+			// 		case '5':
+			// 			$x = 24;	//主管+24
+			// 			break;
+			// 		case '6':
+			// 			$x = 36;	//经理+36
+			// 			break;
+			// 	}
+
+			// 	$x = $max_x > $x ? $x : $max_x;
+
+			// 	$value['bili'] = $bili_mod[$k] + $x;
+
+			// 	$max_x -= $x;
+			// }
+			// if($value['is_sqdl'] >= 3)
+			// {
+			// 	$x = 0;
+			// 	switch ($value['is_sqdl']) {
+			// 		case '3':
+			// 			$x = 6;		//蒜花+6
+			// 			break;
+			// 		case '4':
+			// 			$x = 14;	//蒜苔+14
+			// 			break;
+			// 		case '5':
+			// 			$x = 24;	//主管+24
+			// 			break;
+			// 		case '6':
+			// 			$x = 36;	//经理+36
+			// 			break;
+			// 	}
+
+			// 	$x = $max_x > $x ? $x : $max_x;
+
+			// 	$value['bili'] = $bili_mod[$k] + $x;
+
+			// 	$max_x -= $x;
+			// }
+			// else
+			// {
+			// 	$value['bili'] = $bili_mod[$k];
+			// }
+			if($k == 0)
+			{
+				$guding = 20;	//直推
+			}
+			else
+			{
+				$guding = 10;	//间推
+			}
+
+			$x = $y = 0;
+			switch ($value['is_sqdl']) {
+				case '3':
+					$x = 6;		//蒜花+6
+					$y = $other1['v3'];
+					$other1['v3'] = 0;
+					break;
+				case '4':
+					$x = 14;	//蒜苔+14
+					$y = $other1['v3'] + $other1['v4'];
+					$other1['v3'] = $other1['v4'] = 0;
+					break;
+				case '5':
+					$x = 24;	//主管+24
+					$y = $other1['v3'] + $other1['v4'] + $other1['v5'];
+					$other1['v3'] = $other1['v4'] = $other1['v5'] = 0;
+					break;
+				case '6':
+					$x = 36;	//经理+36
+					$y = $other1['v3'] + $other1['v4'] + $other1['v5'] + $other1['v6'];
+					$other1['v3'] = $other1['v4'] = $other1['v5'] = $other1['v6'] = 0;
+					break;
+			}
+
+			if($x > 0)
+			{
+				$x = $max_x > $x ? $x : $max_x;
+				$max_x -= $x;
+			}
+
+			$value['bili'] = $guding + $x + $y;
+
+			$value['bili_str'] = $bili_str[$k];
+			$k++;
+		}
 
 		foreach($djdata as $k=>$v){
+			//如果他不是代理也不是用户不给
+			//if(intval($v['operator_lv'])==0&&$v['is_sqdl']==0){$is_fl=0;continue;}
+			// if(intval($v['is_sqdl'])>=0){//如果是普通或代理时的比例
+			// 	$id=$lv=intval($v['is_sqdl'])+1;
+			// 	if(floatval($set['fxdl_tjdldj_'.$lv])<$v['lv']){$is_fl=0;}
+			// 	$bili=$set["fxdl_tjdl_bili".$v['lv']."_".$lv];
+			// }
+			// if($v['operator_lv']==1){//如果是运营商时的比例
+			// 	if(floatval($set['fxdl_tjdldj_operator_1'])<$v['lv']){$is_fl=0;}
+			// 	$bili=$set["fxdl_tjdl_bili_operator".$v['lv']."_1"];
+			// }
+			// if($v['operator_lv']==2){//如果是联合创始人时的比例
+			// 	if(floatval($set['fxdl_tjdldj_operator_2'])<$v['lv']){$is_fl=0;}
+			// 	$bili=$set["fxdl_tjdl_bili_operator".$v['lv']."_2"];
+			// }
 
 			$bili = $v['bili'];
 
@@ -216,7 +373,6 @@ class update_goods_do{
 					"gl_uid"=>$uid,//升级的用户
 					"mem_level"=>$level,
 					"gm_money"=>$money,
-					"bili"=>$bili,
 				);
 				$jibie = $k + 1;
 				// 百里.修改前
@@ -240,7 +396,6 @@ class update_goods_do{
 		if($result==false)return false;
 		return true;
 	}
-
 	//获取上级
 	public static function getp($uid,$tidname="extend_id",$maxlv=9){
 		if(empty($uid)||empty($tidname))return array();
@@ -297,9 +452,9 @@ class update_goods_do{
 			$user=zfun::f_row("User","id='$pid'","id,extend_id,is_sqdl,operator_lv");
 
 			if(!empty($user['id']) && $user['is_sqdl'] >= '2'){
+				// if(($user['is_sqdl'] == 2 && $lv2 < $max_lv2) OR ($user['is_sqdl'] == 3 && $lv3 < $max_lv3))
 				// 【招商会】
 				if(($user['is_sqdl'] == 2 && $lv2 < $max_lv2) OR ($user['is_sqdl'] >= 3 && $lv3 < $max_lv3))
-				// if(($user['is_sqdl'] == 2 && $lv2 < $max_lv2) OR ($user['is_sqdl'] == 3 && $lv3 < $max_lv3))
 				{
 
 					$arr[$lv]['lv']=$lv;
@@ -331,10 +486,111 @@ class update_goods_do{
 	 * [hs_bili_mod 百里.重新计算比例]
 	 * @Author   Baili
 	 * @Email    baili@juhuivip.com
-	 * @DateTime 2019-01-10T11:48:21+0800
+	 * @DateTime 2018-11-19T14:49:11+0800
 	 * @param    [type]                   $lv_total [description]
-	 * @return   [type]                             [description]
+	 * @return   [type]                         	[description]
 	 */
+	// public static function hs_bili_mod($lv_total)
+	// {
+	// 	$bili_mod = array();
+
+	// 	if ($lv_total[2] == 0)
+	// 	{
+	// 		switch ($lv_total[3]) {
+	// 			case '1':
+	// 				$bili_mod[] = 40 + 8 + 6;
+	// 				break;
+	// 			case '2':
+	// 				$bili_mod[] = 40 + 2;
+	// 				$bili_mod[] = 8 + 4;
+	// 				break;
+	// 			case '3':
+	// 				$bili_mod[] = 40 + 2;
+	// 				$bili_mod[] = 8 + 2;
+	// 				$bili_mod[] = 2;
+	// 				break;
+	// 			case '4':
+	// 				$bili_mod[] = 40 + 2;
+	// 				$bili_mod[] = 8;
+	// 				$bili_mod[] = 2;
+	// 				$bili_mod[] = 2;
+	// 				break;
+	// 			case '5':
+	// 				$bili_mod[] = 40;
+	// 				$bili_mod[] = 8;
+	// 				$bili_mod[] = 2;
+	// 				$bili_mod[] = 2;
+	// 				$bili_mod[] = 2;
+	// 				break;
+	// 		}
+	// 	}
+	// 	elseif ($lv_total[2] == 1)
+	// 	{
+	// 		$bili_mod[] = 30;
+	// 		switch ($lv_total[3]) {
+	// 			case '1':
+	// 				$bili_mod[] = 20 + 8 + 6;
+	// 				break;
+	// 			case '2':
+	// 				$bili_mod[] = 20 + 2;
+	// 				$bili_mod[] = 8 + 4;
+	// 				break;
+	// 			case '3':
+	// 				$bili_mod[] = 20 + 2;
+	// 				$bili_mod[] = 8 + 2;
+	// 				$bili_mod[] = 2;
+	// 				break;
+	// 			case '4':
+	// 				$bili_mod[] = 20 + 2;
+	// 				$bili_mod[] = 8;
+	// 				$bili_mod[] = 2;
+	// 				$bili_mod[] = 2;
+	// 				break;
+	// 			case '5':
+	// 				$bili_mod[] = 20;
+	// 				$bili_mod[] = 8;
+	// 				$bili_mod[] = 2;
+	// 				$bili_mod[] = 2;
+	// 				$bili_mod[] = 2;
+	// 				break;
+	// 		}
+	// 	}
+	// 	elseif ($lv_total[2] == 2)
+	// 	{
+	// 		$bili_mod[] = 30;
+	// 		$bili_mod[] = 15;
+	// 		switch ($lv_total[3]) {
+	// 			case '1':
+	// 				$bili_mod[] = 8 + 6;
+	// 				break;
+	// 			case '2':
+	// 				$bili_mod[] = 8 + 2;
+	// 				$bili_mod[] = 2 + 2;
+	// 				break;
+	// 			case '3':
+	// 				$bili_mod[] = 8 + 2;
+	// 				$bili_mod[] = 2;
+	// 				$bili_mod[] = 2;
+	// 				break;
+	// 			case '4':
+	// 				$bili_mod[] = 8;
+	// 				$bili_mod[] = 2;
+	// 				$bili_mod[] = 2;
+	// 				$bili_mod[] = 2;
+	// 				break;
+	// 			case '5':
+	// 				$bili_mod[] = 8;
+	// 				$bili_mod[] = 2;
+	// 				$bili_mod[] = 2;
+	// 				$bili_mod[] = 2;
+	// 				$bili_mod[] = 0;
+	// 				break;
+	// 		}
+	// 	}
+
+	// 	return $bili_mod;
+	// }
+	// 【招商会】
 	public static function hs_bili_mod($lv_total)
 	{
 		$bili_mod = array();
@@ -435,73 +691,5 @@ class update_goods_do{
 
 		return $bili_mod;
 	}
-
-
-
-	/**
-	 * [hs_commission 计算各层级分佣比]
-	 * @Author   Baili
-	 * @Email    baili@juhuivip.com
-	 * @DateTime 2019-01-10T14:18:43+0800
-	 * @param    [type]                   $uid [description]
-	 * @return   [type]                        [description]
-	 */
-	public static function hs_commission($uid)
-	{
-		//查询会员的所有上级
-		actionfun("comm/twoway");
-		$extends = twoway::get_extend_all($uid);
-		$extends = array_values($extends);
-
-		unset($extends[0]);	//删除当前会员单元
-
-		$bili_all = 0;	//返利的总百分比
-		$extends_get = $is_sqdl = array();	//可以拿到返佣的上级
-		$level = array('0'=>0, '1'=>0, '2'=>0, '3'=>6, '4'=>14, '5'=>24, '6'=>36);	//等级对应返利百分比(极差算法)
-		foreach ($extends as $key => &$value)
-		{
-			if($key == 1)	//直推单元
-			{
-				//比例=等级对应返利比例 - 已返的总比例 + 直推固定比例
-				$value['bili'] = $level[$value['is_sqdl']] - $bili_all;
-				$value['bili'] = max($value['bili'], 0);
-				$bili_all += $value['bili'];
-
-				$value['bili'] += 20;
-
-				$extends_get[] = $value;
-				$is_sqdl[] = $value['is_sqdl'];
-			}
-			elseif($key == 2)	//间推单元
-			{
-				//比例=等级对应返利比例 - 已返的总比例 + 直推固定比例
-				$value['bili'] = $level[$value['is_sqdl']] - $bili_all;
-				$value['bili'] = max($value['bili'], 0);
-				$bili_all += $value['bili'];
-
-				$value['bili'] += 10;
-
-				$extends_get[] = $value;
-				$is_sqdl[] = $value['is_sqdl'];
-			}
-			else
-			{
-				//非平级单元（>=蒜花）
-				if(!in_array($value['is_sqdl'], $is_sqdl) && $value['is_sqdl'] >= 3)
-				{
-					//比例=等级对应返利比例 - 已返的总比例
-					$value['bili'] = $level[$value['is_sqdl']] - $bili_all;
-					$value['bili'] = max($value['bili'], 0);
-					$bili_all += $value['bili'];
-
-					$extends_get[] = $value;
-					$is_sqdl[] = $value['is_sqdl'];
-				}
-			}
-		}
-
-		return $extends_get;
-	}
-
 }
 ?>
