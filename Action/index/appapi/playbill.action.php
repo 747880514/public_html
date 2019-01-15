@@ -2,7 +2,7 @@
 
 actionfun("appapi/dgappcomm");
 
-actionfun("appapi/appHhr");
+
 
 class playbillAction extends action{
 
@@ -40,13 +40,27 @@ class playbillAction extends action{
 
         if(intval($set['tg_durl'])==1){
 
-            $arrulr=appHhrAction::bdurl($url1,$url2);//0.13
+            $arrulr=self::bdurl($url1,$url2);//0.13
 
 			if(!empty($arrulr[0]))$url1=$arrulr[0];
 
 			if(!empty($arrulr[1]))$url2=$arrulr[1];
 
-		}
+        }
+
+        $share_url=$url1;
+
+    
+
+		if($set['haibao_share_onoff']==1)$share_url-$url2;
+
+		if($set['haibao_share_onoff']==2)$share_url=$url4;
+
+
+
+
+
+        $set['haibao_share_url']=$share_url;
 
         $set['haibao_share_wenan']=str_replace("{下载链接}",$url2,$set['haibao_share_wenan']);
 
@@ -62,13 +76,55 @@ class playbillAction extends action{
 
     }
 
-    
+    public static function bdurl($bd,$bd2,$bd3,$bd4){
+
+		//$bdurl='http://cj.fnuo123.com/rebate_rebateShareDetail_wap-545269808157-931.html';
+
+		$set=zfun::f_getset("xinlang_key");
+
+		$source=$set['xinlang_key'];
+
+		if(empty($source))return array($bd,$bd2,$bd3,$bd4);
+
+		$bd=urlencode($bd);
+
+		$bd2=urlencode($bd2);
+
+		$bd3=urlencode($bd3);
+
+		$bd4=urlencode($bd4);
+
+		$url="https://api.weibo.com/2/short_url/shorten.json?source=$source";
+
+		if(!empty($bd))$url.="&url_long=$bd";
+
+		if(!empty($bd2))$url.="&url_long=$bd2";
+
+		if(!empty($bd3))$url.="&url_long=$bd3";
+
+		if(!empty($bd4))$url.="&url_long=$bd4";
+
+		$data=zfun::curl_get($url);
+
+		$data=json_decode($data,true);
+
+		$arr=array();
+
+		foreach($data['urls']  as $k=>$v){
+
+			$arr[]=$v['url_short'];
+
+		}
+
+		return $arr;
+
+	}
 
     //
 
     static function getsets(){
 
-        $set=zfun::f_getset("haibao_left_bordercolor,haibao_right_bordercolor,haibao_tip_str,haibao_left_bordercolor,haibao_right_bordercolor,share_host,android_url,tg_durl,haibao_left_str,haibao_left_strcolor,haibao_left_btncolor,haibao_right_str,haibao_right_strcolor,haibao_right_btncolor,haibao_share_wenan");
+        $set=zfun::f_getset("haibao_share_onoff,haibao_left_bordercolor,haibao_right_bordercolor,haibao_tip_str,haibao_left_bordercolor,haibao_right_bordercolor,share_host,android_url,tg_durl,haibao_left_str,haibao_left_strcolor,haibao_left_btncolor,haibao_right_str,haibao_right_strcolor,haibao_right_btncolor,haibao_share_wenan");
 
         if(empty($set['haibao_share_wenan'])){$set['haibao_share_wenan']='邀请您加入APP，下载链接：{下载链接}';}
 
@@ -95,6 +151,8 @@ class playbillAction extends action{
     }
 
     //集成二维码
+    //百里.修改
+    //部分数据*2
 
     public function getcode(){
 
@@ -113,8 +171,6 @@ class playbillAction extends action{
 		self::qrcode2($model,$user,1);
 
     }
-
-    //百里修改
 
     public static function qrcode2($arr,$user,$new=0){//生成二维码
 
@@ -158,9 +214,188 @@ class playbillAction extends action{
 
         $pincode_data=zfun::arr64_decode($set['pincode_data']);
 
-		$data['width']=750;
+  //       $data['list'][0] = array(//背景图
 
-		$data['height']=1334;
+  //           "url" => UPLOAD_URL."model/".$arr['img_max'],
+
+  //           "x" => 0,
+
+  //           "y" => 0,
+
+  //           "width" => 750,
+
+  //           "height" => 1334,
+
+		// 	"type"=>"png"
+
+  //       );
+
+  //       //百里.替换域名生成二维码
+  //       $url = "http://".$set['share_host']."/?mod=appapi&act=down&ctrl=get_unionid&tgid=".$tid;
+
+		// $data['list'][1] = array(//二维码
+
+  //          "url" => INDEX_WEB_URL."comm/qrcode/?url=".urlencode($url)."&size=15&codeKB=1",
+
+  //           "x" =>$pincode_data['code_logo']['x'],
+
+  //           "y" => $pincode_data['code_logo']['y'],
+
+  //           "width" => $pincode_data['code_logo']['width'],
+
+  //           "height" => $pincode_data['code_logo']['height'],
+
+		// 	"type"=>"png"
+
+  //       );
+
+        
+
+  //       $data['list'][2] = array(//头像
+
+  //           "url" => $user['head_img'],
+
+  //           "x" =>$pincode_data['codehead_img_logo']['x'],
+
+  //           "y" => $pincode_data['codehead_img_logo']['y'],
+
+  //           "width" => $pincode_data['codehead_img_logo']['width'],
+
+  //           "height" => $pincode_data['codehead_img_logo']['height'],
+
+  //           "type"=>"png"
+
+  //       );
+
+  //       if($set['is_show_codelogo']!=1){
+
+  //           $data['list'][3] = array(//appLOGO
+
+  //               "url" => $set['AppLogo'],
+
+  //               "x" =>$pincode_data['logo']['x'],
+
+  //               "y" => $pincode_data['logo']['y'],
+
+  //               "width" => $pincode_data['logo']['width'],
+
+  //               "height" => $pincode_data['logo']['height'],
+
+  //               "type"=>"png"
+
+  //           );
+
+  //       }
+
+  //        $text=$set['code_rgb_str1'];
+
+  //        $text_width=intval(mb_strlen($text,"utf-8")*25/2)+12;
+
+  //        $data['text'][0]=array(//二维码上方图片
+
+		// 	"size"=>$pincode_data['codetopfont']['size'],
+
+		// 	"x" =>$pincode_data['codetopfont']['x'],
+
+  //           "y" => $pincode_data['codetopfont']['y'],
+
+  //           "width" => $pincode_data['codetopfont']['width'],
+
+  //           "height" => $pincode_data['codetopfont']['height'],
+
+		// 	"val"=>$text,
+
+  //           "color"=>3,
+
+  //           "rgb"=>$set['code_rgb_color1'],
+
+  //       );
+
+       
+
+  //       $text1=$set['code_rgb_str2'];
+
+  //       $text1_width=intval(mb_strlen($text1,"utf-8")*25/2)+10;
+
+  //       $data['text'][1]=array(//二维码下方图片
+
+		// 	"size"=>$pincode_data['codebtmfont']['size'],
+
+		// 	"x" =>$pincode_data['codebtmfont']['x'],
+
+  //           "y" => $pincode_data['codebtmfont']['y'],
+
+  //           "width" => $pincode_data['codebtmfont']['width'],
+
+  //           "height" => $pincode_data['codebtmfont']['height'],
+
+		// 	"val"=>$text1,
+
+  //           "color"=>3,
+
+  //           "rgb"=>$set['code_rgb_color2'],
+
+  //       );
+
+  //       $tgid_width=intval(mb_strlen($user['tid'],"utf-8")*25/2)-2;
+
+  //       $data['text'][2]=array(
+
+		// 	"size"=>$pincode_data['codetgidfont']['size'],
+
+		// 	"x" =>$pincode_data['codetgidfont']['x'],
+
+  //           "y" => $pincode_data['codetgidfont']['y'],
+
+  //           "width" => $pincode_data['codetgidfont']['width'],
+
+  //           "height" => $pincode_data['codetgidfont']['height'],
+
+		// 	"val"=>$user['tid'],
+
+  //           "color"=>3,
+
+  //           "rgb"=>$set['code_rgb_color3'],
+
+  //       );
+
+  //       $text2=$set['AppDisplayName'];
+
+  //       $name_width=intval(mb_strlen($text2,"utf-8")*22/2)+10;
+
+  //       if($set['is_show_codelogo']!=1){
+
+  //           $data['text'][3]=array(
+
+  //               "size"=>$pincode_data['font']['size'],
+
+  //               "x" =>$pincode_data['font']['x'],
+
+  //               "y" => $pincode_data['font']['y'],
+
+  //               "width" => $pincode_data['font']['width'],
+
+  //               "height" => $pincode_data['font']['height'],
+
+  //               "val"=>$text2,
+
+  //               "color"=>3,
+
+  //               "rgb"=>$set['code_rgb_color4'],
+
+  //           );
+
+  //       }
+
+       
+
+  //       fun("pic");
+
+  //       return pic::getpic($data);
+
+        $data['width']=750 * 2;
+
+        $data['height']= 1334 * 2;
 
         $data['list'][0] = array(//背景图
 
@@ -170,30 +405,30 @@ class playbillAction extends action{
 
             "y" => 0,
 
-            "width" => 750,
+            "width" => 750 * 2,
 
-            "height" => 1334,
+            "height" => 1334 * 2,
 
-			"type"=>"png"
+            "type"=>"png"
 
         );
 
         //百里.替换域名生成二维码
         $url = "http://".$set['share_host']."/?mod=appapi&act=down&ctrl=get_unionid&tgid=".$tid;
 
-		$data['list'][1] = array(//二维码
+        $data['list'][1] = array(//二维码
 
             "url" => INDEX_WEB_URL."comm/qrcode/?url=".urlencode($url)."&size=15&codeKB=1",
 
-            "x" =>$pincode_data['code_logo']['x'],
+            "x" =>$pincode_data['code_logo']['x'] * 2 ,
 
-            "y" => $pincode_data['code_logo']['y'] + 300,
+            "y" => ($pincode_data['code_logo']['y'] + 300 ) * 2,
 
-            "width" => $pincode_data['code_logo']['width'],
+            "width" => $pincode_data['code_logo']['width'] * 2,
 
-            "height" => $pincode_data['code_logo']['height'],
+            "height" => $pincode_data['code_logo']['height'] * 2,
 
-			"type"=>"png"
+            "type"=>"png"
 
         );
 
@@ -238,17 +473,17 @@ class playbillAction extends action{
 
          $data['text'][0]=array(//二维码上方图片
 
-			"size"=>$pincode_data['codetopfont']['size'],
+            "size"=>$pincode_data['codetopfont']['size'] * 2,
 
-			"x" =>$pincode_data['codetopfont']['x'],
+            "x" =>$pincode_data['codetopfont']['x'] * 2,
 
-            "y" => $pincode_data['codetopfont']['y'],
+            "y" => $pincode_data['codetopfont']['y'] * 2,
 
-            "width" => $pincode_data['codetopfont']['width'],
+            "width" => $pincode_data['codetopfont']['width'] * 2,
 
-            "height" => $pincode_data['codetopfont']['height'],
+            "height" => $pincode_data['codetopfont']['height'] * 2,
 
-			"val"=>$text,
+            "val"=>$text,
 
             "color"=>3,
 
@@ -264,9 +499,9 @@ class playbillAction extends action{
 
         $data['text'][1]=array(//二维码下方图片
 
-			"size"=>$pincode_data['codebtmfont']['size'],
+            "size"=>$pincode_data['codebtmfont']['size'],
 
-			"x" =>$pincode_data['codebtmfont']['x'],
+            "x" =>$pincode_data['codebtmfont']['x'],
 
             "y" => $pincode_data['codebtmfont']['y'],
 
@@ -274,7 +509,7 @@ class playbillAction extends action{
 
             "height" => $pincode_data['codebtmfont']['height'],
 
-			"val"=>$text1,
+            "val"=>$text1,
 
             "color"=>3,
 
@@ -289,17 +524,17 @@ class playbillAction extends action{
 
         $data['text'][2]=array(
 
-			"size"=>$pincode_data['codetgidfont']['size'],
+            "size"=>$pincode_data['codetgidfont']['size'] * 2,
 
-			"x" => $leftpx,  //$pincode_data['codetgidfont']['x'],
+            "x" => $leftpx * 2,  //$pincode_data['codetgidfont']['x'],
 
-            "y" => $pincode_data['codetgidfont']['y'] - 130,
+            "y" => ($pincode_data['codetgidfont']['y'] - 130)*2,
 
-            "width" => $pincode_data['codetgidfont']['width'],
+            "width" => $pincode_data['codetgidfont']['width'] * 2,
 
-            "height" => $pincode_data['codetgidfont']['height'],
+            "height" => $pincode_data['codetgidfont']['height'] * 2,
 
-			"val"=>$user['tid'],
+            "val"=>$user['tid'],
 
             "color"=>3,
 
@@ -342,6 +577,8 @@ class playbillAction extends action{
         return pic::getpic($data);
 
     }
+
+    //
 
 }
 

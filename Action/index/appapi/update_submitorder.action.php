@@ -328,8 +328,6 @@ class update_submitorderAction extends Action{
 
 		$order=zfun::f_row("Updateorder",$where);
 
-		
-
 		$append=json_decode(base64_decode($order['append']),true);
 
 		if(empty($order)||$order['is_pay']==1)return 0;

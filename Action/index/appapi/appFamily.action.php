@@ -88,7 +88,7 @@ class appFamilyAction extends Action{
 		
 		$sort="lower_reg_time desc";
 		$nexus=appcomm::f_goods("Nexus",$where,NULL,$sort,NULL,20);
-		$nexus_user=zfun::f_kdata("User",$nexus,"lower_uid","id","id,head_img,is_sqdl,nickname,reg_time,operator_lv,yq_all_count,phone,tg_pid,tb_app_pid,ios_tb_app_pid");	//百里追加
+		$nexus_user=zfun::f_kdata("User",$nexus,"lower_uid","id","id,head_img,is_sqdl,nickname,reg_time,operator_lv,yq_all_count,phone,tg_pid,tb_app_pid,ios_tb_app_pid,wx_openid");	//百里追加
 		//$hhr_next_fl=zfun::f_kdata("HhrNextJl",$user1,"id","uid","uid,sum","  extend_id='$uid'");
 		foreach($nexus  as $k=>$v){
 			$one_user=$nexus_user[$v['lower_uid'].''];
@@ -104,7 +104,7 @@ class appFamilyAction extends Action{
 			//未安装APP(有手机号）
 			//未登录APP(无推广位）
 			//待激活(有推广位无首单或订单为0
-			if(empty($one_user['phone']))
+			if(empty($one_user['phone']) && empty($one_user['wx_openid']))
 			{
 				$nexus[$k]['Vname'] = '未下载';//"仅锁粉";
 			}

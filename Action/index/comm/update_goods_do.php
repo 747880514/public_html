@@ -195,11 +195,17 @@ class update_goods_do{
 
 		$user=zfun::f_row("User","id='$uid'");
 
+		//获取推荐人信息
+		$extend_user = "";
+		if($user['extend_id'] > 0)
+		{
+			$extend_user = zfun::f_row("User", "id = '{$user['extend_id']}'", "nickname,phone");
+			$extend_user = $extend_user['nickname'] ? $extend_user['nickname'] : $extends['phone'];
+		}
+
 		//百里.重新计算比例
 		$djdata = self::hs_commission($uid);
 		if(empty($djdata))return;
-		$bili_str = array('直接奖励','间推奖励','管理奖励','蒜花分红','蒜花分红');
-
 
 		foreach($djdata as $k=>$v){
 
@@ -216,14 +222,15 @@ class update_goods_do{
 					"gl_uid"=>$uid,//升级的用户
 					"mem_level"=>$level,
 					"gm_money"=>$money,
+					"is_sqdl" => $v['is_sqdl'],
 					"bili"=>$bili,
 				);
 				$jibie = $k + 1;
 				// 百里.修改前
 				// $result=self::adddetail("推荐【".$user['phone']."】成为".$fxdl_name." ".$jibie."级 返利 ".$commission,$v['uid'],0,$data,time(),$commission);
 				// 百里.修改后
-				$user['phone'] = !empty($user['phone']) ? $user['phone'] : $user['nickname'];
-				$result=self::adddetail("推荐【".$user['phone']."】成为".$fxdl_name." 获得".$v['bili_str'].$commission,$v['uid'],0,$data,time(),$commission);
+				$user['nickname'] = !empty($user['nickname']) ? $user['nickname'] : $user['phone'];
+				$result=self::adddetail($extend_user."邀请【".$user['nickname']."】成为".$fxdl_name." 获得".$v['bili_str'].$commission,$v['uid'],0,$data,time(),$commission);
 				if(empty($result)){$is_fl=0;continue;}
 				$is_fl=1;
 			}
@@ -458,8 +465,12 @@ class update_goods_do{
 		$bili_all = 0;	//返利的总百分比
 		$extends_get = $is_sqdl = array();	//可以拿到返佣的上级
 		$level = array('0'=>0, '1'=>0, '2'=>0, '3'=>6, '4'=>14, '5'=>24, '6'=>36);	//等级对应返利百分比(极差算法)
+		$bili_str = array('直接奖励','间推奖励','管理奖励','团队分红','团队分红','团队分红');
+		$k = 0;
 		foreach ($extends as $key => &$value)
 		{
+			$value['uid'] = $value['id'];
+
 			if($key == 1)	//直推单元
 			{
 				//比例=等级对应返利比例 - 已返的总比例 + 直推固定比例
@@ -467,10 +478,17 @@ class update_goods_do{
 				$value['bili'] = max($value['bili'], 0);
 				$bili_all += $value['bili'];
 
-				$value['bili'] += 20;
+				$value['bili_str'] = "团队分红";//$bili_str[$k];
+				$k++;
 
 				$extends_get[] = $value;
 				$is_sqdl[] = $value['is_sqdl'];
+
+				//拆分处理
+				$value['bili'] = 20;
+				$value['bili_str'] = "直推奖励";
+				$extends_get[] = $value;
+
 			}
 			elseif($key == 2)	//间推单元
 			{
@@ -479,10 +497,16 @@ class update_goods_do{
 				$value['bili'] = max($value['bili'], 0);
 				$bili_all += $value['bili'];
 
-				$value['bili'] += 10;
+				$value['bili_str'] = "团队分红";//$bili_str[$k];
+				$k++;
 
 				$extends_get[] = $value;
 				$is_sqdl[] = $value['is_sqdl'];
+
+				//拆分处理
+				$value['bili'] = 10;
+				$value['bili_str'] = "间推奖励";
+				$extends_get[] = $value;
 			}
 			else
 			{
@@ -493,6 +517,9 @@ class update_goods_do{
 					$value['bili'] = $level[$value['is_sqdl']] - $bili_all;
 					$value['bili'] = max($value['bili'], 0);
 					$bili_all += $value['bili'];
+
+					$value['bili_str'] = $bili_str[$k];
+					$k++;
 
 					$extends_get[] = $value;
 					$is_sqdl[] = $value['is_sqdl'];

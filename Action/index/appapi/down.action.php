@@ -207,7 +207,9 @@ class downAction extends Action{
 		$abs_url_data = file_get_contents($abs_url);
 		$obj_data=json_decode($abs_url_data);
 		$obj_data->access_token = $access_token;
-
+// print_r($obj);
+// print_r($obj_data);
+// die;
 		$unionid = $obj_data->unionid;
 		$openid = $obj_data->openid;
 		$nickname = $obj_data->nickname;
@@ -288,6 +290,8 @@ class downAction extends Action{
 
 				"blocking_price_endtime" => $blocking_price_endtime,	//3天内
 
+				"is_sqdl" => 1,
+
 			);
 
 			$uid = zfun::f_insert("User", $arr);
@@ -299,10 +303,12 @@ class downAction extends Action{
 			$mobile = $user['phone'];
 
 			//未下单的用户，可以随意修改上下级关系
-			if($user['is_create_order'] != 1 && $user['extend_id'] != $tgid)
+			if($user['is_create_order'] != 1 && $user['extend_id'] != $tgid && $tgid > 0)
 			{
-				$is_create_order = zfun::f_row("Order", "uid='{$uid}' AND `status` IN ('订单付款','订单结算')");
-				if($is_create_order)
+				$is_create_order = zfun::f_row("Order", "uid='{$uid}' AND `status` IN ('订单付款','订单结算')");	//查询普通订单
+				$is_create_order2 = zfun::f_row("Updateorder", "uid = '{$uid}' AND is_pay = 1");	//查询升级订单
+
+				if($is_create_order || $is_create_order2)
 				{
 					$updatedata['is_create_order'] = 1;	//已下单，不能更改上下级，固定标识
 				}
@@ -315,11 +321,9 @@ class downAction extends Action{
 				{
 					$updatedata['is_sqdl'] = 1;	//如果上级在公司名下，降级处理
 				}
-
 				zfun::f_update("User", "id = '{$uid}'", $updatedata);
 			}
 		}
-
 
 		$downurl = "http://".$set['share_host']."/?mod=appapi&act=down&ctrl=supdownload&uid=".$uid."&mobile=".$mobile;
 		header('Location: '.$downurl);
