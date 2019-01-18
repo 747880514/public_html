@@ -230,7 +230,7 @@ class update_goods_do{
 				// $result=self::adddetail("推荐【".$user['phone']."】成为".$fxdl_name." ".$jibie."级 返利 ".$commission,$v['uid'],0,$data,time(),$commission);
 				// 百里.修改后
 				$user['nickname'] = !empty($user['nickname']) ? $user['nickname'] : $user['phone'];
-				$result=self::adddetail($extend_user."邀请【".$user['nickname']."】成为".$fxdl_name." 获得".$v['bili_str'].$commission,$v['uid'],0,$data,time(),$commission);
+				$result=self::adddetail($extend_user."推荐【".$user['nickname']."】成为".$fxdl_name." 获得".$v['bili_str'].$commission,$v['uid'],0,$data,time(),$commission);
 				if(empty($result)){$is_fl=0;continue;}
 				$is_fl=1;
 			}

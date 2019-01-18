@@ -1,5 +1,8 @@
 <?php
 actionfun("comm/order");
+actionfun("comm/tuisong");//推送
+actionfun("comm/tuisong");
+
 //记录当前时间 订单 用户等级 比例佣金
 class set_order_user_lvAction extends Action{
 	static $set=array();
@@ -35,7 +38,7 @@ class set_order_user_lvAction extends Action{
 		$order=zfun::f_select("Order",$where,"id,orderId,status,orderType,uid,share_uid,is_rebate,commission,createDate,now_user,returnstatus",100,0,"id asc");
 		if(empty($order))$order=array();
 		$order=zfun::ordercommission($order);
-
+		
 		foreach($order as $k=>$v){
 			order::$set['tmp_oid']=$v['orderId'];
 			$uid=$v['uid'];
@@ -66,20 +69,21 @@ class set_order_user_lvAction extends Action{
 				{
 					continue;
 				}
+				$tmp_uid=$v1['id'];
 				$arr=array(
 					"uid"=>$v1['id'],
 					"oid"=>$v['id'],
 					"orderId"=>$v['orderId'],
 					"platform"=>$v['orderType'],
 					"order_create_time"=>$v['createDate'],
-					// "bili"=>$v1['bili'],	//百里
+					// "bili"=>$v1['bili'],//百里
 					"bili"=>$v1['hs_bili'],	//百里
 					"time"=>time(),
 					"lv"=>$v1['lv'],
 					"gx_str"=>$v1['gx_str'],
 					"gx_id"=>$v1['gx_id'],
 					"comment"=>$v1['gx_type_str'],
-					// "fcommission"=>zfun::dian(doubleval($v['commission'])*$v1['bili'],1000),//返利佣金	百里
+					// "fcommission"=>zfun::dian(doubleval($v['commission'])*$v1['bili'],1000),//返利佣金
 					"fcommission"=>zfun::dian(doubleval($v['commission'])*$v1['hs_bili'],1000),//返利佣金	百里
 					"status"=>$v['status'],//订单状态
 					"returnstatus"=>$v['returnstatus'],//是否已经返利
@@ -96,7 +100,23 @@ class set_order_user_lvAction extends Action{
 				$tmp=zfun::f_row("Rebate",$where);
 
 				// 百里.修改前
-				// if(empty($tmp))zfun::f_insert("Rebate",$arr);
+				// if(empty($tmp)){
+				// 	zfun::f_insert("Rebate",$arr);
+				// 	//插入新团队分享订单收益 推送``````````````````````````````````
+				// 	do{
+				// 		if(doubleval($arr['bili'])==0)break;
+				// 		if($arr['status']=='订单失效')break;
+				// 		if(doubleval($arr['fcommission'])==0)break;
+				// 		$tuisong_type="团队新订单";
+				// 		if($arr['comment']=='分享'||$arr['comment']=='自购')$tuisong_type='自购分享新订单';
+				// 		$tuisong_arr=array();
+				// 		$tuisong_arr['uid']=$arr['uid'];
+				// 		$tuisong_arr['订单编号']=$arr['orderId'];
+				// 		$tuisong_arr['预估佣金']=$arr['fcommission'];
+				// 		tuisong::save_msg($tuisong_type,$tuisong_arr);
+				// 	}while(false);
+				// 	//```````````````````````````````````````````````````
+				// }
 				// else{
 				// 	//只更新佣金 不更新关系
 				// 	$arr=array();
@@ -109,10 +129,29 @@ class set_order_user_lvAction extends Action{
 				if($v1['gx_type_str'] == '订单分红')
 				{
 					zfun::f_insert("Rebate",$arr);
+
+					//推送
+					self::presell_push($arr['uid'], "团队订单收益提醒", "订单号：{$arr['orderId']} 收益+".$arr['fcommission']);
 				}
 				else
 				{
-					if(empty($tmp))zfun::f_insert("Rebate",$arr);
+					if(empty($tmp)){
+						zfun::f_insert("Rebate",$arr);
+						//插入新团队分享订单收益 推送``````````````````````````````````
+						do{
+							if(doubleval($arr['bili'])==0)break;
+							if($arr['status']=='订单失效')break;
+							if(doubleval($arr['fcommission'])==0)break;
+							$tuisong_type="团队新订单";
+							if($arr['comment']=='分享'||$arr['comment']=='自购')$tuisong_type='自购分享新订单';
+							$tuisong_arr=array();
+							$tuisong_arr['uid']=$arr['uid'];
+							$tuisong_arr['订单编号']=$arr['orderId'];
+							$tuisong_arr['预估佣金']=$arr['fcommission'];
+							tuisong::save_msg($tuisong_type,$tuisong_arr);
+						}while(false);
+						//```````````````````````````````````````````````````
+					}
 					else{
 						//只更新佣金 不更新关系
 						$arr=array();
@@ -122,6 +161,10 @@ class set_order_user_lvAction extends Action{
 						zfun::f_update("Rebate",$where,$arr);
 					}
 				}
+
+
+				//刷新用户排行榜统计
+				zfun::f_update("User","id='".$tmp_uid."'",array("phb_time"=>0));
 			}
 
 			//修改订单 已分配状态
@@ -129,17 +172,19 @@ class set_order_user_lvAction extends Action{
 			zfun::f_update("Order","id='".$v['id']."'",$order_arr);
 		}
 
+
+		
 		/*
 		if(count($order)!=0){
 			echo '<script>window.location=window.location.href;</script>';
 		}
 		else{die("完成");}*/
-
+		
 		zfun::fecho("run ".count($order),array(),1);
 	}
 
 	/**
-	 * [hs_fenyong 花蒜分佣.百里]
+	 * [hs_fenyong 百里.花蒜分佣]
 	 * @Author   Baili
 	 * @Email    baili@juhuivip.com
 	 * @DateTime 2018-11-12T17:21:22+0800
@@ -148,35 +193,47 @@ class set_order_user_lvAction extends Action{
 	 */
 	public static function hs_fenyong($ex_user)
 	{
-
 		//百里.每个人能拿到的最大比例
 		$total_bili = 0.91;
 		$ex_user = array_values($ex_user);	//重置key
 		$hs_buy_lv = '';	//购买者等级
 
-		$hs_bili 	= array('v1'=>0.51,'v2'=>0.76,'v3'=>0.88);	//每个等级拿到的最低比例
-		// $hs_v1_bili = array(0.10, 0.15, 0.06, 0.06, 0.03);	//蒜头购买：[0]蒜苗分享者/蒜头分享者 [1][2]蒜苗 [3][4]蒜花
-		// $hs_v2_bili = array(0.06, 0.06, 0.03);	//蒜苗购买：[0]蒜苗 [1][2]蒜花
+		// $hs_bili 	= array('v1'=>0.51,'v2'=>0.76,'v3'=>0.88);	//每个等级拿到的最低比例
+		// $hs_v1_bili = array(0.10, 0.15, 0.06);	//蒜头购买：[0]蒜苗分享者/蒜头分享者 [1][2]蒜苗 [3][4]蒜花
+		// $hs_v2_bili = array(0.06);	//蒜苗购买：[0]蒜苗 [1][2]蒜花
 		// $hs_v3_bili = array(0.03);	//蒜花购买 [0]蒜花
+		$hs_bili 	= array('v1'=>0.51,'v2'=>0.76,'v3'=>0.82);	//每个等级拿到的最低比例
 		$hs_v1_bili = array(0.10, 0.15, 0.06);	//蒜头购买：[0]蒜苗分享者/蒜头分享者 [1][2]蒜苗 [3][4]蒜花
 		$hs_v2_bili = array(0.06);	//蒜苗购买：[0]蒜苗 [1][2]蒜花
-		// $hs_v3_bili = array(0.03);	//蒜花购买 [0]蒜花
 
 		//重新计算分配比
 		$hs_lv = array();
 		foreach ($ex_user as $bk => &$bv)
 		{
-			if($bv['is_sqdl'] > 3)
-			{
-				$bv['lv'] = 'v3';
-			}
 
+			$bv['lv'] = $bv['is_sqdl'] > 3 ? 'v3' : $bv['lv'];
 			$hs_lv[$bv['lv']] += 1;
 			if($hs_lv[$bv['lv']] > 2)
 			{
 				unset($ex_user[$bk]);
 				$hs_lv[$bv['lv']] -= 1;
 			}
+
+
+			//判断成员属性(下级蒜花数)
+			// if($bv['is_sqdl'] == '3')
+			// {
+			// 	$xj_hs_number = 0;
+			// 	$xj_hs_number = zfun::f_count("User", "extend_id = {$bv['id']} AND is_sqdl = 3", "id");
+			// 	if($xj_hs_number >= 50)
+			// 	{
+			// 		$bv['is_zhuguan'] = 1;	//主管标识
+			// 	}
+			// 	if($xj_hs_number >= 500)
+			// 	{
+			// 		$bv['is_jingli'] = 1;	//经理标识
+			// 	}
+			// }
 		}
 
 		foreach ($ex_user as $bk => &$bv)
@@ -184,25 +241,16 @@ class set_order_user_lvAction extends Action{
 			$bv['hs_bili'] = 0;
 			if($bk == 0)
 			{
+				//购买者
 				switch ($bv['lv']){
 					case 'v1':
 						$bv['hs_bili'] = $hs_bili['v1'];
 						break;
 					case 'v2':
 						$bv['hs_bili'] = $hs_bili['v2'];
-						if($hs_lv['v2'] == 1)
-						{
-							$bv['hs_bili'] += $hs_v2_bili[0];
-							$hs_v2_bili[0] = 0;
-						}
 						break;
 					case 'v3':
 						$bv['hs_bili'] = $hs_bili['v3'];
-						if($hs_lv['v3'] == 1)
-						{
-							$bv['hs_bili'] += $hs_v3_bili[0];
-							$hs_v3_bili[0] = 0;
-						}
 						break;
 					default:
 						$bv['hs_bili'] = 0;
@@ -229,22 +277,17 @@ class set_order_user_lvAction extends Action{
 									$bv['hs_bili'] = $hs_v1_bili[0];
 									$hs_v1_bili[0] = 0;
 								}
-								$bv['hs_bili'] += $hs_v1_bili[1] + $hs_v1_bili[2];
-								$hs_v1_bili[1] = $hs_v1_bili[2] = 0;
+								$bv['hs_bili'] += $hs_v1_bili[1];
+								$hs_v1_bili[1] = 0;
 							}
 							else if($hs_lv['v2'] == 2)
 							{
-								if($hs_v1_bili[0] > 0)
+								if($hs_v1_bili[0] > 0 || $hs_v1_bili[1] > 0)
 								{
-									$bv['hs_bili'] = $hs_v1_bili[0];
-									$hs_v1_bili[0] = 0;
+									$bv['hs_bili'] = $hs_v1_bili[0] +  $hs_v1_bili[1];
+									$hs_v1_bili[0] = $hs_v1_bili[1] = 0;
 								}
-								if($hs_v1_bili[1] > 0)
-								{
-									$bv['hs_bili'] += $hs_v1_bili[1];
-									$hs_v1_bili[1] = 0;
-								}
-								elseif($hs_v1_bili[1] == 0 && $hs_v1_bili[2] > 0)
+								elseif($hs_v1_bili[2] > 0)
 								{
 									$bv['hs_bili'] += $hs_v1_bili[2];
 									$hs_v1_bili[2] = 0;
@@ -252,46 +295,26 @@ class set_order_user_lvAction extends Action{
 							}
 							break;
 
-						// case 'v3':
-						// 	if($hs_lv['v2'] == 0 || !isset($hs_lv['v2']))
-						// 	{
-						// 		if($hs_v1_bili[0] > 0)
-						// 		{
-						// 			$bv['hs_bili'] += $hs_v1_bili[0];
-						// 			$hs_v1_bili[0] = 0;
-						// 		}
-						// 		if($hs_v1_bili[1] > 0)
-						// 		{
-						// 			$bv['hs_bili'] += $hs_v1_bili[1];
-						// 			$hs_v1_bili[1] = 0;
-						// 		}
-						// 		if($hs_v1_bili[2] > 0)
-						// 		{
-						// 			$bv['hs_bili'] += $hs_v1_bili[2];
-						// 			$hs_v1_bili[2] = 0;
-						// 		}
-						// 	}
-
-						// 	if($hs_lv['v3'] == 1)
-						// 	{
-						// 		$bv['hs_bili'] += $hs_v1_bili[3];
-						// 		$bv['hs_bili'] += $hs_v1_bili[4];
-						// 		$hs_v1_bili[3] = $hs_v1_bili[4] = 0;
-						// 	}
-						// 	else if($hs_lv['v3'] == 2)
-						// 	{
-						// 		if($hs_v1_bili[3] > 0)
-						// 		{
-						// 			$bv['hs_bili'] += $hs_v1_bili[3];
-						// 			$hs_v1_bili[3] = 0;
-						// 		}
-						// 		else if($hs_v1_bili[4] > 0)
-						// 		{
-						// 			$bv['hs_bili'] += $hs_v1_bili[4];
-						// 			$hs_v1_bili[4] = 0;
-						// 		}
-						// 	}
-						// 	break;
+						case 'v3':
+							if($hs_lv['v3'] == 1)
+							{
+								$bv['hs_bili'] = $hs_v1_bili[0] + $hs_v1_bili[1] + $hs_v1_bili[2];
+								$hs_v1_bili[0] = $hs_v1_bili[1] = $hs_v1_bili[2] = 0;
+							}
+							else if($hs_lv['v3'] == 2)
+							{
+								if($hs_v1_bili[0] > 0 || $hs_v1_bili[1] > 0)
+								{
+									$bv['hs_bili'] = $hs_v1_bili[0] + $hs_v1_bili[1];
+									$hs_v1_bili[0] = $hs_v1_bili[1] = 0;
+								}
+								else if($hs_v1_bili[2] > 0)
+								{
+									$bv['hs_bili'] = $hs_v1_bili[2];
+									$hs_v1_bili[2] = 0;
+								}
+							}
+							break;
 					}
 				}
 				//蒜苗购买
@@ -305,26 +328,13 @@ class set_order_user_lvAction extends Action{
 								$hs_v2_bili[0] = 0;
 							}
 
-						// case 'v3':
-						// 	if($hs_lv['v3'] == 1)
-						// 	{
-						// 		$bv['hs_bili'] = $hs_v2_bili[1] + $hs_v2_bili[2];
-						// 		$hs_v2_bili[1] = $hs_v2_bili[2] = 0;
-						// 	}
-						// 	else if($hs_lv['v3'] == 2)
-						// 	{
-						// 		if($hs_v2_bili[1] > 0)
-						// 		{
-						// 			$bv['hs_bili'] = $hs_v2_bili[1];
-						// 			$hs_v2_bili[1] = 0;
-						// 		}
-						// 		else if($hs_v2_bili[2] > 0)
-						// 		{
-						// 			$bv['hs_bili'] = $hs_v2_bili[2];
-						// 			$hs_v2_bili[2] = 0;
-						// 		}
-						// 	}
-						// 	break;
+						case 'v3':
+							if($hs_v2_bili[0] > 0)
+							{
+								$bv['hs_bili'] = $hs_v2_bili[0];
+								$hs_v2_bili[0] = 0;
+							}
+							break;
 					}
 				}
 				//蒜花购买
@@ -340,7 +350,7 @@ class set_order_user_lvAction extends Action{
 			}
 		}
 
-		//9%的团队分佣
+		//蒜花级别以上 9%的分佣
 		$ex_user_exp = self::hs_fenyong_exp($ex_user[0]['id']);
 		$ex_user = array_merge($ex_user,$ex_user_exp);
 
@@ -419,6 +429,54 @@ class set_order_user_lvAction extends Action{
 		}
 
 		return $extends;
+	}
+
+	/**
+	 * [presell_push 团队订单推送]
+	 * @Author   Baili
+	 * @Email    baili@juhuivip.com
+	 * @DateTime 2019-01-15T09:41:05+0800
+	 * @return   [type]                   [description]
+	 */
+	public static function presell_push($uid='', $title='', $msg='')
+	{
+
+        if(!$uid)
+        {
+        	return false;
+        }
+
+        include_once ROOT_PATH."Action/admin/dg_appsetting.action.php";
+
+        $arr=array(
+
+            "title"=>addslashes($title),
+
+            "msg"=>addslashes($msg),
+
+            "type"=>'pub_my_order',
+
+            "sd"=>1,
+
+            "is_app_msg"=>1,
+
+            "time"=>time(),
+
+            "jg_send_time"=>0,
+
+            "data"=>array(),
+
+            "uid" => $uid,
+
+        );
+
+        $data=array();
+
+        $arr['data']=addslashes(json_encode($data));
+
+        zfun::f_insert("Tuisong",$arr);
+
+        return 1;
 	}
 
 }

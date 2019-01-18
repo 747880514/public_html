@@ -17,13 +17,15 @@ class appDiyIndexAction extends Action{
 		//外链带token，实现H5页面获取会员信息
 		foreach ($arr as $key => &$value)
 		{
-			if($value['type'] == 'index_huandengpian_01')
+			$carry = array('index_huandengpian_01','index_kuaisurukou_01');
+			if(in_array($value['type'], $carry))
 			{
 				foreach ($value['list'] as $k => &$v)
 				{
 					if($v['SkipUIIdentifier'] == 'pub_wailian')
 					{
-						$v['url'] .= "&token=".filter_check($_POST['token']);
+						$guanlian = strstr($v['url'],'?') ? '&' : '?';
+						$v['url'] .= $guanlian."token=".filter_check($_POST['token']);
 					}
 				}
 			}

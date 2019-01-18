@@ -128,7 +128,13 @@ class appHhrAction extends Action{
 
 		//$result=order::get_lower($uid);
 
-		$count=zfun::f_count("Nexus","extend_uid='{$uid}' and bili<>0");
+		$set=zfun::f_getset("jzcy_fl_onoff");
+
+		$where="extend_uid='{$uid}' and bili>0";
+
+		if(intval($set['jzcy_fl_onoff'])==1)$where="extend_uid='{$uid}' ";//全部的
+
+		$count=zfun::f_count("Nexus",$where);
 
 		$data['allcount']=$count;
 
@@ -684,9 +690,15 @@ class appHhrAction extends Action{
 
 		$user=appcomm::signcheck(1);$uid=$user['id'];
 
+		$set=zfun::f_getset("jzcy_fl_onoff");
+
 		$data['sum']=zfun::f_sum("Rebate","uid='{$uid}' and buy_share_uid<>'{$uid}' and returnstatus=1","fcommission");
 
-		$data['count']=zfun::f_count("Nexus","extend_uid='{$uid}' and bili > 0");
+		$where="extend_uid='{$uid}' and bili>0";
+
+		if(intval($set['jzcy_fl_onoff'])==1)$where="extend_uid='{$uid}' ";//全部的
+
+		$data['count']=zfun::f_count("Nexus",$where);
 
 		$data['fan']=array();
 
@@ -706,7 +718,7 @@ class appHhrAction extends Action{
 
 		$sort=$sort_arr[intval($_POST['sort']).''];
 
-		$where="extend_uid='{$uid}' and bili > 0";
+
 
 		$nexus=appcomm::f_goods("Nexus",$where,NULL,$sort,NULL,20);
 
@@ -1226,8 +1238,6 @@ class appHhrAction extends Action{
 
 	}
 
-	//百里.修改
-	//部分基数*2
 	public function getcode(){
 
 		ob_end_clean();
@@ -1364,10 +1374,10 @@ class appHhrAction extends Action{
 
 		$goods=zfun::f_fgoodscommission(array($arr));$goods=reset($goods);
 
-		self::new_qrcode($goods,$user,'',1);
-
-
-
+		// 百里.修改前
+		// self::new_qrcode($goods,$user,'',1);
+		// 百里.修改后
+		self::new_qrcode2($goods,$user,'',1);
 	}
 
 	public static function bdurl($bd,$bd2,$bd3,$bd4){
@@ -1502,9 +1512,10 @@ class appHhrAction extends Action{
 
 		$data = array();
 
-		$data['width']=600 * 2;
+		$data['width']=600;
 
-		$data['height']=880 * 2;
+		$data['height']=880;
+
 
 
        $data['list'][0] = array(
@@ -1515,9 +1526,9 @@ class appHhrAction extends Action{
 
             "y" => 0,
 
-            "width" => 600 * 2,
+            "width" => 600,
 
-            "height" => 880 * 2,
+            "height" => 880,
 
 			"type"=>"png"
 
@@ -1527,13 +1538,13 @@ class appHhrAction extends Action{
 
             "url" => INDEX_WEB_URL."View/index/img/wap/takeOutt/sup_download/bj.png",
 
-            "x" => 380 * 2,
+            "x" => 380,
 
-            "y" => 650 * 2,
+            "y" => 650,
 
-            "width" => 193 * 2,
+            "width" => 193,
 
-            "height" => 177 * 2,
+            "height" => 177,
 
 			"type"=>"png"
 
@@ -1543,13 +1554,13 @@ class appHhrAction extends Action{
 
 		   "url" => INDEX_WEB_URL."comm/qrcode/?url=".urlencode($tg_url)."&size=11&codeKB=1",
 
-            "x" => 400 * 2,
+            "x" => 400,
 
-            "y" => 660 * 2,
+            "y" => 660,
 
-            "width" => 150 * 2,
+            "width" => 150,
 
-            "height" => 150 * 2,
+            "height" => 150,
 
 			"type"=>"png"
 
@@ -1565,9 +1576,9 @@ class appHhrAction extends Action{
 
             "y" => 0,
 
-            "width" => 600 * 2,
+            "width" => 600,
 
-            "height" => 600 * 2,
+            "height" => 600,
 
 			"type"=>"jpg"
 
@@ -1579,11 +1590,11 @@ class appHhrAction extends Action{
 
 			$data['text'][$i]=array(
 
-				"size"=>15 * 2,
+				"size"=>15,
 
-				"x"=>10 * 2,
+				"x"=>10,
 
-				"y"=>(670+25*$i)*2,
+				"y"=>670+25*$i,
 
 				"val"=>mb_substr($arr['goods_title'],16*$i,16,'utf-8'),
 
@@ -1597,11 +1608,11 @@ class appHhrAction extends Action{
 
 		$data['text'][$ii['i']+1]=array(
 
-			"size"=>16 * 2,
+			"size"=>16,
 
-			"x"=>10 * 2,
+			"x"=>10,
 
-			"y"=>(670+22*$ii['i']+50)*2,
+			"y"=>670+22*$ii['i']+50,
 
 			"val"=>"现价：￥".(floatval($arr['goods_price'])+floatval($arr['yhq_price'])),
 
@@ -1613,13 +1624,13 @@ class appHhrAction extends Action{
 
 				"url" => INDEX_WEB_URL."View/index/img/wap/takeOutt/sup_download/quan.png",
 
-				"x" => 10 * 2,
+				"x" => 10,
 
-				"y" => (670+22*$ii['i']+70) * 2,
+				"y" => 670+22*$ii['i']+70,
 
-				"width" => 123 * 2,
+				"width" => 123,
 
-				"height" => 48 * 2,
+				"height" => 48,
 
 				"type"=>"png"
 
@@ -1627,11 +1638,11 @@ class appHhrAction extends Action{
 
 			$data['text'][$ii['i']+2]=array(
 
-				"size"=>16 * 2,
+				"size"=>16,
 
-				"x"=>60 * 2,
+				"x"=>60,
 
-				"y"=>(670+22*$ii['i']+100)*2,
+				"y"=>670+22*$ii['i']+100,
 
 				"val"=>(floatval($arr['yhq_price'])),
 
@@ -1639,11 +1650,11 @@ class appHhrAction extends Action{
 
 			$data['text'][$ii['i']+3]=array(
 
-				"size"=>16 * 2,
+				"size"=>16,
 
-				"x"=>150 * 2,
+				"x"=>150,
 
-				"y"=>(670+22*$ii['i']+100)*2,
+				"y"=>670+22*$ii['i']+100,
 
 				"val"=>"券后价：￥".(floatval($arr['goods_price'])),
 
@@ -1679,8 +1690,6 @@ class appHhrAction extends Action{
 
 	}
 
-	//百里.修改
-	//部分基数*2
 	public static function new_qrcode($arr=array(),$user=array(),$urls='',$getnew=0){//生成二维码
 
 		$img=str_replace("https:","http:",$arr['goods_img']);
@@ -1817,229 +1826,7 @@ class appHhrAction extends Action{
 
 
 
-  //      $data['list'][0] = array(//底部的框
-
-  //           "url" => INDEX_WEB_URL."View/index/img/appapi/comm/code_bg_0.png?time=".time(),
-
-  //           "x" => 0,//30,
-
-  //           "y" => 1054,
-
-  //           "width" => 750,//690,
-
-  //           "height" => 270,//230,
-
-		// 	"type"=>"png"
-
-  //       );
-
-		// $data['list'][1] = array(//二维码
-
-		//    "url" => INDEX_WEB_URL."comm/qrcode/?url=".urlencode($tg_url)."&size=20&codeKB=1",
-
-  //           "x" => 27,//113,
-
-  //           "y" => 1165,//1076,
-
-  //           "width" => 130,//183,
-
-  //           "height" => 130,//183,
-
-		// 	"type"=>"png"
-
-  //       );
-
-		// //
-
-		// $data['list'][2] = array(//商品图【图片
-
-  //           "url" => $img,
-
-  //           "x" =>30,
-
-  //           "y" => 350,//300,
-
-  //           "width" => 680,
-
-  //           "height" => 680,
-
-		// 	"type"=>"jpg"
-
-  //       );
-
-		// $data['list'][3] = array(//商品来源
-
-  //           "url" => $shop_img,
-
-  //           "x" =>34,
-
-  //           "y" => 75,
-
-  //           "width" => 64,
-
-  //           "height" => 32,
-
-		// 	"type"=>"jpg"
-
-  //       );
-
-		// $data['list'][4] = array(//
-
-  //           "url" => INDEX_WEB_URL."View/index/img/appapi/comm/h2_nr_kuang_gold.png?time=".time(),
-
-  //           "x" =>560,
-
-  //           "y" => 842,
-
-  //           "width" => 150,
-
-  //           "height" => 54,
-
-		// 	"type"=>"png"
-
-  //       );
-
-		// for($i=0;$i<3;$i++){
-
-		// 	$data['text'][$i]=array(
-
-		// 		"size"=>22,
-
-		// 		"x"=>118,
-
-		// 		"y"=>100+40*$i,
-
-		// 		"val"=>mb_substr($arr['goods_title'],intval(590/29)*$i,intval(590/29),'utf-8'),
-
-		// 		"i"=>$i,
-
-		// 	);
-
-		// 	if($i!=0){
-
-		// 		$data['text'][$i]['x']=34;
-
-		// 	}
-
-		// }
-
-		// foreach($data['text'] as $k=>$v){
-
-		// 	if(empty($v['val']))unset($data['text'][$k]);
-
-		// }
-
-		// $data['text']=array_values($data['text']);
-
-		// $ii=end($data['text']);
-
-		// $y=80+30*$ii['i'];
-
-		// $data['text'][$ii['i']+1]=array(
-
-		// 	"size"=>22,
-
-		// 	"x"=>140,
-
-		// 	"y"=>$y+108,
-
-		// 	"val"=>"￥".(floatval($arr['goods_price'])),
-
-		// 	"color"=>'red',
-
-		// );
-
-		// $quan=INDEX_WEB_URL."View/index/img/appapi/comm/list_after_quan_one.png?time=".time();
-
-		// if(floatval($arr['yhq_price'])==0){$quan=INDEX_WEB_URL."View/index/img/appapi/comm/list_discount_quan_one.png?time=".time();}
-
-		// $data['list'][5] = array(
-
-  //           "url" => $quan,
-
-  //           "x" =>33,
-
-  //           "y" => $y+80,
-
-  //           "width" => 89,
-
-  //           "height" => 32,
-
-		// 	"type"=>"png"
-
-  //       );
-
-		// $data['text'][$ii['i']+2]=array(
-
-		// 	"size"=>22,
-
-		// 	"x"=>563,
-
-		// 	"y"=>880,
-
-		// 	"val"=>"￥".(floatval($arr['goods_price'])),
-
-		// 	"color"=>'white',
-
-		// );
-
-		// $arr['yhq_price']=floatval($arr['yhq_price']);
-
-		// if(!empty($arr['yhq_price'])){
-
-		// 	$len=strlen(floatval($arr['yhq_price'])."元优惠券");
-
-		// 	$data['text'][$ii['i']+3] = array(
-
-		// 		"size"=>20,
-
-		// 		"x"=>525,
-
-		// 		"y"=>$y+105,
-
-		// 		"val"=>(floatval($arr['yhq_price']))."元优惠券",
-
-		// 		"color"=>'white',
-
-		// 	);
-
-		// 	$data['list'][6] = array(
-
-		// 		"url" => INDEX_WEB_URL."View/index/img/appapi/comm/h2_nr_kuang_gold_one.png?time=".time(),
-
-		// 		"x" =>480,
-
-		// 		"y" => $y+70,
-
-		// 		"width" => 215,
-
-		// 		"height" => 48,
-
-		// 		"type"=>"png"
-
-		// 	);
-
-		// }
-
-
-
-		// if($getnew==1){
-
-		// 	fun("pic");
-
-		// 		//fpre($data);
-
-		// 	return pic::getpic($data);
-
-		// }
-
-		// $data=zfun::arr64_encode($data);
-
-		// $url=INDEX_WEB_URL."comm/pic.php?pic_ctrl=getpic&data=".urlencode($data);
-
-		// return $url;
-
-	$data['list'][0] = array(//底部的框
+       $data['list'][0] = array(//底部的框
             "url" => INDEX_WEB_URL."View/index/img/appapi/comm/code_bg_0.png?time=".time(),
             "x" => 0,
             "y" => 1054 * 2,
@@ -2081,7 +1868,8 @@ class appHhrAction extends Action{
 			"type"=>"png"
         );
         $data['list'][7] = array(//logo
-            "url" => INDEX_WEB_URL."View/index/img/appapi/comm/good_share_logo.png?time=".time(),
+            // "url" => INDEX_WEB_URL."View/index/img/appapi/comm/good_share_logo.png?time=".time(),
+            "url" => INDEX_WEB_URL."Upload/huasuan/goods_share/header.png?time=".time(),
             "x" =>30 * 2,
             "y" => 50 * 2,
             "width" => 257 * 2,
@@ -2163,7 +1951,10 @@ class appHhrAction extends Action{
 		$url=INDEX_WEB_URL."comm/pic.php?pic_ctrl=getpic&data=".urlencode($data);
 		return $url;
 
+
+
 	}
+
 
 	/*合伙人收益中心*/
 
@@ -2474,7 +2265,7 @@ class appHhrAction extends Action{
 	}
 
 	public static function xphone($phone=''){
-		// 百里.修改前
+
 		// $phone.="";
 
 		// $len=strlen($phone);
@@ -2642,6 +2433,472 @@ class appHhrAction extends Action{
 
 		return $arr;*/
 
+	}
+
+	/**
+	 * [getcode2 百里.测试.无缓存]
+	 * getcode 有缓存
+	 * @Author   Baili
+	 * @Email    baili@juhuivip.com
+	 * @DateTime 2019-01-18T16:23:53+0800
+	 * @return   [type]                   [description]
+	 */
+	public function getcode2(){
+
+		ob_end_clean();
+
+		$cookie_key="img getcode";
+
+
+
+		foreach($_GET as $k=>$v){
+
+			$cookie_key.=$k."_".$v;
+
+		}
+
+		$cookie_key=md5($cookie_key);
+
+		$cookie_path=ROOT_PATH."Temp/dgapp/{$cookie_key}.log";
+
+		$fnuo_id=$_GET['fnuo_id'];
+
+		$token=filter_check($_GET['token']);
+
+		$user=zfun::f_row("User","token='$token'");
+
+		$getgoodstype=filter_check($_GET['getGoodsType']);//类型 物料 大淘客
+
+		$set=zfun::f_getset("ggapitype");
+
+			actionfun("comm/tbmaterial");
+
+			$v=tbmaterial::id($fnuo_id);
+
+
+
+			if(!empty($_GET['img']))$v['goods_img']=$_GET['img'];
+
+			$arr=array(
+
+				"goods_title"=>$v['goods_title'],
+
+				"goods_price"=>$v['goods_price'],
+
+				"goods_cost_price"=>$v['goods_cost_price'],
+
+				"goods_img"=>str_replace("_250x250.jpg","_500x500.jpg",$v['goods_img']),
+
+				"goods_sales"=>$v['goods_sales'],
+
+				"commission"=>$v['commission'],
+
+				"shop_id"=>$v['shop_id'],
+
+				"fnuo_id"=>$v['fnuo_id'],
+
+				"yhq_price"=>$v['yhq_price'],
+
+				"start_time"=>$v['start_time'],
+
+				"end_time"=>$v['end_time'],
+
+			);
+
+			actionfun("appapi/goods_check_yhq");
+
+			$arr=goods_check_yhqAction::check(array($arr));$arr=reset($arr);
+
+
+
+			if($v['shop_id']==1)$arr['shop_type']="淘宝";
+
+			elseif($v['shop_id']==2)$arr['shop_type']="天猫";
+
+		actionfun("default/gototaobao");
+
+		$arr['yhq_url']='';
+
+		//$tmp_yhq_url=gototaobaoAction::check_yhq_url(array("goods_title"=>$v['goods_title'],"fnuo_id"=>$fnuo_id),1);
+
+		if(!empty($tmp_yhq_url))$arr['yhq_url']=$tmp_yhq_url;
+
+		if(empty($getgoodstype)){
+
+			if(!empty($GLOBALS['yhq_span']))$arr['yhq_span']=$GLOBALS['yhq_span'];
+
+			if(!empty($GLOBALS['yhq_price']))$arr['yhq_price']=$GLOBALS['yhq_price'];
+
+			if(!empty($GLOBALS['yhq_span']))$arr['yhq_span']=$GLOBALS['yhq_span'];
+
+			if(!empty($GLOBALS['goods_cost_price']))$arr['goods_cost_price']=$GLOBALS['goods_cost_price'];
+
+			if(!empty($GLOBALS['goods_price']))$arr['goods_price']=$GLOBALS['goods_price'];
+
+			//if(!empty($GLOBALS['dtk_commission'])&&$GLOBALS['dtk_commission']>$arr['commission'])$arr['commission']=$GLOBALS['dtk_commission'];
+
+		}
+
+		if(!empty($arr['yhq_price'])){
+
+			$arr['yhq']=1;
+
+		}
+
+		$goods=zfun::f_fgoodscommission(array($arr));$goods=reset($goods);
+
+		// 百里.修改前
+		// self::new_qrcode($goods,$user,'',1);
+		// 百里.修改后
+		self::new_qrcode2($goods,$user,'',1);
+	}
+
+
+	/**
+	 * [new_qrcode2 百里.花蒜修改]
+	 * @Author   Baili
+	 * @Email    baili@juhuivip.com
+	 * @DateTime 2019-01-18T16:11:26+0800
+	 * @param    array                    $arr    [description]
+	 * @param    array                    $user   [description]
+	 * @param    string                   $urls   [description]
+	 * @param    integer                  $getnew [description]
+	 * @return   [type]                           [description]
+	 */
+	public static function new_qrcode2($arr=array(),$user=array(),$urls='',$getnew=0){//生成二维码
+
+		$img=str_replace("https:","http:",$arr['goods_img']);
+
+		if($arr['shop_id']==1)$shop_img=INDEX_WEB_URL."Upload/huasuan/goods_share/tb.png?time=".time();
+
+		if($arr['shop_id']==2)$shop_img=INDEX_WEB_URL."Upload/huasuan/goods_share/tm.png?time=".time();
+
+		if($arr['pdd']==1){$shop_width='95';$shop_height='48';$shop_img=INDEX_WEB_URL."Upload/huasuan/goods_share/pdd.png?time=".time();}
+
+		if($arr['jd']==1)$shop_img=INDEX_WEB_URL."Upload/huasuan/goods_share/jd.png?time=".time();
+
+		$tgidkey = self::getApp('Tgidkey');
+
+		$tgid = $tgidkey->addkey($user['id']);
+
+		if(!empty($user['tg_code']))$tgid=$user['tg_code'];
+
+		$getgoodstype=filter_check($_POST['getGoodsType']);//类型 物料 大淘客
+
+		$tg_url=self::getUrl('rebate_DG', 'rebate_detail', array("getgoodstype"=>$getgoodstype,"fnuo_id"=>$arr['fnuo_id'],'tgid' => $tgid),'wap');
+
+		$set=zfun::f_getset("share_host,android_url,tg_durl,is_openbd,app_goods_tw_url,app_goods_tljtw_url");
+
+		$url3=self::getUrl('invite_friend', 'new_packet', array("is_goods_share"=>1,"fnuo_id"=>$arr['fnuo_id'],'tgid' => $tgid),'new_share');
+
+		$url2=self::getUrl("down","supdownload",array('tgid' => $tgid),"appapi");/*更换*/
+
+		//新商品详情
+
+		$goods_down_url=self::getUrl("rebate_DG","rebate_detail",array("type"=>'down',"is_goods_share"=>1,"fnuo_id"=>$arr['fnuo_id'],'tgid' => $tgid),"wap");
+
+		if(!empty($set['share_host'])){
+
+			$tg_url=str_replace(HTTP_HOST,$set['share_host'],$tg_url);
+
+			$url2=str_replace(HTTP_HOST,$set['share_host'],$url2);
+
+			$url3=str_replace(HTTP_HOST,$set['share_host'],$url3);
+
+			$goods_down_url=str_replace(HTTP_HOST,$set['share_host'],$goods_down_url);
+
+		}
+
+		$url4=$set['android_url'];
+
+		if(empty($url4))$url4=INDEX_WEB_URL."?act=api&ctrl=downloadfile";
+
+
+
+		if(intval($set['tg_durl'])==1){
+
+			//$url1=INDEX_WEB_URL."rebate_rebateShareDetail_wap-".$arr['fnuo_id']."-".$tgid.".html";
+
+			$url1=INDEX_WEB_URL."?mod=wap&act=rebate_DG&ctrl=rebateShareDetail&getgoodstype=$getgoodstype&tgid=".($tgid)."&fnuo_id=".filter_check($arr['fnuo_id']);
+
+			if(!empty($set['is_openbd']))$bd="http://fanyi.baidu.com/transpage?query=".urlencode($url1)."&source=url&ie=utf8&from=en&to=zh&render=1";
+
+			else{
+
+			//	$url1=INDEX_WEB_URL."rebate-".$arr['fnuo_id']."-".$tgid.".html";
+
+				$url1=$tg_url;
+
+				$bd=$url1;
+
+			}
+
+			if(!empty($set['is_openbd']))$bd2="http://fanyi.baidu.com/transpage?query=".urlencode($url2)."&source=url&ie=utf8&from=en&to=zh&render=1";
+
+			else{
+
+				$bd2=$url2;
+
+			}
+
+			//$url3=INDEX_WEB_URL."new_share-".$tgid."-".$arr['fnuo_id']."-1.html";
+
+			if(!empty($set['is_openbd']))$bd3="http://fanyi.baidu.com/transpage?query=".urlencode($url3)."&source=url&ie=utf8&from=en&to=zh&render=1";
+
+			else{
+
+				$bd3=$url3;
+
+			}
+
+			$arrulr=self::bdurl($bd,$bd2,$bd3,$goods_down_url);
+
+			if(!empty($arrulr[0]))$tg_url=$arrulr[0];
+
+			if(!empty($arrulr[1]))$url2=$arrulr[1];
+
+			if(!empty($arrulr[2]))$url3=$arrulr[2];
+
+			if(!empty($arrulr[3]))$goods_down_url=$arrulr[3];
+
+		}
+
+
+
+		//淘礼金
+
+		if($_GET['tlj']==1)$set['app_goods_tw_url']=intval($set['app_goods_tljtw_url']);
+
+		if(intval($set['app_goods_tw_url'])==1){
+
+			$tg_url=$url2;
+
+		}
+
+		if(intval($set['app_goods_tw_url'])==2){
+
+			$tg_url=$url3;
+
+		}
+
+		if(intval($set['app_goods_tw_url'])==3){
+
+			$tg_url=$url4;
+
+		}
+
+		if(intval($set['app_goods_tw_url'])==4){
+
+			$tg_url=$goods_down_url;
+
+		}
+
+		$data = array();
+
+		$data['width']=1080;
+
+		$data['height']=1760;
+
+
+
+       $data['list'][0] = array(//底部的框
+            "url" => INDEX_WEB_URL."Upload/huasuan/goods_share/juxing.png?time=".time(),
+            "x" => 51,
+            "y" => 1287,
+            "width" => 978,
+            "height" => 108,
+			"type"=>"png"
+        );
+		$data['list'][1] = array(//二维码
+		   "url" => INDEX_WEB_URL."comm/qrcode/?url=".urlencode($tg_url)."&size=20&codeKB=1",
+            "x" => 789,
+            "y" => 1440,
+            "width" => 240,
+            "height" => 240,
+			"type"=>"png"
+        );
+		//
+		$data['list'][2] = array(//商品图【图片
+            "url" => $img,
+            "x" =>51,
+            "y" => 308,
+            "width" => 978,
+            "height" => 978,
+			"type"=>"jpg"
+        );
+		$data['list'][3] = array(//商品来源
+            "url" => $shop_img,
+            "x" =>51,
+            "y" => 1456,
+            "width" => 112,
+            "height" => 50,
+			"type"=>"jpg"
+        );
+		// $data['list'][4] = array(//
+  //           "url" => INDEX_WEB_URL."View/index/img/appapi/comm/h2_nr_kuang_gold.png?time=".time(),
+  //           "x" =>475 * 2,
+  //           "y" => 890 * 2,
+  //           "width" => 252 * 2,
+  //           "height" => 105 * 2,
+		// 	"type"=>"png"
+  //       );
+        $data['list'][7] = array(//logo
+            // "url" => INDEX_WEB_URL."View/index/img/appapi/comm/good_share_logo.png?time=".time(),
+            "url" => INDEX_WEB_URL."Upload/huasuan/goods_share/header.png?time=".time(),
+            "x" =>0,
+            "y" => 0,
+            "width" => 1080,
+            "height" => 309,
+			"type"=>"png"
+        );
+
+        $data['list'][8] = array(//会员头像
+            "url" => $user['head_img'],
+            "x" =>51,
+            "y" => 1670,
+            "width" => 60,
+            "height" => 60,
+			"type"=>"png"
+        );
+        $data['list'][9] = array(//会员头像
+            "url" => INDEX_WEB_URL."Upload/huasuan/goods_share/head_bg.png?time=".time(),
+            "x" =>51,
+            "y" => 1670,
+            "width" => 60,
+            "height" => 60,
+			"type"=>"png"
+        );
+
+		for($i=0;$i<2;$i++){
+			// $data['text'][$i]=array(
+			// 	"size"=>32,
+			// 	"x"=>180,
+			// 	"y"=>(750+30*$i)*2,
+			// 	"val"=>mb_substr($arr['goods_title'],intval(700/42)*$i,intval(700/42),'utf-8'),
+			// 	"i"=>$i,
+			// );
+			// if($i!=0){
+			// 	$data['text'][$i]['x']=51;
+			// 	if(strlen($data['text'][$i]["val"]) > 15)
+			// 	{
+			// 		$data['text'][$i]["val"] = mb_substr($data['text'][$i]["val"],0,15,'utf-8') . "...";
+			// 	}
+			// }
+
+			if($i == 0)
+			{
+				$data['text'][$i]=array(
+					"size"=>32,
+					"x"=>180,
+					"y"=>(750+30*$i)*2,
+					"val"=>mb_substr($arr['goods_title'],0,13,'utf-8'),
+					"i"=>$i,
+				);
+			}
+			else
+			{
+				$add = strlen($arr['goods_title']) > 31 ? '...' : '';
+				$data['text'][$i]=array(
+					"size"=>32,
+					"x"=>51,
+					"y"=>(750+30*$i)*2,
+					"val"=>mb_substr($arr['goods_title'],13,14,'utf-8') . $add,
+					"i"=>$i,
+				);
+			}
+		}
+		foreach($data['text'] as $k=>$v){
+			if(empty($v['val']))unset($data['text'][$k]);
+		}
+		$data['text']=array_values($data['text']);
+		$ii=end($data['text']);
+		$y=80+30*$ii['i'];
+		// $data['text'][$ii['i']+1]=array(
+		// 	"size"=>34,
+		// 	"x"=>140,
+		// 	"y"=>$y+128,
+		// 	"val"=>"￥".(floatval($arr['goods_price'])),
+		// 	"color"=>'red',
+		// );
+
+		// $quan=INDEX_WEB_URL."View/index/img/appapi/comm/list_after_quan_one.png?time=".time();
+
+		// if(floatval($arr['yhq_price'])==0){$quan=INDEX_WEB_URL."View/index/img/appapi/comm/list_discount_quan_one.png?time=".time();}
+		// $data['list'][5] = array(
+  //           "url" => $quan,
+  //           "x" =>33,
+  //           "y" => $y+80,
+  //           "width" => 89,
+  //           "height" => 32,
+		// 	"type"=>"png"
+  //       );
+		$data['text'][$ii['i']+2]=array(	//价格
+			"size"=>42,
+			"x"=>45,
+			"y"=>1640,
+			"val"=>"￥". sprintf("%.2f", floatval( $arr['goods_price'] ) ),
+			// "color"=>'red',
+			"rgb" => "255,32,74",
+			"font" => "pingfang_heavy.ttf",
+		);
+		$data['text'][$ii['i']+5] = array(
+			"size"=>24,
+			"x"=>strlen(sprintf("%.2f", floatval( $arr['goods_price'] ) )) * 50 + 25,
+			"y"=>1640,
+			"val"=>"券后价",
+			// "color"=>'red',
+			"rgb" => "255,32,74",
+		);
+		$data['text'][$ii['i']+6] = array(
+			"size"=>24,
+			"x"=>795,
+			"y"=>1725,
+			"val"=>"长按二维码购买",
+			"rgb" => "106,106,106",
+		);
+		$data['text'][$ii['i']+7] = array(
+			"size"=>24,
+			"x"=>130,
+			"y"=>1710,
+			"val"=>"来自".$user['nickname']."分享",
+			"rgb" => "106,106,106",
+		);
+
+		$arr['yhq_price']=floatval($arr['yhq_price']);
+		if(!empty($arr['yhq_price'])){
+			$len=strlen(floatval($arr['yhq_price'])."元优惠券");
+			$data['text'][$ii['i']+3] = array(
+				"size"=>36,
+				"x"=>780 - 25 * strlen(floatval($arr['yhq_price'])),
+				"y"=>1356,
+				"val"=>(floatval($arr['yhq_price']))."元优惠券",
+				"color"=>'white',
+			);
+			$data['text'][$ii['i']+4] = array(
+				"size"=>36,
+				"x"=>75,
+				"y"=>1356,
+				"val"=>"限时优惠",
+				"color"=>'white',
+			);
+			// $data['list'][6] = array(
+			// 	"url" => INDEX_WEB_URL."View/index/img/appapi/comm/h2_nr_kuang_gold_one.png?time=".time(),
+			// 	"x" =>30 * 2,
+			// 	"y" => ($y+155) * 2,
+			// 	"width" => 225 * 2,
+			// 	"height" => 50 * 2,
+			// 	"type"=>"png"
+			// );
+		}
+
+		if($getnew==1){
+			fun("pic");
+				//fpre($data);
+			return pic::getpic($data);
+		}
+		$data=zfun::arr64_encode($data);
+		$url=INDEX_WEB_URL."comm/pic.php?pic_ctrl=getpic&data=".urlencode($data);
+		return $url;
 	}
 
 }

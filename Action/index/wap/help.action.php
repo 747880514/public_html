@@ -44,9 +44,29 @@ class helpAction extends Action {
 
 		$guanggaoModel = $this -> getDatabase('Guanggao');
 		$guanggao = $guanggaoModel -> selectRow('type="returnrules" AND hide=0');
-		$this -> assign('img', str_replace("slide/","",reset(explode(",",$guanggao['img']))));
-		$this -> display();
-		$this -> play();
+
+		//资源
+		$source = array(
+			1 => array('title'=>'花蒜APP如何邀请好友注册下载', 'img'=>'one.jpg', 'video'=>'one.mp4'),
+			2 => array('title'=>'花蒜APP新用户如何下载登录注册', 'img'=>'two.jpg', 'video'=>'two.MP4'),
+			3 => array('title'=>'花蒜APP的大牌超级入口介绍', 'img'=>'three.jpg', 'video'=>'three.mp4'),
+			4 => array('title'=>'花蒜老用户如何登录超级APP', 'img'=>'for.jpg', 'video'=>'for.mp4'),
+			5 => array('title'=>'花蒜超级APP如何分享赚取佣金', 'img'=>'five.jpg', 'video'=>'five.MP4'),
+			6 => array('title'=>'花蒜APP疑问帮助指南', 'img'=>'six.jpg', 'video'=>'six.MP4'),
+			7 => array('title'=>'花蒜APP如何通过花蒜领取大额优惠券', 'img'=>'every.jpg', 'video'=>'every.mp4'),
+			8 => array('title'=>'一分钟了解花蒜', 'img'=>'eight.jpg', 'video'=>'eight.mp4'),
+			9 => array('title'=>'如何升级店主权益', 'img'=>'6646780135942441269.png', 'video'=>'6646780135942441269.MP4'),
+			10 => array('title'=>'花蒜下单 VS 淘宝下单', 'img'=>'6646780135942441271.png', 'video'=>'6646780135942441271.MP4'),
+			11 => array('title'=>'花蒜超级APP如何分享赚佣金', 'img'=>'6646780135942441273.png', 'video'=>'6646780135942441273.MP4'),
+			12 => array('title'=>'花蒜超级APP如何邀请好友', 'img'=>'6646780135942441275.png', 'video'=>'6646780135942441275.MP4'),
+			13 => array('title'=>'花蒜超级APP疑问帮助指南', 'img'=>'6646780135942441277.png', 'video'=>'6646780135942441277.MP4'),
+			14 => array('title'=>'如何找回淘宝订单', 'img'=>'6646780135942441279.png', 'video'=>'6646780135942441279.MP4'),
+		);
+
+		$this->assign('img', str_replace("slide/","",reset(explode(",",$guanggao['img']))));
+		$this->assign('source', $source);
+		$this->display();
+		$this->play();
 	}
 	public function fenxiao(){
 		$HelperArticleModel = $this -> getDatabase('HelperArticle');

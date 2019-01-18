@@ -171,6 +171,7 @@ class downAction extends Action{
 	{
 		$tgid = $_REQUEST['tgid'];
 		$_SESSION['down_tgid'] = $tgid;
+		$_SESSION['test'] = $_REQUEST['test'] == 1 ? 1 : 0;
 
 		$set=zfun::f_getset("share_host");
 
@@ -207,9 +208,15 @@ class downAction extends Action{
 		$abs_url_data = file_get_contents($abs_url);
 		$obj_data=json_decode($abs_url_data);
 		$obj_data->access_token = $access_token;
-// print_r($obj);
-// print_r($obj_data);
-// die;
+
+		//测试打印
+		if($_SESSION['test'] == 1)
+		{
+			print_r($obj);
+			print_r($obj_data);
+			die;
+		}
+
 		$unionid = $obj_data->unionid;
 		$openid = $obj_data->openid;
 		$nickname = $obj_data->nickname;
@@ -223,7 +230,7 @@ class downAction extends Action{
 		// $dq2 = zfun::f_row("District", " DistrictName LIKE '%".$obj_data->city."%'", "DistrictID");
 		// $dq2 = $dq2['DistrictID'];
 
-		if(!empty($obj_data->city))
+		if(!empty($dq1) && !empty($obj_data->city))
 		{
 			$dq2 = zfun::f_row("City", "ProvinceID = {$dq1} AND CityName LIKE '%".$obj_data->city."%'", "CityID");
 			$dq2 = $dq2['CityID'];
@@ -234,8 +241,11 @@ class downAction extends Action{
 			$dq2 = zfun::f_row("City", "ProvinceID = {$dq1}", "CityID");
 			$dq2 = $dq2['CityID'];
 
-			$dq3 = zfun::f_row("District", "CityID = {$dq2} AND DistrictName LIKE '%".$obj_data->city."%'", "DistrictID");
-			$dq3 = $dq3['DistrictID'];
+			if(!empty($dq2) && !empty($obj_data->city))
+			{
+				$dq3 = zfun::f_row("District", "CityID = {$dq2} AND DistrictName LIKE '%".$obj_data->city."%'", "DistrictID");
+				$dq3 = $dq3['DistrictID'];
+			}
 		}
 
 		//检测用户，注册
