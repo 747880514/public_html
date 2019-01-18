@@ -30,7 +30,7 @@ class pic {
 		$line_x = 0;
 		$start_x = 0; // 开始位置X
 		$start_y = 0; // 开始位置Y
-		
+
 		//zfun::pre($pic_list);
 		//exit;
 		foreach ($pic_list as $k => $v) {
@@ -45,8 +45,8 @@ class pic {
 				break;
 				case 'gif':
 				default:
-					
-					
+
+
 				break;
 			}
 			$imagecreatefromjpeg = 'imagecreatefromstring';
@@ -63,19 +63,19 @@ class pic {
 				}
 			}
 			else{
-				$v['url'] = zfun::get($v['url']);	
+				$v['url'] = zfun::get($v['url']);
 			}
-			
+
 			$resource = $imagecreatefromjpeg($v['url']);
 			imagecopyresized($background, $resource, $v['x'], $v['y'], 0, 0, $v['width'], $v['height'], imagesx($resource), imagesy($resource));
 		}
-		
+
 		$path = dirname(dirname(__FILE__));
 		$fontfile = $path . "/comm/wximg/PingFang.ttf";
 		if(file_exists($fontfile)==false)$fontfile = $path . "/comm/wximg/font.ttf";
 		if (empty($text)) $text = array();
 
-		
+
 		foreach ($text as $k => $v) {
 			if(($v['color'])=='white')$color = imagecolorallocatealpha($background, 255, 255, 255, 0);
 			else if(($v['color'])=='red')$color = imagecolorallocatealpha($background, 255, 0, 0, 0);
@@ -95,9 +95,9 @@ class pic {
 			{
 				imagettftext($background, $v['size'], 0, $v['x'], $v['y'], $color, $fontfile, $v['val']);
 			}
-			
+
 		}
-			
+
 		if(empty($filename)){
 			ob_end_clean();
 			header("Content-type: image/jpeg");
@@ -105,7 +105,7 @@ class pic {
 		}
 		else{
 			imagejpeg($background,ROOT_PATH.$filename);
-			return INDEX_WEB_URL.$filename;	
+			return INDEX_WEB_URL.$filename;
 		}
 	}
 }
