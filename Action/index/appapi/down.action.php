@@ -31,6 +31,13 @@ class downAction extends Action{
 		$baili['mobile'] = !empty($_GET['mobile']) ? $_GET['mobile'] : -1;
 		$baili['share_host'] = $set['share_host'];
 
+		if(empty($baili['uid']))
+		{
+			echo "<script>alert('请通过扫描对方邀请二维码进入！');</script>";
+			echo "<center style='margin-top:50px;'><h1>扫码失败！</h1></center>";
+			die;
+		}
+
 		//读取花蒜后台自定义页面
 		//顶部背景图
 		$page = file_get_contents("https://www.juhuivip.com/app/index.php?i=2&c=entry&m=ewei_shopv2&do=mobile&r=diypage&id=152");

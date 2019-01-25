@@ -276,6 +276,14 @@ class integral_manageAction extends Action{
 
             $data['sort']=intval($_POST['sort']);
 
+            $data['kilo']=floatval($_POST['kilo']);
+
+            $data['more_kilo']=floatval($_POST['more_kilo']);
+
+            $data['more_postage']=floatval($_POST['more_postage']);
+
+            
+
             $data['hide']=$_POST['hide'];
 
             if(!empty($_POST['detail_getimg']))$data['detail_getimg']=$_POST['detail_getimg'];
@@ -318,6 +326,10 @@ class integral_manageAction extends Action{
 
         $GLOBALS['ztp']['getimg']="{link:integral_manage-addimg}";
 
+        $GLOBALS['ztp']['more_kilo']=floatval($integral['more_kilo']);
+
+        $GLOBALS['ztp']['more_postage']=floatval($integral['more_postage']);
+
         $type=intval($_POST['exchangType']) <1 ? 0: 1;
 
         $hide=intval($_POST['hide']) <1 ? 0 : 1;
@@ -334,7 +346,11 @@ class integral_manageAction extends Action{
 
         ztp::add("text","原价",$_POST['oldIntegral'],"name=oldIntegral","商品人民币的价格");
 
-        ztp::add("text","邮费",$_POST['postage'],"name=postage","请输入数字");    
+        ztp::add("text","商品重量",$_POST['kilo'],"name=kilo","单位：kg   请输入数字");    
+
+        ztp::add("text","邮费",$_POST['postage'],"name=postage id=postage","请输入数字");    
+
+
 
         ztp::add('texts',"商品列表标签","jj=".$integral['label']."/name-label,ll=".$integral['label_color']."/name-label_color","","左  文字  右 颜色");            
 
@@ -379,6 +395,10 @@ class integral_manageAction extends Action{
         ztp::addjs("integral/attr.js");
 
         ztp::addjs("integral/img.js");
+
+        ztp::addjs("integral/join.js");
+
+
 
         ztp::play();
 
@@ -512,6 +532,12 @@ class integral_manageAction extends Action{
 
             $data['hide']=$_POST['hide'];
 
+            $data['kilo']=floatval($_POST['kilo']);
+
+            $data['more_kilo']=floatval($_POST['more_kilo']);
+
+            $data['more_postage']=floatval($_POST['more_postage']);
+
             if(!empty($_POST['detail_getimg']))$data['detail_getimg']=$_POST['detail_getimg'];
 
             if(!empty($_POST['img'])){
@@ -580,6 +606,10 @@ class integral_manageAction extends Action{
 
         $GLOBALS['ztp']['getimg']="{link:integral_manage-addimg}";
 
+        $GLOBALS['ztp']['more_kilo']=floatval($integral['more_kilo']);
+
+        $GLOBALS['ztp']['more_postage']=floatval($integral['more_postage']);
+
         ztp::add("select","物品类目",$cate,"name=cid val=".$integral['cid']);
 
         ztp::add("text","商品名称",$integral['title'],"name=title");
@@ -588,7 +618,11 @@ class integral_manageAction extends Action{
 
         ztp::add("text","原价",$integral['oldIntegral'],"name=oldIntegral","商品人民币的价格");
 
-        ztp::add("text","邮费",$integral['postage'],"name=postage","请输入数字");    
+        ztp::add("text","商品重量",$integral['kilo'],"name=kilo","单位：kg   请输入数字");    
+
+        ztp::add("text","邮费",$integral['postage'],"name=postage id=postage","请输入数字");    
+
+
 
         ztp::add('texts',"商品列表标签","jj=".$integral['label']."/name-label,ll=".$integral['label_color']."/name-label_color","","左  文字  右 颜色");            
 
@@ -631,6 +665,10 @@ class integral_manageAction extends Action{
         ztp::addjs("integral/attr.js");
 
         ztp::addjs("integral/img.js");
+
+        ztp::addjs("integral/join.js");
+
+
 
         ztp::play();
 
@@ -1158,6 +1196,14 @@ class integral_manageAction extends Action{
 
             }
 
+            if(!empty($_GET['oid'])){
+
+                $oid=filter_check($_GET['oid']);
+
+                $where.=" and data like '%$oid%'";
+
+            }
+
         }
 
         ztp::addtop("a","导出",$dc_url);
@@ -1172,6 +1218,8 @@ class integral_manageAction extends Action{
 
         ztp::addtop("text","兑换物品",$_GET['keyword'],"name=keyword");
 
+        ztp::addtop("text","订单号",$_GET['oid'],"name=oid");
+
         ztp::addtop("submit","搜索");
 
         if(!empty($_POST['page'])){
@@ -1184,9 +1232,13 @@ class integral_manageAction extends Action{
 
         ztp::addjs("comm/foot_jump.js");
 
-        $action=zfun::f_goods("Authentication",$where,null,$sort,null,12);
+        $action=zfun::f_goods("Authentication",$where,null,$sort,$_GET,12);
 
         foreach ($action as $k => $v) {
+
+            $arr=json_decode($v['data'],true);unset($action[$k]['data']);
+
+			$action[$k]['orderId']=$arr['oid'];
 
             // $action[$k]['caozuo']=ztp::cstrarr("button=审核|{$sh_url}&id-".$v['id'].",button=删除|{$del_url}"."|ids-".$v['id']);
 
@@ -1218,9 +1270,12 @@ class integral_manageAction extends Action{
 
             }
 
+            //百里
+            $action[$k]['wl'] = $action[$k]['wl_company']."<br/>".$action[$k]['wl_id'];
+
         }
 
-        $str="ID=id/widtn-50,兑换物品=info,时间=time,审核状态=audit_status,操作=caozuo/width-300";
+        $str="ID=id/widtn-50,订单号=orderId,兑换物品=info,时间=time,物流=wl,审核状态=audit_status,操作=caozuo/width-300";//百里追加wl
 
 
 
@@ -1468,11 +1523,11 @@ class integral_manageAction extends Action{
 
 		ztp::add("text","收货地址",$receiptaddress['new_address'],"disabled");
 
+        ztp::add("text","兑换所需积分",abs($data['jf'])," disabled");
 
+        ztp::add("text","兑换所需佣金",abs($data['price'])," disabled");
 
-        ztp::add("text","用户剩余积分",$user['integral'],"name=info disabled");
-
-        ztp::add("text","兑换所需积分",abs($data['jf']),"name=info disabled");
+        ztp::add("text","邮费",abs($data['postage'])," disabled");
 
         ztp::add("text","兑换账号",$data['name'],"name=info disabled");
 
@@ -1543,10 +1598,10 @@ class integral_manageAction extends Action{
 
 
         foreach($data as $k=>$v){
+
             //百里
             $obj = json_decode($v['data']);
             $receiptaddress =zfun::f_row("ReceiptAddress",'user_id=' . $v['uid'] . ' AND id="'.$obj->addressID.'"');
-
 
 
             $data[$k]['info']=$v['info'];
@@ -1587,7 +1642,6 @@ class integral_manageAction extends Action{
             "jf"=>"用户剩余积分",
 
             "shenhe"=>"类型",
-
 
             "realname" => "真实姓名",   //百里
 

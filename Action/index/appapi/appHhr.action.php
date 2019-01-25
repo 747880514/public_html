@@ -2701,14 +2701,15 @@ class appHhrAction extends Action{
 
 
 
-       $data['list'][0] = array(//底部的框
-            "url" => INDEX_WEB_URL."Upload/huasuan/goods_share/juxing.png?time=".time(),
-            "x" => 51,
-            "y" => 1287,
-            "width" => 978,
-            "height" => 108,
-			"type"=>"png"
-        );
+   //      $data['list'][0] = array(//底部的框
+   //          "url" => INDEX_WEB_URL."Upload/huasuan/goods_share/juxing.png?time=".time(),
+   //          "x" => 51,
+   //          "y" => 1287,
+   //          "width" => 978,
+   //          "height" => 108,
+			// "type"=>"png"
+   //      );
+
 		$data['list'][1] = array(//二维码
 		   "url" => INDEX_WEB_URL."comm/qrcode/?url=".urlencode($tg_url)."&size=20&codeKB=1",
             "x" => 789,
@@ -2752,14 +2753,19 @@ class appHhrAction extends Action{
 			"type"=>"png"
         );
 
+        $head_img = $user['head_img'];
+        if(empty($head_img))$head_img='default.png';
+		if(strstr($head_img,"http")==false)$head_img=UPLOAD_URL."user/".$head_img;
+
         $data['list'][8] = array(//会员头像
-            "url" => $user['head_img'],
+            "url" => $head_img,
             "x" =>51,
             "y" => 1670,
             "width" => 60,
             "height" => 60,
 			"type"=>"png"
         );
+
         $data['list'][9] = array(//会员头像
             "url" => INDEX_WEB_URL."Upload/huasuan/goods_share/head_bg.png?time=".time(),
             "x" =>51,
@@ -2867,14 +2873,22 @@ class appHhrAction extends Action{
 		$arr['yhq_price']=floatval($arr['yhq_price']);
 		if(!empty($arr['yhq_price'])){
 			$len=strlen(floatval($arr['yhq_price'])."元优惠券");
-			$data['text'][$ii['i']+3] = array(
+			$data['list'][0] = array(//底部的框
+	            "url" => INDEX_WEB_URL."Upload/huasuan/goods_share/juxing.png?time=".time(),
+	            "x" => 51,
+	            "y" => 1287,
+	            "width" => 978,
+	            "height" => 108,
+				"type"=>"png"
+	        );
+			$data['text'][$ii['i']+3] = array(	//底部的框文字2
 				"size"=>36,
 				"x"=>780 - 25 * strlen(floatval($arr['yhq_price'])),
 				"y"=>1356,
 				"val"=>(floatval($arr['yhq_price']))."元优惠券",
 				"color"=>'white',
 			);
-			$data['text'][$ii['i']+4] = array(
+			$data['text'][$ii['i']+4] = array(		//底部的框文字1
 				"size"=>36,
 				"x"=>75,
 				"y"=>1356,
